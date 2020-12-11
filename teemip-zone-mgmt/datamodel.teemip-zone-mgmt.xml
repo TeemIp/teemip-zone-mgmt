@@ -510,84 +510,6 @@
     </class>
     <class id="IPv4Address" _delta="must_exist">
       <methods>
-        <method id="DisplayBareRelations" _delta="define">
-          <comment/>
-          <static>false</static>
-          <access>public</access>
-          <type>Custom</type>
-          <code><![CDATA[ public function DisplayBareRelations(WebPage $oP, $bEditMode = false)
-    {
-        // Execute parent function first
-        parent::DisplayBareRelations($oP, $bEditMode);
-
-        if (!$bEditMode)
-        {
-            $iRRecords = 0;
-
-            // Search for PTR records
-            $aDigit = array();
-            $aDigit = explode('.', $this->Get('ip'));
-            $sPtr = implode('.', array_reverse($aDigit)).'.in-addr.arpa.';
-            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-            $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-            $iPTRRecords = $oPTRRecordSet->Count();
-            $iRRecords += $iPTRRecords;
-
-            // Search for A records
-            $sOQL = "SELECT ARecord WHERE ip_id = :ip_id";
-            $oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $this->GetKey()));
-            $iARecords = $oARecordSet->Count();
-            $iRRecords += $iARecords;
-
-            // Searh for CNAME records
-            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
-            $oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $this->Get('fqdn')));
-            $iCNAMERecords = $oCNAMERecordSet->Count();
-            $iRRecords += $iCNAMERecords;
-
-            if ($iRRecords > 0)
-            {
-                $oP->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list').' ('.$iRRecords.')');
-                $oP->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:rrecords_list+'));
-                if ($iPTRRecords > 0)
-                {
-                    $oP->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:ptrrecords_list', $iPTRRecords));
-                    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oP, 'ptr_records', array('menu' => false));
-                }
-                else
-                {
-                    $oP->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:ptrrecords_list_empty'));
-                }
-                if ($iARecords > 0)
-                {
-                    $oP->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:arecords_list', $iARecords));
-                    $oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oP, 'a_records', array('menu' => false));
-               }
-                else
-                {
-                    $oP->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:arecords_list_empty'));
-                }
-                if ($iCNAMERecords > 0)
-                {
-                    $oP->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:cnamerecords_list', $iCNAMERecords));
-                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oP, 'cname_records', array('menu' => false));
-                }
-                else
-                {
-                    $oP->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:cnamerecords_list_empty'));
-                }
-            }
-            else
-            {
-                $oP->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list'));
-                $oP->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::S('UI:NoObjectToDisplay'));
-            }
-        }
-    }]]></code>
-        </method>
         <method id="ConvertToZone" _delta="define">
           <comment/>
           <static>false</static>
@@ -782,83 +704,6 @@
     </class>
     <class id="IPv6Address" _delta="must_exist">
       <methods>
-        <method id="DisplayBareRelations" _delta="define">
-          <comment/>
-          <static>false</static>
-          <access>public</access>
-          <type>Custom</type>
-          <code><![CDATA[ public function DisplayBareRelations(WebPage $oP, $bEditMode = false)
-    {
-        // Execute parent function first
-        parent::DisplayBareRelations($oP, $bEditMode);
-
-        if (!$bEditMode)
-        {
-            $iRRecords = 0;
-
-            // Search for PTR records
-            $sIp = $this->Get('ip')->GetAsCannonical();
-            $sPtr = $this->ConvertToZone($sIp);
-            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-            $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-            $iPTRRecords = $oPTRRecordSet->Count();
-            $iRRecords += $iPTRRecords;
-
-            // Search for AAAA records
-            $sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id";
-            $oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $this->GetKey()));
-            $iAAAARecords = $oAAAARecordSet->Count();
-            $iRRecords += $iAAAARecords;
-
-            // Searh for CNAME records
-            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
-            $oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $this->Get('fqdn')));
-            $iCNAMERecords = $oCNAMERecordSet->Count();
-            $iRRecords += $iCNAMERecords;
-
-            if ($iRRecords > 0)
-            {
-                $oP->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list').' ('.$iRRecords.')');
-                $oP->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:rrecords_list+'));
-                if ($iPTRRecords > 0)
-                {
-                    $oP->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:ptrrecords_list', $iPTRRecords));
-                    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oP, 'ptr_records', array('menu' => false));
-               }
-                else
-                {
-                    $oP->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:ptrrecords_list_empty'));
-                }
-                if ($iAAAARecords > 0)
-                {
-                    $oP->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:aaaarecords_list', $iAAAARecords));
-                    $oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oP, 'aaaa_records', array('menu' => false));
-                }
-                else
-                {
-                    $oP->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:aaaarecords_list_empty'));
-                }
-                if ($iCNAMERecords > 0)
-                {
-                    $oP->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:cnamerecords_list', $iCNAMERecords));
-                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oP, 'cname_records', array('menu' => false));
-                }
-                else
-                {
-                    $oP->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:cnamerecords_list_empty'));
-                }
-            }
-            else
-            {
-                $oP->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list'));
-                $oP->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::S('UI:NoObjectToDisplay'));
-            }
-        }
-    }]]></code>
-        </method>
         <method id="ConvertToZone" _delta="define">
           <comment/>
           <static>false</static>
@@ -1695,8 +1540,8 @@
           <code><![CDATA[ public function GetDataString()
     {
      	$sDataName = $this->GetDataNameForDataString();
-        $oIp = MetaModel::GetObject('IPv4Address', $this->Get('ip_id'), true /* MustBeFound */);
-        $sIp = $oIp->Get('ip');
+     	$oIp = MetaModel::GetObject('IPv6Address', $this->Get('ip_id'), true /* MustBeFound */);
+     	$sIp = $oIp->GetAsCompressed();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
      		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN A     ".$sIp;
@@ -1872,7 +1717,7 @@
     {
      	$sDataName = $this->GetDataNameForDataString();
         $oIp = MetaModel::GetObject('IPv6Address', $this->Get('ip_id'), true /* MustBeFound */);
-        $sIp = $oIp->GetName();
+        $sIp = $oIp->GetAsCompressed();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
      		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN AAAA  ".$sIp;
@@ -3606,4 +3451,232 @@
       </profile>
     </profiles>
   </user_rights>
+  <snippets>
+    <snippet id="TeemIpZoneMgmt" _delta="define">
+      <placement>module</placement>
+      <module>teemip-zone-mgmt</module>
+      <rank>10</rank>
+      <content><![CDATA[
+/*************************************************************************************************************************
+ * Plugin to handle DisplayBare methods on non TeemIp classes and impacts on IPs when a CI is created, changed or deleted
+ */
+class TeemIpZoneMgmt implements iApplicationUIExtension
+{
+	/**
+	 * @param DBObject $oObject The object being displayed
+	 * @param WebPage $oPage The output context
+	 * @param boolean $bEditMode True if the edition form is being displayed
+	 *
+	 * @return void
+	 */
+	public function OnDisplayProperties($oObject, WebPage $oPage, $bEditMode = false)
+	{
+	}
+
+	/**
+	 * @param DBObject $oObject The object being displayed
+	 * @param WebPage $oPage The output context
+	 * @param boolean $bEditMode True if the edition form is being displayed
+	 *
+	 * @return void
+	 */
+	public function OnDisplayRelations($oObject, WebPage $oPage, $bEditMode = false)
+	{
+		if ($oObject instanceof IPv4Address)
+		{
+		    if (!$bEditMode)
+	        {
+	            $iRRecords = 0;
+
+	            // Search for PTR records
+	            $aDigit = explode('.', $oObject->Get('ip'));
+	            $sPtr = implode('.', array_reverse($aDigit)).'.in-addr.arpa.';
+	            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
+	            $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+	            $iPTRRecords = $oPTRRecordSet->Count();
+	            $iRRecords += $iPTRRecords;
+
+	            // Search for A records
+	            $sOQL = "SELECT ARecord WHERE ip_id = :ip_id";
+	            $oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $oObject->GetKey()));
+	            $iARecords = $oARecordSet->Count();
+	            $iRRecords += $iARecords;
+
+	            // Searh for CNAME records
+	            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+	            $oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oObject->Get('fqdn')));
+	            $iCNAMERecords = $oCNAMERecordSet->Count();
+	            $iRRecords += $iCNAMERecords;
+
+	            if ($iRRecords > 0)
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list').' ('.$iRRecords.')');
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:rrecords_list+'));
+	                if ($iPTRRecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:ptrrecords_list', $iPTRRecords));
+	                    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:ptrrecords_list_empty'));
+	                }
+	                if ($iARecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:arecords_list', $iARecords));
+	                    $oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'a_records', array('menu' => false));
+	               }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:arecords_list_empty'));
+	                }
+	                if ($iCNAMERecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:cnamerecords_list', $iCNAMERecords));
+	                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'cname_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:cnamerecords_list_empty'));
+	                }
+	            }
+	            else
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list'));
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::S('UI:NoObjectToDisplay'));
+	            }
+	        }
+
+	    }
+		elseif ($oObject instanceof IPv6Address)
+		{
+	        if (!$bEditMode)
+	        {
+	            $iRRecords = 0;
+
+	            // Search for PTR records
+	            $sIp = $oObject->Get('ip')->GetAsCannonical();
+	            $sPtr = $oObject->ConvertToZone($sIp);
+	            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
+	            $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+	            $iPTRRecords = $oPTRRecordSet->Count();
+	            $iRRecords += $iPTRRecords;
+
+	            // Search for AAAA records
+	            $sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id";
+	            $oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $oObject->GetKey()));
+	            $iAAAARecords = $oAAAARecordSet->Count();
+	            $iRRecords += $iAAAARecords;
+
+	            // Searh for CNAME records
+	            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+	            $oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oObject->Get('fqdn')));
+	            $iCNAMERecords = $oCNAMERecordSet->Count();
+	            $iRRecords += $iCNAMERecords;
+
+	            if ($iRRecords > 0)
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list').' ('.$iRRecords.')');
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:rrecords_list+'));
+	                if ($iPTRRecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:ptrrecords_list', $iPTRRecords));
+	                    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+	               }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:ptrrecords_list_empty'));
+	                }
+	                if ($iAAAARecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:aaaarecords_list', $iAAAARecords));
+	                    $oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'aaaa_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:aaaarecords_list_empty'));
+	                }
+	                if ($iCNAMERecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:cnamerecords_list', $iCNAMERecords));
+	                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'cname_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::S('Class:IPAddress/Tab:cnamerecords_list_empty'));
+	                }
+	            }
+	            else
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list'));
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::S('UI:NoObjectToDisplay'));
+	            }
+	        }
+		}
+	}
+
+	/**
+	 * @param DBObject $oObject The object being edited
+	 * @param string $sFormPrefix Prefix given to the HTML form inputs
+	 *
+	 * @return void
+	 */
+	public function OnFormSubmit($oObject, $sFormPrefix = '')
+	{
+	}
+
+	/**
+	 * @param string $sTempId Unique temporary identifier made of session_id and transaction_id. It identifies the object in a unique way.
+	 *
+	 * @return void
+	 */
+	public function OnFormCancel($sTempId)
+	{
+	}
+
+	/**
+	 * @param DBObject $oObject The object being displayed
+	 *
+	 * @return string[] desc
+	 */
+	public function EnumUsedAttributes($oObject) // Not yet implemented
+	{
+	}
+
+	/**
+	 * @param DBObject $oObject The object being displayed
+	 *
+	 * @return string Path of the icon, relative to the modules directory.
+	 */
+	public function GetIcon($oObject) // Not yet implemented
+	{
+	}
+
+	/**
+	 * @param DBObject $oObject The object being displayed
+	 *
+	 * @return integer The value representing the mood of the object
+	 */
+	public function GetHilightClass($oObject)
+	{
+	}
+
+	/**
+	 * @param DBObjectSet $oSet A set of persistent objects (DBObject)
+	 *
+	 * @return string[string]
+	 */
+	public function EnumAllowedActions(DBObjectSet $oSet)
+	{
+	}
+
+}]]></content>
+    </snippet>
+  </snippets>
 </itop_design>
