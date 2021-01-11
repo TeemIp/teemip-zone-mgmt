@@ -3451,16 +3451,26 @@
       </profile>
     </profiles>
   </user_rights>
+  <constants>
+    <constant id="SPACE_TO_SOA" xsi:type="integer" _delta="define">16</constant>
+    <constant id="SPACE_SOA_TO_COMMENT" xsi:type="integer" _delta="define">8</constant>
+    <constant id="SPACE_OWNER_TO_CLASS" xsi:type="integer" _delta="define">24</constant>
+    <constant id="SPACE_PTR_OWNER_TO_CLASS" xsi:type="integer" _delta="define">12</constant>
+    <constant id="SPACE_OWNER_TO_TTL" xsi:type="integer" _delta="define">16</constant>
+    <constant id="SPACE_PTR_OWNER_TO_TTL" xsi:type="integer" _delta="define">4</constant>
+    <constant id="SPACE_TTL_TO_CLASS" xsi:type="integer" _delta="define">7</constant>
+    <constant id="SPACE_TO_COMMENT" xsi:type="integer" _delta="define">96</constant>
+  </constants>
   <snippets>
     <snippet id="TeemIpZoneMgmt" _delta="define">
       <placement>module</placement>
       <module>teemip-zone-mgmt</module>
       <rank>10</rank>
       <content><![CDATA[
-/*************************************************************************************************************************
- * Plugin to handle DisplayBare methods on non TeemIp classes and impacts on IPs when a CI is created, changed or deleted
+/********************************************************************************************************************************
+ * Plugin to handle DisplayBare methods on IPAddress classes and impacts on RRs when an IPAddress is created, changed or deleted
  */
-class TeemIpZoneMgmt implements iApplicationUIExtension
+class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExtension
 {
 	/**
 	 * @param DBObject $oObject The object being displayed
@@ -3477,8 +3487,13 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	 * @param DBObject $oObject The object being displayed
 	 * @param WebPage $oPage The output context
 	 * @param boolean $bEditMode True if the edition form is being displayed
-	 *
+			 *
 	 * @return void
+	 * @throws \CoreException
+	 * @throws \MissingQueryArgument
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
+	 * @throws \OQLException
 	 */
 	public function OnDisplayRelations($oObject, WebPage $oPage, $bEditMode = false)
 	{
@@ -3647,6 +3662,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	 */
 	public function EnumUsedAttributes($oObject) // Not yet implemented
 	{
+		return array();
 	}
 
 	/**
@@ -3656,6 +3672,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	 */
 	public function GetIcon($oObject) // Not yet implemented
 	{
+		return '';
 	}
 
 	/**
@@ -3665,6 +3682,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	 */
 	public function GetHilightClass($oObject)
 	{
+		return 0;
 	}
 
 	/**
@@ -3674,9 +3692,189 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	 */
 	public function EnumAllowedActions(DBObjectSet $oSet)
 	{
+		return '';
 	}
 
-}]]></content>
+	public function OnIsModified($oObject)
+	{
+	}
+
+	public function OnCheckToWrite($oObject)
+	{
+	}
+
+	public function OnCheckToDelete($oObject)
+	{
+	}
+
+	/**
+	 * @param $oObject
+	 * @param null $oChange
+	 */
+	public function OnDBUpdate($oObject, $oChange = null)
+	{
+		if ($oObject instanceof IPAddress)
+		{
+			// Update DNS records associated to IP if config requires it
+			$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+			if ($sIpUpdateDNSRecords == 'yes')
+			{
+				$sError = $oObject->DoCheckUpdateRRs();
+				if ($sError != '')
+				{
+					$oObject->CleanRRs();
+				}
+				else
+				{
+					$oObject->UpdateRRs();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param $oObject
+	 * @param null $oChange
+	 */
+	public function OnDBInsert($oObject, $oChange = null)
+	{
+		if ($oObject instanceof IPAddress)
+		{
+			// Create DNS records associated to IP if config requires it
+			$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+			if ($sIpUpdateDNSRecords == 'yes')
+			{
+				$sError = $oObject->DoCheckUpdateRRs();
+				if ($sError != '')
+				{
+					$oObject->CleanRRs();
+				}
+				else
+				{
+					$oObject->UpdateRRs();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param $oObject
+	 * @param null $oChange
+	 */
+	public function OnDBDelete($oObject, $oChange = null)
+	{
+		if ($oObject instanceof IPAddress)
+		{
+			// Cleanup DNS records associated to IP if config requires it
+			$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+			if ($sIpUpdateDNSRecords == 'yes')
+			{
+				$oObject->CleanRRs();
+			}
+		}
+	}
+
+}
+
+/*******************************************************************************************
+ * Plugin to add menu items in the "popup" menus related to zones and RRs to TeemIp objects
+ */
+class ZoneMgmtExtraMenus implements iPopupMenuExtension
+{
+	public static function EnumItems($iMenuId, $param)
+	{
+		$aResult = array();
+		switch($iMenuId)
+		{
+			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:	// $param is a DBObjectSet
+			case iPopupMenuExtension::MENU_OBJLIST_TOOLKIT: // $param is a DBObjectSet
+				break;
+
+			case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS: // $param is a DBObject
+				$oObj = $param;
+
+				// Additional actions for IPAddress and IPSubnet
+				if (($oObj instanceof IPAddress) || ($oObj instanceof IPSubnet))
+				{
+					$aResult[] = new SeparatorPopupMenuItem();
+					$oAppContext = new ApplicationContext();
+
+					/** @var \IPObject $oObj */
+					$id = $oObj->GetKey();
+					$sClass = get_class($oObj);
+
+					$aParams = $oAppContext->GetAsHash();
+					$aParams['class'] = $sClass;
+					$aParams['id'] = $id;
+
+					$operation = utils::ReadParam('operation', '');
+					switch ($operation)
+					{
+						case 'apply_modify':
+						case 'apply_new':
+						case 'details':
+						case 'doexpandsubnet':
+						case 'doshrinksubnet':
+							$aParams['operation'] = 'updaterrs';
+							$sMenu = 'UI:ZoneManagement:Action:IPObject:UpdateRR';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
+							$aParams['operation'] = 'deleterrs';
+							$sMenu = 'UI:ZoneManagement:Action:IPObject:DeleteRR';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
+							break;
+
+						default:
+							break;
+					}
+				}
+				// Additional actions for Zone
+				elseif ($oObj instanceof Zone)
+				{
+					$aResult[] = new SeparatorPopupMenuItem();
+					$oAppContext = new ApplicationContext();
+					$sContext = $oAppContext->GetForLink();
+
+					/** @var \Zone $oObj */
+					$id = $oObj->GetKey();
+					$sClass = get_class($oObj);
+
+					$aParams = $oAppContext->GetAsHash();
+					$aParams['class'] = $sClass;
+					$aParams['id'] = $id;
+
+					$operation = utils::ReadParam('operation', '');
+					switch ($operation)
+					{
+						case 'apply_new':
+						case 'apply_modify':
+						case 'details':
+							$aParams['operation'] = 'datafiledisplay';
+							$aParams['sort_order'] = 'sort_by_record';
+							$sMenu = 'UI:ZoneManagement:Action:Zone:DataFileDisplay';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
+						break;
+
+						case 'datafiledisplay':
+							$sMenu = 'UI:ZoneManagement:Action:Zone:Details';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$id&$sContext");
+						break;
+
+						default:
+						break;
+					}
+				}
+				break;
+
+			case iPopupMenuExtension::MENU_DASHBOARD_ACTIONS: // $param is a Dashboard
+				break;
+
+			default: // Unknown type of menu, do nothing
+				break;
+		}
+		return $aResult;
+	}
+}
+]]></content>
     </snippet>
   </snippets>
 </itop_design>
