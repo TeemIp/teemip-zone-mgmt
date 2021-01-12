@@ -116,8 +116,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:Zone/Attribute:expire+' => '',
 	'Class:Zone/Attribute:minimum' => 'Minimum',
 	'Class:Zone/Attribute:minimum+' => '',
-	'Class:Zone/Attribute:servers_list' => 'Authoritative servers',
-	'Class:Zone/Attribute:servers_list+' => 'Authoritative servers looking after the zone',
+	'Class:Zone/Attribute:functionalcis_list' => 'Authoritative servers',
+	'Class:Zone/Attribute:functionalcis_list+' => 'Authoritative servers looking after the zone',
 	'Class:Zone/Tab:nsrecords_list' => 'NS records',
 	'Class:Zone/Tab:nsrecords_list+' => 'List of all NS records of the zone',
 	'Class:Zone/Tab:arecords_list' => 'A Records',
@@ -174,30 +174,30 @@ Dict::Add('EN US', 'English', 'English', array(
 ));
 
 //
-// Class: lnkServerToZone
+// Class: lnkFunctionalCIToZone
 //
 
 Dict::Add('EN US', 'English', 'English', array(
-	'Class:lnkServerToZone' => 'Link Server / Zone',
-	'Class:lnkServerToZone+' => '',
-	'Class:lnkServerToZone/Attribute:server_id' => 'Server',
-	'Class:lnkServerToZone/Attribute:server_id+' => '',
-	'Class:lnkServerToZone/Attribute:server_name' => 'Server name',
-	'Class:lnkServerToZone/Attribute:server_name+' => '',
-	'Class:lnkServerToZone/Attribute:zone_id' => 'Zone',
-	'Class:lnkServerToZone/Attribute:zone_id+' => '',
-	'Class:lnkServerToZone/Attribute:zone_name' => 'Zone name',
-	'Class:lnkServerToZone/Attribute:zone_name+' => '',
-	'Class:lnkServerToZone/Attribute:authority' => 'Authority',
-	'Class:lnkServerToZone/Attribute:authority+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:master' => 'Master',
-	'Class:lnkServerToZone/Attribute:authority/Value:master+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:slave' => 'Slave',
-	'Class:lnkServerToZone/Attribute:authority/Value:slave+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_master' => 'Hidden master',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_mastermaster+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_slave' => 'Hidden slave',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_slave+' => '',
+	'Class:lnkFunctionalCIToZone' => 'Link FunctionalCI / Zone',
+	'Class:lnkFunctionalCIToZone+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'Server',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'Server name',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_id' => 'Zone',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_id+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_name' => 'Zone name',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_name+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority' => 'Authority',
+	'Class:lnkFunctionalCIToZone/Attribute:authority+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:master' => 'Master',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:master+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:slave' => 'Slave',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:slave+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_master' => 'Hidden master',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_mastermaster+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_slave' => 'Hidden slave',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_slave+' => '',
 ));
 
 //
@@ -362,6 +362,7 @@ Dict::Add('EN US', 'English', 'English', array(
 Dict::Add('EN US', 'English', 'English', array(
 	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Wrong format: IPv4 reverse zone format is x.[y.][z.]in-addr.arpa. !',
 	'UI:ZoneManagement:Action:New:Zone:V6:WrongFormat' => 'Wrong format: IPv6 reverse zone format is x1.[x2.]...[xi.]ip6.arpa. !',
+	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'An authoritative server can only be of Server or Virtual Machine class !',
 ));
 
 //

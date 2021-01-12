@@ -116,8 +116,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone/Attribute:expire+' => '',
 	'Class:Zone/Attribute:minimum' => 'Minimum',
 	'Class:Zone/Attribute:minimum+' => '',
-	'Class:Zone/Attribute:servers_list' => 'Serveurs autoritaires',
-	'Class:Zone/Attribute:servers_list+' => 'Serveurs autoritaires en charge de la zone',
+	'Class:Zone/Attribute:functionalcis_list' => 'Serveurs autoritaires',
+	'Class:Zone/Attribute:functionalcis_list+' => 'Serveurs autoritaires en charge de la zone',
 	'Class:Zone/Tab:nsrecords_list' => 'Enregistrements NS',
 	'Class:Zone/Tab:nsrecords_list+' => 'Liste de tous les enregistrements NS de la zone',
 	'Class:Zone/Tab:arecords_list' => 'Enregistrements A',
@@ -174,30 +174,30 @@ Dict::Add('FR FR', 'French', 'Français', array(
 ));
 
 //
-// Class: lnkServerToZone
+// Class: lnkFunctionalCIToZone
 //
 
 Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:lnkServerToZone' => 'Lien Serveur / Zone',
-	'Class:lnkServerToZone+' => '',
-	'Class:lnkServerToZone/Attribute:server_id' => 'Serveur',
-	'Class:lnkServerToZone/Attribute:server_id+' => '',
-	'Class:lnkServerToZone/Attribute:server_name' => 'Nom du serveur',
-	'Class:lnkServerToZone/Attribute:server_name+' => '',
-	'Class:lnkServerToZone/Attribute:zone_id' => 'Zone',
-	'Class:lnkServerToZone/Attribute:zone_id+' => '',
-	'Class:lnkServerToZone/Attribute:zone_name' => 'Nom de la zone',
-	'Class:lnkServerToZone/Attribute:zone_name+' => '',
-	'Class:lnkServerToZone/Attribute:authority' => 'Relation d\'autorité',
-	'Class:lnkServerToZone/Attribute:authority+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:master' => 'Maître',
-	'Class:lnkServerToZone/Attribute:authority/Value:master+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:slave' => 'Esclave',
-	'Class:lnkServerToZone/Attribute:authority/Value:slave+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_master' => 'Maître caché',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_mastermaster+' => '',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_slave' => 'Esclave caché',
-	'Class:lnkServerToZone/Attribute:authority/Value:hidden_slave+' => '',
+	'Class:lnkFunctionalCIToZone' => 'Lien Serveur / Zone',
+	'Class:lnkFunctionalCIToZone+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'Serveur',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'Nom du serveur',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_id' => 'Zone',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_id+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_name' => 'Nom de la zone',
+	'Class:lnkFunctionalCIToZone/Attribute:zone_name+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority' => 'Relation d\'autorité',
+	'Class:lnkFunctionalCIToZone/Attribute:authority+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:master' => 'Maître',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:master+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:slave' => 'Esclave',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:slave+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_master' => 'Maître caché',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_mastermaster+' => '',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_slave' => 'Esclave caché',
+	'Class:lnkFunctionalCIToZone/Attribute:authority/Value:hidden_slave+' => '',
 ));
 
 //
@@ -362,6 +362,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 Dict::Add('FR FR', 'French', 'Français', array(
 	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv4 est x.[y.][z.]in-addr.arpa. !',
 	'UI:ZoneManagement:Action:New:Zone:V6:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv6 est x1.[x2.]...[x31.]ip6.arpa. !',
+	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'Un serveur authoritaire ne peut être que de classe Serveur ou Machine Virtuelle !',
 ));
 
 //

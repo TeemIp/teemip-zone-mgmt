@@ -24,7 +24,7 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'teemip-zone-mgmt/2.7.0',
+	'teemip-zone-mgmt/2.7.1',
 	array(
 		// Identification
 		//
@@ -34,7 +34,7 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => array(
-			'teemip-ip-mgmt/2.7.0',
+			'teemip-ip-mgmt/2.7.1',
 			'teemip-ipv6-mgmt/2.7.0',
 			'teemip-network-mgmt/2.7.0',
 		),
@@ -46,7 +46,6 @@ SetupWebPage::AddModule(
 		//
 		'datamodel' => array(
 			'model.teemip-zone-mgmt.php',
-			'main.teemip-zone-mgmt.php',
 		),
 		'webservice' => array(),
 		'data.struct' => array(// add your 'structure' definition XML files here,
@@ -117,6 +116,17 @@ if (!class_exists('ZoneManagementInstaller'))
 
 				SetupPage::log_info("Module teemip-zone-mgmt: migration done");
 			}
+
+			if (in_array($sPreviousVersion, array('2.7.0', '2.6.2', '2.6.1', '2.6.0','1.2.0')))
+			{
+				SetupPage::log_info("Module teemip-zone-mgmt: move zone authoritative servers from obsolete lnkServerToZone to new lnkFunctionalCIToZone");
+
+				$sCopy = "INSERT INTO lnkfunctionalcitozone (functionalci_id, zone_id, authority) SELECT server_id, zone_id, authority FROM lnkservertozone";
+				CMDBSource::Query($sCopy);
+
+				SetupPage::log_info("Module teemip-zone-mgmt: migration done");
+			}
+
 		}
 	}
 }
