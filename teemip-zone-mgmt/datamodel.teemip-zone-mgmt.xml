@@ -3285,6 +3285,9 @@
       <enable_class>Zone</enable_class>
       <enable_action>UR_ACTION_READ</enable_action>
       <enable_admin_only>0</enable_admin_only>
+      <style>
+        <decoration_classes>fas fa-sitemap</decoration_classes>
+      </style>
     </menu>
     <menu id="NameSpace" xsi:type="DashboardMenuNode" _delta="define">
       <rank>10</rank>
@@ -3496,27 +3499,14 @@
 class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExtension
 {
 	/**
-	 * @param DBObject $oObject The object being displayed
-	 * @param WebPage $oPage The output context
-	 * @param boolean $bEditMode True if the edition form is being displayed
-	 *
-	 * @return void
+	 * @inheritdoc
 	 */
 	public function OnDisplayProperties($oObject, WebPage $oPage, $bEditMode = false)
 	{
 	}
 
 	/**
-	 * @param DBObject $oObject The object being displayed
-	 * @param WebPage $oPage The output context
-	 * @param boolean $bEditMode True if the edition form is being displayed
-			 *
-	 * @return void
-	 * @throws \CoreException
-	 * @throws \MissingQueryArgument
-	 * @throws \MySQLException
-	 * @throws \MySQLHasGoneAwayException
-	 * @throws \OQLException
+	 * @inheritdoc
 	 */
 	public function OnDisplayRelations($oObject, WebPage $oPage, $bEditMode = false)
 	{
@@ -3660,28 +3650,21 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	}
 
 	/**
-	 * @param DBObject $oObject The object being edited
-	 * @param string $sFormPrefix Prefix given to the HTML form inputs
-	 *
-	 * @return void
+	 * @inheritdoc
 	 */
 	public function OnFormSubmit($oObject, $sFormPrefix = '')
 	{
 	}
 
 	/**
-	 * @param string $sTempId Unique temporary identifier made of session_id and transaction_id. It identifies the object in a unique way.
-	 *
-	 * @return void
+	 * @inheritdoc
 	 */
 	public function OnFormCancel($sTempId)
 	{
 	}
 
 	/**
-	 * @param DBObject $oObject The object being displayed
-	 *
-	 * @return string[] desc
+	 * @inheritdoc
 	 */
 	public function EnumUsedAttributes($oObject) // Not yet implemented
 	{
@@ -3689,9 +3672,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	}
 
 	/**
-	 * @param DBObject $oObject The object being displayed
-	 *
-	 * @return string Path of the icon, relative to the modules directory.
+	 * @inheritdoc
 	 */
 	public function GetIcon($oObject) // Not yet implemented
 	{
@@ -3699,9 +3680,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	}
 
 	/**
-	 * @param DBObject $oObject The object being displayed
-	 *
-	 * @return integer The value representing the mood of the object
+	 * @inheritdoc
 	 */
 	public function GetHilightClass($oObject)
 	{
@@ -3709,30 +3688,36 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	}
 
 	/**
-	 * @param DBObjectSet $oSet A set of persistent objects (DBObject)
-	 *
-	 * @return string[string]
+	 * @inheritdoc
 	 */
 	public function EnumAllowedActions(DBObjectSet $oSet)
 	{
-		return '';
+		return array();
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function OnIsModified($oObject)
 	{
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function OnCheckToWrite($oObject)
 	{
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function OnCheckToDelete($oObject)
 	{
 	}
 
 	/**
-	 * @param $oObject
-	 * @param null $oChange
+	 * @inheritdoc
 	 */
 	public function OnDBUpdate($oObject, $oChange = null)
 	{
@@ -3756,8 +3741,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	}
 
 	/**
-	 * @param $oObject
-	 * @param null $oChange
+	 * @inheritdoc
 	 */
 	public function OnDBInsert($oObject, $oChange = null)
 	{
@@ -3781,8 +3765,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	}
 
 	/**
-	 * @param $oObject
-	 * @param null $oChange
+	 * @inheritdoc
 	 */
 	public function OnDBDelete($oObject, $oChange = null)
 	{
@@ -3804,6 +3787,9 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
  */
 class ZoneMgmtExtraMenus implements iPopupMenuExtension
 {
+	/**
+	 * @inheritdoc
+	 */
 	public static function EnumItems($iMenuId, $param)
 	{
 		$aResult = array();
