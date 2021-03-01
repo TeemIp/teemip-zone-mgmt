@@ -35,8 +35,8 @@ SetupWebPage::AddModule(
 		//
 		'dependencies' => array(
 			'teemip-ip-mgmt/2.7.1',
-			'teemip-ipv6-mgmt/2.7.0',
-			'teemip-network-mgmt/2.7.0',
+			'teemip-ipv6-mgmt/2.7.1',
+			'teemip-network-mgmt/2.7.1',
 		),
 		'mandatory' => false,
 		'visible' => true,

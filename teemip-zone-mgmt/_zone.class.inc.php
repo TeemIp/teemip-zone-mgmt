@@ -365,14 +365,20 @@ class _Zone extends DNSObject
     {
      	// Default TTL
      	$sHtml = "\$TTL ".$this->Get('ttl')."\n";
-     	
-     	// SOA Record
-        $sMBox = $this->Get('mbox');
+
+     	// Prepare mailbox
+	    //  Fully qualify it
+	    //  Replace @ by . and replace prior . by \.
+	    $sMBox = $this->Get('mbox');
 	    if (substr($sMBox, - 1) != '.')
 	    {
-	    	$sMBox .= '.';         
-		}	     
-      	$sHtml .= "@ IN SOA ".$this->Get('sourcedname')." ".str_replace("@", ".", $sMBox)." (\n";
+	    	$sMBox .= '.';
+		}
+		$aMBox = explode('@', $sMBox);
+		$sMBox = str_replace(".", "\.",  $aMBox[0]).'.'.$aMBox[1];
+
+	    // SOA Record
+	    $sHtml .= "@ IN SOA ".$this->Get('sourcedname')." ".$sMBox." (\n";
      	$sHtml .= str_pad("", SPACE_TO_SOA)." ".str_pad($this->Get('serial'), SPACE_SOA_TO_COMMENT)."; Serial\n";
      	$sHtml .= str_pad("", SPACE_TO_SOA)." ".str_pad($this->Get('refresh'), SPACE_SOA_TO_COMMENT)."; Refresh\n";
      	$sHtml .= str_pad("", SPACE_TO_SOA)." ".str_pad($this->Get('retry'), SPACE_SOA_TO_COMMENT)."; Retry\n";

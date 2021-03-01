@@ -1249,7 +1249,7 @@
           <sql>name</sql>
           <default_value/>
           <is_null_allowed>false</is_null_allowed>
-          <validation_pattern>[@]</validation_pattern>
+          <validation_pattern>^[@]$|^[*](\.\w[\w-]*)*\.?$</validation_pattern>
         </field>
         <field id="comment" xsi:type="AttributeString">
           <sql>comment</sql>
