@@ -35,12 +35,7 @@
     <class id="View" _delta="define">
       <parent>cmdbAbstractObject</parent>
       <properties>
-        <comment><![CDATA[/**
- * Persistent classes for a TeemIp Zone Mgmt
- *
- * @copyright   Copyright (C) 2017 TeemIp
- * @license     http://opensource.org/licenses/AGPL-3.0
- */]]></comment>
+        <comment/>
         <category>bizmodel,searchable,dnsmgmt</category>
         <abstract>false</abstract>
         <key_type>autoincrement</key_type>
@@ -54,7 +49,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/view.png</icon>
+        <icon>asset/img/view.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -297,7 +292,11 @@
         $sShortName = $this->Get('short_name');
         if ($sShortName == '')
         {
-            $sError = Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:NoShortName');
+        	$sComputeFqdnWithEmptyShortname = IPConfig::GetFromGlobalIPConfig('compute_fqdn_with_empty_shortname', $this->Get('org_id'));
+			if ($sComputeFqdnWithEmptyShortname != 'yes')
+			{
+                $sError = Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:NoShortName');
+            }
         }
 
         // Check if Domain Name exists
@@ -616,8 +615,8 @@
     public function ExistARecord($iZoneId)
     {
         // ARecord exists if FQDN points to IP in its Zone
-        $sOQL = "SELECT ARecord WHERE ip_id = :ip_id AND name = :fqdn AND zone_id = :zone_id";
-        $oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $this->GetKey(), 'fqdn' => $this->Get('fqdn'), 'zone_id' => $iZoneId));
+        $sOQL = "SELECT ARecord AS ar JOIN IPAddress AS ip ON ar.ip_id = ip.id WHERE ip_id = :ip_id AND ((ar.name = ip.fqdn AND ip.short_name != '') OR (ar.name = '@' AND ip.short_name = '')) AND zone_id = :zone_id";
+        $oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $this->GetKey(), 'zone_id' => $iZoneId));
         if ($oARecordSet->CountExceeds(0))
         {
             return true;
@@ -639,7 +638,14 @@
         $oARecord = MetaModel::NewObject('ARecord');
         $oARecord->Set('org_id', $this->Get('org_id'));
         $oARecord->Set('zone_id', $iZoneId);
-        $oARecord->Set('name', $this->Get('fqdn'));
+        if ($this->Get('short_name') == '')
+        {
+            $oARecord->Set('name', '@');
+        }
+        else
+        {
+            $oARecord->Set('name', $this->Get('fqdn'));
+        }
         $oARecord->Set('ip_id', $this->GetKey());
         $oARecord->DBInsert();
     }]]></code>
@@ -905,8 +911,8 @@
     <class id="Zone" _delta="define">
       <parent>DNSObject</parent>
       <php_parent>
-        <name>_Zone</name>
-        <file>_zone.class.inc.php</file>
+        <name>TeemIp\TeemIp\Extension\ZoneManagement\Model\_Zone</name>
+        <file>src/Model/_Zone.php</file>
       </php_parent>
       <properties>
         <comment/>
@@ -922,7 +928,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/zone.png</icon>
+        <icon>asset/img/zone.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1507,7 +1513,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/a.png</icon>
+        <icon>asset/img/a.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1682,7 +1688,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/aaaa.png</icon>
+        <icon>asset/img/aaaa.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1858,7 +1864,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/cname.png</icon>
+        <icon>asset/img/cname.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2056,7 +2062,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/mx.png</icon>
+        <icon>asset/img/mx.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2265,7 +2271,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/ns.png</icon>
+        <icon>asset/img/ns.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2467,7 +2473,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/ptr.png</icon>
+        <icon>asset/img/ptr.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2729,7 +2735,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/srv.png</icon>
+        <icon>asset/img/srv.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2960,7 +2966,7 @@
           </attributes>
         </naming>
         <display_template/>
-        <icon>images/txt.png</icon>
+        <icon>asset/img/txt.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -3302,7 +3308,7 @@
               <dashlet id="teemip-dns-101" xsi:type="DashletHeaderStatic">
                 <rank>1</rank>
                 <title>Menu:DNSSpace:MainObjects</title>
-                <icon>teemip-zone-mgmt/images/dnsobject.png</icon>
+                <icon>teemip-zone-mgmt/asset/img/dnsobject.png</icon>
               </dashlet>
               <dashlet id="teemip-dns-111" xsi:type="DashletBadge">
                 <rank>2</rank>
@@ -3324,7 +3330,7 @@
               <dashlet id="teemip-dns-201" xsi:type="DashletHeaderStatic">
                 <rank>1</rank>
                 <title>Menu:DNSSpace:ResourceRecords</title>
-                <icon>teemip-zone-mgmt/images/dnsobject.png</icon>
+                <icon>teemip-zone-mgmt/asset/img/dnsobject.png</icon>
               </dashlet>
               <dashlet id="teemip-dns-211" xsi:type="DashletBadge">
                 <rank>2</rank>
@@ -3480,12 +3486,12 @@
   <constants>
     <constant id="SPACE_TO_SOA" xsi:type="integer" _delta="define">16</constant>
     <constant id="SPACE_SOA_TO_COMMENT" xsi:type="integer" _delta="define">8</constant>
-    <constant id="SPACE_OWNER_TO_CLASS" xsi:type="integer" _delta="define">24</constant>
+    <constant id="SPACE_OWNER_TO_CLASS" xsi:type="integer" _delta="define">48</constant>
     <constant id="SPACE_PTR_OWNER_TO_CLASS" xsi:type="integer" _delta="define">12</constant>
-    <constant id="SPACE_OWNER_TO_TTL" xsi:type="integer" _delta="define">16</constant>
+    <constant id="SPACE_OWNER_TO_TTL" xsi:type="integer" _delta="define">40</constant>
     <constant id="SPACE_PTR_OWNER_TO_TTL" xsi:type="integer" _delta="define">4</constant>
     <constant id="SPACE_TTL_TO_CLASS" xsi:type="integer" _delta="define">7</constant>
-    <constant id="SPACE_TO_COMMENT" xsi:type="integer" _delta="define">96</constant>
+    <constant id="SPACE_TO_COMMENT" xsi:type="integer" _delta="define">120</constant>
   </constants>
   <snippets>
     <snippet id="TeemIpZoneMgmt" _delta="define">
@@ -3647,6 +3653,176 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	            }
 	        }
 		}
+		elseif ($oObject instanceof IPv4Subnet)
+		{
+		    if (!$bEditMode)
+	        {
+	            $iRRecords = 0;
+
+		        $sOQL = "SELECT IPv4Address WHERE subnet_id = :id";
+   	            $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $oObject->GetKey()));
+
+	            // Search for PTR records
+	            $iPTRRecords = 0;
+				$oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
+	            while ($oIP = $oIPSet->Fetch())
+	            {
+	                $aDigit = explode('.', $oIP->Get('ip'));
+		            $sPtr = implode('.', array_reverse($aDigit)).'.in-addr.arpa.';
+		            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
+	                $oIPPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+	                $oPTRRecordSet->Append($oIPPTRRecordSet);
+	                $iPTRRecords += $oIPPTRRecordSet->Count();
+	            }
+	            $iRRecords += $iPTRRecords;
+
+	            // Search for A records
+	            $sOQL = "SELECT ARecord AS ar JOIN IPv4Address AS ip ON ar.ip_id = ip.id WHERE ip.subnet_id = :subnet_id";
+	            $oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('subnet_id' => $oObject->GetKey()));
+	            $iARecords = $oARecordSet->Count();
+	            $iRRecords += $iARecords;
+
+	            // Searh for CNAME records
+				$iCNAMERecords = 0;
+				$oCNAMERecordSet = DBObjectSet::FromScratch('CNAMERecord');
+				$oIPSet->Rewind();
+	            while ($oIP = $oIPSet->Fetch())
+	            {
+		            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+		            $oIPCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oIP->Get('fqdn')));
+	                $oCNAMERecordSet->Append($oIPCNAMERecordSet);
+	                $iCNAMERecords += $oIPCNAMERecordSet->Count();
+	            }
+	            $iRRecords += $iCNAMERecords;
+
+	            if ($iRRecords > 0)
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPSubnet/Tab:rrecords_list').' ('.$iRRecords.')');
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:rrecords_list+'));
+	                if ($iPTRRecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', $iPTRRecords));
+	                    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::S('Class:IPSubnet/Tab:ptrrecords_list_empty'));
+	                }
+	                if ($iARecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:arecords_list', $iARecords));
+	                    $oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'a_records', array('menu' => false));
+	               }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::S('Class:IPSubnet/Tab:arecords_list_empty'));
+	                }
+	                if ($iCNAMERecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', $iCNAMERecords));
+	                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'cname_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::S('Class:IPSubnet/Tab:cnamerecords_list_empty'));
+	                }
+	            }
+	            else
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPSubnet/Tab:rrecords_list'));
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::S('UI:NoObjectToDisplay'));
+	            }
+	        }
+
+		}
+		elseif ($oObject instanceof IPv6Subnet)
+		{
+	        if (!$bEditMode)
+	        {
+	            $iRRecords = 0;
+
+		        $sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
+   	            $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $oObject->GetKey()));
+
+	            // Search for PTR records
+	            $iPTRRecords = 0;
+				$oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
+	            while ($oIP = $oIPSet->Fetch())
+	            {
+		            $sIp = $oIP->Get('ip')->GetAsCannonical();
+	                $sPtr = $oIP->ConvertToZone($sIp);
+	                $sOQL = "SELECT PTRRecord WHERE name = :ptr";
+	                $oIPPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+	                $oPTRRecordSet->Append($oIPPTRRecordSet);
+	                $iPTRRecords += $oIPPTRRecordSet->Count();
+	            }
+	            $iRRecords += $iPTRRecords;
+
+	            // Search for AAAA records
+	            $sOQL = "SELECT AAAARecord AS ar JOIN IPv6Address AS ip ON ar.ip_id = ip.id WHERE ip.subnet_id = :subnet_id";
+	            $oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('subnet_id' => $oObject->GetKey()));
+	            $iAAAARecords = $oAAAARecordSet->Count();
+	            $iRRecords += $iAAAARecords;
+
+	            // Searh for CNAME records
+				$iCNAMERecords = 0;
+				$oCNAMERecordSet = DBObjectSet::FromScratch('CNAMERecord');
+				$oIPSet->Rewind();
+	            while ($oIP = $oIPSet->Fetch())
+	            {
+		            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+		            $oIPCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oIP->Get('fqdn')));
+	                $oCNAMERecordSet->Append($oIPCNAMERecordSet);
+	                $iCNAMERecords += $oIPCNAMERecordSet->Count();
+	            }
+	            $iRRecords += $iCNAMERecords;
+
+	            if ($iRRecords > 0)
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPSubnet/Tab:rrecords_list').' ('.$iRRecords.')');
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:rrecords_list+'));
+	                if ($iPTRRecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', $iPTRRecords));
+	                    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+	               }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::S('Class:IPSubnet/Tab:ptrrecords_list_empty'));
+	                }
+	                if ($iAAAARecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:aaaarecords_list', $iAAAARecords));
+	                    $oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'aaaa_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::S('Class:IPSubnet/Tab:aaaarecords_list_empty'));
+	                }
+	                if ($iCNAMERecords > 0)
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', $iCNAMERecords));
+	                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+	                    $oBlock->Display($oPage, 'cname_records', array('menu' => false));
+	                }
+	                else
+	                {
+	                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::S('Class:IPSubnet/Tab:cnamerecords_list_empty'));
+	                }
+	            }
+	            else
+	            {
+	                $oPage->SetCurrentTab(Dict::S('Class:IPAddress/Tab:rrecords_list'));
+	                $oPage->p(MetaModel::GetClassIcon('Zone').'&nbsp;'.Dict::S('UI:NoObjectToDisplay'));
+	            }
+	        }
+		}
+
 	}
 
 	/**
