@@ -1,23 +1,6 @@
 <?php
-// Copyright (C) 2020 TeemIp
-//
-//   This file is part of TeemIp.
-//
-//   TeemIp is free software; you can redistribute it and/or modify	
-//   it under the terms of the GNU Affero General Public License as published by
-//   the Free Software Foundation, either version 3 of the License, or
-//   (at your option) any later version.
-//
-//   TeemIp is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU Affero General Public License for more details.
-//
-//   You should have received a copy of the GNU Affero General Public License
-//   along with TeemIp. If not, see <http://www.gnu.org/licenses/>
-
-/**
- * @copyright   Copyright (C) 2020 TeemIP
+/*
+ * @copyright   Copyright (C) 2021 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -46,11 +29,28 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:IPAddress/Tab:ptrrecords_list' => 'Enregistrements PTR:',
 	'Class:IPAddress/Tab:ptrrecords_list_empty' => 'Il n\'y a pas d\'enregistrements PTR liés à cette IP',
 	'Class:IPAddress/Tab:arecords_list' => 'Enregistrements A:',
-	'Class:IPAddress/Tab:arecords_list_empty' => 'Il n\'y a pas d\'enregistrements A liés à cette IPP',
+	'Class:IPAddress/Tab:arecords_list_empty' => 'Il n\'y a pas d\'enregistrements A liés à cette IP',
 	'Class:IPAddress/Tab:aaaarecords_list' => 'Enregistrements AAAA:',
 	'Class:IPAddress/Tab:aaaarecords_list_empty' => 'Il n\'y a pas d\'enregistrements AAAA liés à cette IP',
 	'Class:IPAddress/Tab:cnamerecords_list' => 'Enregistrements CNAME:',
 	'Class:IPAddress/Tab:cnamerecords_list_empty' => 'Il n\'y a pas d\'enregistrements CNAME liés à cette IP',
+));
+
+//
+// Class extensions for IPSubnet
+//
+
+Dict::Add('FR FR', 'French', 'Français', array(
+	'Class:IPSubnet/Tab:rrecords_list' => 'Enregistrements DNS',
+	'Class:IPSubnet/Tab:rrecords_list+' => 'Liste de tous les enregistrements DNS associés au sous-réseau.',
+	'Class:IPSubnet/Tab:ptrrecords_list' => 'Enregistrements PTR:',
+	'Class:IPSubnet/Tab:ptrrecords_list_empty' => 'Il n\'y a pas d\'enregistrements PTR liés au sous-réseau',
+	'Class:IPSubnet/Tab:arecords_list' => 'Enregistrements A:',
+	'Class:IPSubnet/Tab:arecords_list_empty' => 'Il n\'y a pas d\'enregistrements A liés au sous-réseau',
+	'Class:IPSubnet/Tab:aaaarecords_list' => 'Enregistrements AAAA:',
+	'Class:IPSubnet/Tab:aaaarecords_list_empty' => 'Il n\'y a pas d\'enregistrements AAAA liés au sous-réseau',
+	'Class:IPSubnet/Tab:cnamerecords_list' => 'Enregistrements CNAME:',
+	'Class:IPSubnet/Tab:cnamerecords_list_empty' => 'Il n\'y a pas d\'enregistrements CNAME liés au sous-réseau',
 ));
 
 //
