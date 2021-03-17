@@ -2332,7 +2332,7 @@
     	$sDataName = $this->GetDataNameForDataString();
     	if ($sDataName == '@')
     	{
-    	    $sDataName = '';
+    	    $sDataName = $this->Get('zone_name');
     	}
    		if ($this->Get('overwrite_zone_ttl') == 'yes')
    		{
