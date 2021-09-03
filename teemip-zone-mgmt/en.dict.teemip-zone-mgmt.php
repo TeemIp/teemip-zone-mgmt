@@ -129,6 +129,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:Zone/Tab:ptrrecords_list' => 'PTR records',
 	'Class:Zone/Tab:ptrrecords_list+' => 'List of all PTR records of the zone',
 	'Class:Zone/Tab:otherrecords_list' => 'Other Records',
+	'Class:Zone/Tab:otherrecords_list+' => 'List of all other Records of the zone',
 	'Class:Zone/Tab:mxrecords_list' => 'List of all %1$s MX records of the zone',
 	'Class:Zone/Tab:mxrecords_list_empty' => 'There are no MX records in the zone',
 	'Class:Zone/Tab:srvrecords_list' => 'List of all %1$s SRV records of the zone',
@@ -369,12 +370,13 @@ Dict::Add('EN US', 'English', 'English', array(
 // Management of data files
 //
 Dict::Add('EN US', 'English', 'English', array(
-	'UI:ZoneManagement:Action:Zone:DataFileDisplay' => 'Display data file',
-	'UI:ZoneManagement:Action:Zone:Details' => 'Details',
-	'UI:ZoneManagement:Action:Zone:DataFileDisplay:PageTitle_Object_Class' => '%1$s - %2$s data file',
-	'UI:ZoneManagement:Action:Zone:DataFileDisplay:Title_Class_Object' => 'Data file of %1$s: <span class="hilite">%2$s</span>',
-	'UI:ZoneManagement:Action:DataFileDisplay:sort_by_record' => 'Display data file sorted by records',
-	'UI:ZoneManagement:Action:DataFileDisplay:sort_by_char' => 'Display data file sorted by alphabetical order',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone' => 'Data file',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:Menu' => 'Display data file',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class' => '%1$s - %2$s data file',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:Title_Class_Object' => 'Data file of %1$s: %2$s',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:sort_by_record' => 'Display data file sorted by records',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:sort_by_char' => 'Display data file sorted by alphabetical order',
+	'UI:ZoneManagement:Action:Details:Zone:Menu' => 'Details',
 ));
 	
 //
