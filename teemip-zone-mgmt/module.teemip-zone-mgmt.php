@@ -105,7 +105,8 @@ if (!class_exists('ZoneManagementInstaller'))
 			{
 				SetupPage::log_info("Module teemip-zone-mgmt: move zone authoritative servers from obsolete lnkServerToZone to new lnkFunctionalCIToZone");
 
-				$sCopy = "INSERT INTO lnkfunctionalcitozone (functionalci_id, zone_id, authority) SELECT server_id, zone_id, authority FROM lnkservertozone";
+				$sDBSubname = $oConfiguration->Get('db_subname');
+				$sCopy = "INSERT INTO ".$sDBSubname."lnkfunctionalcitozone (functionalci_id, zone_id, authority) SELECT server_id, zone_id, authority FROM ".$sDBSubname."lnkservertozone";
 				CMDBSource::Query($sCopy);
 
 				SetupPage::log_info("Module teemip-zone-mgmt: migration done");
