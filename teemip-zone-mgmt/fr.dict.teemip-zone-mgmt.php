@@ -129,6 +129,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone/Tab:ptrrecords_list' => 'Enregistrements PTR',
 	'Class:Zone/Tab:ptrrecords_list+' => 'Liste de tous les enregistrements PTR de la zone',
 	'Class:Zone/Tab:otherrecords_list' => 'Autres enregistrements',
+	'Class:Zone/Tab:otherrecords_list+' => 'Liste de tous les autres enregistrements de la zone',
 	'Class:Zone/Tab:mxrecords_list' => 'Liste des %1$s enregistrements MX de la zone',
 	'Class:Zone/Tab:mxrecords_list_empty' => 'Il n\'y a pas d\enregistrement MX dans la zone',
 	'Class:Zone/Tab:srvrecords_list' => 'Liste des %1$s enregistrements SRV de la zone',
@@ -369,12 +370,13 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Management of data files
 //
 Dict::Add('FR FR', 'French', 'Français', array(
-	'UI:ZoneManagement:Action:Zone:DataFileDisplay' => 'Affiche le fichier de données',
-	'UI:ZoneManagement:Action:Zone:Details' => 'Détails',
-	'UI:ZoneManagement:Action:Zone:DataFileDisplay:PageTitle_Object_Class' => '%1$s - %2$s fichier de données',
-	'UI:ZoneManagement:Action:Zone:DataFileDisplay:Title_Class_Object' => 'Fichier de données de %1$s: <span class="hilite">%2$s</span>',
-	'UI:ZoneManagement:Action:DataFileDisplay:sort_by_record' => 'Affiche le fichier de données trié par enregistrements',
-	'UI:ZoneManagement:Action:DataFileDisplay:sort_by_char' => 'Affiche le fichier de données trié par ordre alphabétique',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone' => 'Fichier de données',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:Menu' => 'Affiche le fichier de données',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class' => '%1$s - %2$s fichier de données',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:Title_Class_Object' => 'Fichier de données de %1$s: %2$s',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:sort_by_record' => 'Affiche le fichier de données trié par enregistrements',
+	'UI:ZoneManagement:Action:DataFileDisplay:Zone:sort_by_char' => 'Affiche le fichier de données trié par ordre alphabétique',
+	'UI:ZoneManagement:Action:Details:Zone:Menu' => 'Détails',
 ));
 
 //

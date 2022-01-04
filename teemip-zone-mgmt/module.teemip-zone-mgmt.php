@@ -7,19 +7,19 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'teemip-zone-mgmt/2.7.1',
+	'teemip-zone-mgmt/3.0.0',
 	array(
 		// Identification
 		//
 		'label' => 'Zone Management',
 		'category' => 'business',
-		
+
 		// Setup
 		//
 		'dependencies' => array(
-			'teemip-ip-mgmt/2.7.1',
-			'teemip-ipv6-mgmt/2.7.1',
-			'teemip-network-mgmt/2.7.1',
+			'teemip-ip-mgmt/3.0.0',
+			'teemip-ipv6-mgmt/3.0.0',
+			'teemip-network-mgmt/3.0.0',
 		),
 		'mandatory' => false,
 		'visible' => true,
@@ -88,7 +88,7 @@ if (!class_exists('ZoneManagementInstaller'))
 
 			if (($sPreviousVersion == '1.0.0') || ($sPreviousVersion == '1.1.0'))
 			{
-				SetupPage::log_info("Module teemip-zone-mgmt: remove ResourceRecord class from the DNSObject tree and move it directly under cmdbAbstractObject class");
+				SetupLog::Info("Module teemip-zone-mgmt: remove ResourceRecord class from the DNSObject tree and move it directly under cmdbAbstractObject class");
 
 				$sDNSObjectTable = MetaModel::DBGetTable('DNSObject');
 				$sRRTable = MetaModel::DBGetTable('ResourceRecord');
@@ -98,18 +98,18 @@ if (!class_exists('ZoneManagementInstaller'))
 				$sRemove = "DELETE FROM `$sDNSObjectTable` WHERE finalclass IN ('ARecord', 'AAAARecord', 'CNAMERecord', 'MXRecord', 'NSRecord', 'PTRRecord', 'SRVRecord', 'TextRecord')";
 				CMDBSource::Query($sRemove);
 
-				SetupPage::log_info("Module teemip-zone-mgmt: migration done");
+				SetupLog::Info("Module teemip-zone-mgmt: migration done");
 			}
 
 			if (in_array($sPreviousVersion, array('2.7.0', '2.6.2', '2.6.1', '2.6.0','1.2.0')))
 			{
-				SetupPage::log_info("Module teemip-zone-mgmt: move zone authoritative servers from obsolete lnkServerToZone to new lnkFunctionalCIToZone");
+				SetupLog::Info("Module teemip-zone-mgmt: move zone authoritative servers from obsolete lnkServerToZone to new lnkFunctionalCIToZone");
 
 				$sDBSubname = $oConfiguration->Get('db_subname');
 				$sCopy = "INSERT INTO ".$sDBSubname."lnkfunctionalcitozone (functionalci_id, zone_id, authority) SELECT server_id, zone_id, authority FROM ".$sDBSubname."lnkservertozone";
 				CMDBSource::Query($sCopy);
 
-				SetupPage::log_info("Module teemip-zone-mgmt: migration done");
+				SetupLog::Info("Module teemip-zone-mgmt: migration done");
 			}
 
 		}
