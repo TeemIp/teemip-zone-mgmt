@@ -13,6 +13,7 @@ use DBObjectSearch;
 use Dict;
 use DisplayBlock;
 use DNSObject;
+use iTopWebPage;
 use MetaModel;
 use TeemIp\TeemIp\Extension\Framework\Helper\IPUtils;
 use utils;
@@ -61,16 +62,14 @@ class _Zone extends DNSObject {
 		$sMapping = $this->Get('mapping');
 		if ($sMapping == 'ipv4reverse') {
 			$sPattern = '/^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){1,3}in-addr\.arpa\.$/';
-			$aMatches = array();
-			if (!preg_match($sPattern, $sName, $aMatches)) {
+			if (!preg_match($sPattern, $sName)) {
 				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V4:WrongFormat');
 
 				return;
 			}
 		} elseif ($sMapping == 'ipv6reverse') {
 			$sPattern = '/^((\d|[a-f]|[A-F])\.){1,31}ip6\.arpa\.$/';
-			$aMatches = array();
-			if (!preg_match($sPattern, $sName, $aMatches)) {
+			if (!preg_match($sPattern, $sName)) {
 				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V6:WrongFormat');
 
 				return;
@@ -81,8 +80,11 @@ class _Zone extends DNSObject {
 	/**
 	 * Displays data file
 	 *
-	 * @param \WebPage $oP
+	 * @param \iTopWebPage $oP
+	 * @param $aParams
 	 *
+	 * @return void
+	 * @throws \ApplicationException
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
@@ -90,7 +92,7 @@ class _Zone extends DNSObject {
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public function DisplayDataFile(WebPage $oP, $aParams = array()) {
+	public function DisplayDataFile(iTopWebPage $oP, $aParams = array()) {
 		$this->DisplayBareTab($oP, 'UI:ZoneManagement:Action:DataFileDisplay:');
 
 		if ($this->Get('mapping') == 'direct') {
@@ -130,9 +132,11 @@ HTML
 			// Adjust the size of the block
 			$oP->add_ready_script(" $('#zonedatafile>textarea').height($('#zonedatafile').parent().height() - 220).width( $('#zonedatafile').parent().width() - 30);");
 		} else {
+			$sUITitle = Dict::Format('UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class', 'Zone', $this->GetName());
+			$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fa fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
 			$oP->add(<<<HTML
 				<div id="zonedatafile" class="ibo-is-code">
-				<pre>{$sHtml}</pre>
+				<pre>$sHtml</pre>
 				</div>
 HTML
 			);
