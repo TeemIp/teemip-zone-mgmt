@@ -48,7 +48,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/view.png</icon>
+        <icon>asset/img/icons8-3d-glasses-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -926,7 +926,7 @@
             <attribute id="full_name"/>
           </attributes>
         </naming>
-        <icon>asset/img/zone.png</icon>
+        <icon>asset/img/icons8-zone-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1509,7 +1509,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/a.png</icon>
+        <icon>asset/img/icons8-rj45-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1683,7 +1683,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/aaaa.png</icon>
+        <icon>asset/img/icons8-rj45v6-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1858,7 +1858,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/cname.png</icon>
+        <icon>asset/img/icons8-duplicate-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2055,7 +2055,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/mx.png</icon>
+        <icon>asset/img/icons8-mail-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2263,7 +2263,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/ns.png</icon>
+        <icon>asset/img/icons8-server.svg</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2464,7 +2464,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/ptr.png</icon>
+        <icon>asset/img/icons8-hand-right-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2725,7 +2725,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/srv.png</icon>
+        <icon>asset/img/icons8-service.svg</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2955,7 +2955,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/txt.png</icon>
+        <icon>asset/img/icons8-signing-a-document-48.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -3296,7 +3296,7 @@
               <dashlet id="teemip-dns-101" xsi:type="DashletHeaderStatic">
                 <rank>1</rank>
                 <title>Menu:DNSSpace:MainObjects</title>
-                <icon>teemip-zone-mgmt/asset/img/dnsobject.png</icon>
+                <icon>teemip-ip-mgmt/asset/img/icons8-internet-folder-48.png</icon>
               </dashlet>
               <dashlet id="teemip-dns-111" xsi:type="DashletBadge">
                 <rank>2</rank>
@@ -3318,7 +3318,7 @@
               <dashlet id="teemip-dns-201" xsi:type="DashletHeaderStatic">
                 <rank>1</rank>
                 <title>Menu:DNSSpace:ResourceRecords</title>
-                <icon>teemip-zone-mgmt/asset/img/dnsobject.png</icon>
+                <icon>teemip-ip-mgmt/asset/img/icons8-internet-folder-48.png</icon>
               </dashlet>
               <dashlet id="teemip-dns-211" xsi:type="DashletBadge">
                 <rank>2</rank>
