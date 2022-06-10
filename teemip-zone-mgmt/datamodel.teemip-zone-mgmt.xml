@@ -1023,12 +1023,12 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
         <field id="functionalcis_list" xsi:type="AttributeLinkedSetIndirect">
-        <linked_class>lnkFunctionalCIToZone</linked_class>
-        <ext_key_to_me>zone_id</ext_key_to_me>
-        <count_min>0</count_min>
-        <count_max>0</count_max>
-        <ext_key_to_remote>functionalci_id</ext_key_to_remote>
-        <duplicates/>
+          <linked_class>lnkFunctionalCIToZone</linked_class>
+          <ext_key_to_me>zone_id</ext_key_to_me>
+          <count_min>0</count_min>
+          <count_max>0</count_max>
+          <ext_key_to_remote>functionalci_id</ext_key_to_remote>
+          <duplicates/>
         </field>
       </fields>
       <methods>
