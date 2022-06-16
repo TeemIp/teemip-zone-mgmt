@@ -361,7 +361,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Management of zones
 //
 Dict::Add('FR FR', 'French', 'Français', array(
-	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv4 est x.[y.][z.]in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv4 est x.[y.][z.]in-addr.arpa. ou u-v.x.y.z.in-addr.arpa. !',
 	'UI:ZoneManagement:Action:New:Zone:V6:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv6 est x1.[x2.]...[x31.]ip6.arpa. !',
 	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'Un serveur authoritaire ne peut être que de classe Serveur ou Machine Virtuelle !',
 ));
@@ -383,9 +383,10 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Management of records
 //
 Dict::Add('FR FR', 'French', 'Français', array(
-	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit' => 'Mauvais format: les enregistrements PTR IPv4 sont constitués de 4 nombres - x.y.z.t.in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit' => 'Mauvais format: les enregistrements PTR IPv4 sont constitués de 4 / 5 nombres - x.y.z.t.in-addr.arpa. / w.u-v.x.y.z.in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone' => 'Dans une zone relative à un sous class C, le dernier nombre d\'un enregistrement PTR doit appartenir à l\'intervalle définit par le nombre suivant (w dans [u,v] pour w.u-v.x.y.z.in-addr.arpa.) !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange' => 'Mauvais format: les nombres IPv4 sont contenus dans l\'interval 0 - 255 !',
-	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat' => 'Mauvais format: le format des enregistrements PTR IPv4 est x.y.z.t.in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat' => 'Mauvais format: le format des enregistrements PTR IPv4 est x.y.z.t.in-addr.arpa. ou w.u-v.x.y.z.in-addr.arpa !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit' => 'Mauvais format: les enregistrements PTR IPv6 PTR sont constitués de 32 nombres - x1.x2....x32.ip6.arpa. !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:IpNotInRange' => 'Mauvais format: les nombres IPv6 sont contenus dans l\'interval 0 - F range, en hexa !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:WrongFormat' => 'Mauvais format: le format des enregistrements PTR IPv6 est x1.x2....x32.ip6.arpa. !',
@@ -420,6 +421,9 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:NameSpace' => 'Espace de Nomage',
 	'Menu:NameSpace+' => '',
 	'Menu:DNSSpace:MainObjects' => 'Principaux objets DNS',
+	'Title:Zones:DirectMapping' => 'Zones forward',
+	'Title:Zones:V4ReverseMapping' => 'Zones IPv4 inverse',
+	'Title:Zones:V6ReverseMapping' => 'Zones IPv6 inverse',
 	'Menu:DNSSpace:ResourceRecords' => 'Enregistrements',
 	'Menu:View' => 'Vues',
 	'Menu:View+' => 'Vues DNS',

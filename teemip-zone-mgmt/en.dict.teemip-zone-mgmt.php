@@ -361,7 +361,7 @@ Dict::Add('EN US', 'English', 'English', array(
 // Management of zones
 //
 Dict::Add('EN US', 'English', 'English', array(
-	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Wrong format: IPv4 reverse zone format is x.[y.][z.]in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Wrong format: IPv4 reverse zone format is x.[y.][z.]in-addr.arpa. or u-v.x.y.z.in-addr.arpa. !',
 	'UI:ZoneManagement:Action:New:Zone:V6:WrongFormat' => 'Wrong format: IPv6 reverse zone format is x1.[x2.]...[xi.]ip6.arpa. !',
 	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'An authoritative server can only be of Server or Virtual Machine class !',
 ));
@@ -383,9 +383,10 @@ Dict::Add('EN US', 'English', 'English', array(
 // Management of records
 //
 Dict::Add('EN US', 'English', 'English', array(
-	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit' => 'Wrong format: IPv4 PTR records are made of 4 numbers - x.y.z.t.in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit' => 'Wrong format: IPv4 PTR records are made of 4 / 5 "numbers" - x.y.z.t.in-addr.arpa. / w.u-v.x.y.z.in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone' => 'Last digit of PTR in sub class C zone must belong to the range defined by the following digit (w in [u,v] for w.u-v.x.y.z.in-addr.arpa.) !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange' => 'Wrong format: IPv4 numbers are contained within 0 - 255 range!',
-	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat' => 'Wrong format: IPv4 PTR records format is x.y.z.t.in-addr.arpa. !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat' => 'Wrong format: IPv4 PTR records format is x.y.z.t.in-addr.arpa. or w.u-v.x.y.z.in-addr.arpa !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit' => 'Wrong format: IPv6 PTR records are made of 32 numbers - x1.x2....x32.ip6.arpa. !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:IpNotInRange' => 'Wrong format: IPv6 numbers are contained within 0 - F range, in hexa!',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:WrongFormat' => 'Wrong format: IPv6 PTR records format is x1.x2....x32.ip6.arpa. !',
@@ -420,6 +421,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:NameSpace' => 'Name Space',
 	'Menu:NameSpace+' => '',
 	'Menu:DNSSpace:MainObjects' => 'DNS Main Objects',
+	'Title:Zones:DirectMapping' => 'Forward Zones',
+	'Title:Zones:V4ReverseMapping' => 'IPv4 reverse Zones',
+	'Title:Zones:V6ReverseMapping' => 'IPv6 reverse Zones',
 	'Menu:DNSSpace:ResourceRecords' => 'Resource Records',
 	'Menu:View' => 'Views',
 	'Menu:View+' => 'DNS Views',
