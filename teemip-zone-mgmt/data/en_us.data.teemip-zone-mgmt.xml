@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Set>
+	<AuditCategory alias="AuditCategory" id="1">
+		<name>Zone Management</name>
+		<description>Set of audit rules related to DNS Zones</description>
+		<definition_set>SELECT Zone</definition_set>
+	</AuditCategory>
+	<AuditRule alias="AuditRule" id="1">
+		<name>Master server of Zone is not an authoritative server</name>
+		<description>Master server defined in SOA doesn't exist as master server in the list of authoritative servers</description>
+		<query>SELECT Zone AS z JOIN lnkFunctionalCIToZone AS l ON l.zone_id = z.id WHERE (z.sourcedname = l.functionalci_name OR z.sourcedname = CONCAT(l.functionalci_name, '.')) AND l.authority = 'master'</query>
+		<valid_flag>true</valid_flag>
+		<category_id>1</category_id>
+	</AuditRule>
+	<AuditRule alias="AuditRule" id="2">
+		<name>One server in NS Record of Zone is not an authoritative server</name>
+		<description>At least one server defined in NS Record doesn't appear in the list of authoritative servers</description>
+		<query>SELECT Zone AS z JOIN NSRecord AS nsr ON nsr.zone_id = z.id WHERE z.id NOT IN (SELECT Zone AS z1 JOIN NSRecord AS nsr1 ON nsr1.zone_id = z1.id JOIN lnkFunctionalCIToZone AS l1 ON l1.zone_id = z1.id WHERE nsr1.nsname = l1.functionalci_name OR nsr1.nsname = CONCAT(l1.functionalci_name, '.'))</query>
+		<valid_flag>false</valid_flag>
+		<category_id>1</category_id>
+	</AuditRule>
+</Set>
