@@ -1334,8 +1334,8 @@
       $sName = $this->Get('name');
       if ($sName != '@')
       {
-          $sZone = $this->Get('zone_name');
-          $sFqdn = $this->ComputeFqdn($sName, $sZone);
+          $sZoneName = $this->Get('zone_name');
+          $sFqdn = $this->ComputeFqdn($sName, $sZoneName);
           if ($sName != $sFqdn)
           {
               $this->Set('name', $sFqdn);
@@ -1355,8 +1355,8 @@
       $sName = $this->Get('name');
       if ($sName != '@')
       {
-          $sZone = $this->Get('zone_name');
-          $sFqdn = $this->ComputeFqdn($sName, $sZone);
+          $sZoneName = $this->Get('zone_name');
+          $sFqdn = $this->ComputeFqdn($sName, $sZoneName);
           if ($sName != $sFqdn)
           {
               $this->Set('name', $sFqdn);
@@ -1425,13 +1425,13 @@
           <type>Overload-cmdbAbstractObject</type>
           <code><![CDATA[ protected function GetDataNameForDataString()
    {
-    	$sZone = $this->Get('zone_name');
+    	$sZoneName = $this->Get('zone_name');
    		$sOwner = $this->Get('name');
-   		if (($sOwner == '@') || ($sOwner == $sZone))
+   		if (($sOwner == '@') || ($sOwner == $sZoneName))
    		{
    		    return $sOwner;
    		}
-  	    $sPrependedDomainName = ".".$sZone;
+  	    $sPrependedDomainName = ".".$sZoneName;
    	    $sDataName = str_replace($sPrependedDomainName, "", $sOwner);
     	return $sDataName;
     }]]></code>
@@ -2488,55 +2488,61 @@
           <type>Overload-cmdbAbstractObject</type>
           <code><![CDATA[ public function DoCheckToWrite()
     {
-		parent::DoCheckToWrite();
+        parent::DoCheckToWrite();
 		
         $iZoneId = $this->Get('zone_id');
         $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */); 
-        if (!is_null($oZone))
-        {
+        if (!is_null($oZone)) {
             $sMapping = $oZone->Get('mapping');
-            $sZone = $oZone->Get('name');
+            $sZoneName = $oZone->Get('name');
             $sName = $this->Get('name');
-            $sFqdn = $this->ComputeFqdn($sName, $sZone);
+            $sFqdn = $this->ComputeFqdn($sName, $sZoneName);
             $aDigit = array();
-            if ($sMapping == 'ipv4reverse')
-            {
+            if ($sMapping == 'ipv4reverse') {
                 $aDigit = explode('.', strstr($sFqdn, '.in-addr.arpa.', true));
                 $iNbDigit = sizeof($aDigit);
-                if ($iNbDigit != 4)
-                {
-                    $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit');
-                    return;
-                }
-                for ($i = 0; $i < $iNbDigit; $i++)
-                {
-                    if (!((0 <= $aDigit[$i]) && ($aDigit[$i] <= 255)))
-                    {
+                $bSubClassC = TeemIp\TeemIp\Extension\ZoneManagement\Model\_Zone::IsIPv4SubClassCReverseZone($sZoneName);
+                if ($bSubClassC) {
+                    if ($iNbDigit != 5) {
+                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit');
+                        return;
+                    }
+                    if (!TeemIp\TeemIp\Extension\ZoneManagement\Model\_Zone::IsInSubClassCReverseZone($aDigit[0], $sZoneName)) {
+                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone');
+                        return;
+                    }
+                    if (!((0 <= $aDigit[0]) && ($aDigit[0] <= 255))) {
                         $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange');
                         return;
                     }
+                } else {
+                    if ($iNbDigit != 4) {
+                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit');
+                        return;
+                    }
+                    for ($i = 0; $i < $iNbDigit; $i++) {
+                        if (!((0 <= $aDigit[$i]) && ($aDigit[$i] <= 255))) {
+                            $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange');
+                            return;
+                        }
+                    }
+                    $sPattern ='/^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){4}in-addr\.arpa\.$/';
+                    $aMatches = array();
+                    if (!preg_match($sPattern, $sFqdn, $aMatches)) {
+                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat');
+                        return;
+                    }
                 }
-                $sPattern ='/^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){4}in-addr\.arpa\.$/';
-                $aMatches = array();
-                if (!preg_match($sPattern, $sFqdn, $aMatches))
-                {
-                    $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat');
-                    return;
-                }
-            }
-            elseif ($sMapping == 'ipv6reverse')
-            {
+            } elseif ($sMapping == 'ipv6reverse') {
                 $aDigit = explode('.', strstr($sFqdn, '.ip6.arpa.', true));
                 $iNbDigit = sizeof($aDigit);
-                if ($iNbDigit != 32)
-                {
+                if ($iNbDigit != 32) {
                     $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit');
                     return;
                 }
                 $sPattern = '/^((\d|[a-f]|[A-F])\.){32}ip6\.arpa\.$/';
                 $aMatches = array();
-                if (!preg_match($sPattern, $sFqdn, $aMatches))
-                {
+                if (!preg_match($sPattern, $sFqdn, $aMatches)) {
                     $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:IpNotInRange');
                     return;
                 }
@@ -3306,9 +3312,20 @@
                 <rank>3</rank>
                 <class>View</class>
               </dashlet>
-              <dashlet id="teemip-dns-113" xsi:type="DashletBadge">
+              <dashlet id="teemip-dns-114" xsi:type="DashletBadgeFiltered">
                 <rank>4</rank>
-                <class>Zone</class>
+                <title>Title:Zones:DirectMapping</title>
+                <query>SELECT Zone WHERE mapping = 'direct'</query>
+              </dashlet>
+              <dashlet id="teemip-dns-115" xsi:type="DashletBadgeFiltered">
+                <rank>4</rank>
+                <title>Title:Zones:V4ReverseMapping</title>
+                <query>SELECT Zone WHERE mapping = 'ipv4reverse'</query>
+              </dashlet>
+              <dashlet id="teemip-dns-116" xsi:type="DashletBadgeFiltered">
+                <rank>4</rank>
+                <title>Title:Zones:V6ReverseMapping</title>
+                <query>SELECT Zone WHERE mapping = 'ipv6reverse'</query>
               </dashlet>
             </dashlets>
           </cell>
@@ -3568,7 +3585,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	              }
 	          } else {
 				        $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-			          IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+			          TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
 	          }
 	      }
 	  } elseif ($oObject instanceof IPv6Address) {
@@ -3635,7 +3652,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	              }
 	          } else {
 				        $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-				        IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+				        TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
 	          }
 	      }
 		} elseif ($oObject instanceof IPv4Subnet) {
@@ -3716,7 +3733,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
                 }
             } else {
                 $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-                IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+                TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
             }
 	      }
 		} elseif ($oObject instanceof IPv6Subnet) {
@@ -3797,7 +3814,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	          }
 	      } else {
 			      $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-				    IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+				    TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
 	      }
 	  }
 	  }
@@ -3868,7 +3885,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	public function OnDBUpdate($oObject, $oChange = null) {
 		if ($oObject instanceof IPAddress) {
 		    // Update DNS records associated to IP if config requires it
-		    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+		    $sIpUpdateDNSRecords = TeemIp\TeemIp\Extension\Framework\Model\IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
 		    if ($sIpUpdateDNSRecords == 'yes') {
 				    $sError = $oObject->DoCheckUpdateRRs();
 				    if ($sError != '') {
