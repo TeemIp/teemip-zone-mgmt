@@ -20,6 +20,20 @@ use utils;
 use WebPage;
 
 class _Zone extends DNSObject {
+	const MODULE_CODE = 'teemip-zone-mgmt';
+	const IPV4_REVERSE_ZONE_PATTERN = 'ipv4_reverse_zone_pattern';
+	const IPV4_SUB_CLASS_C_SEPARATOR = 'ipv4_sub_class_c_separator';
+	const IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN = 'ipv4_sub_classC_reverse_zone_pattern';
+	const IPV6_REVERSE_ZONE_PATTERN = 'ipv6_reverse_zone_pattern';
+
+	// Pattern for IPv4 reverse zone, including sub class C zones:
+	//   a) x.[y.][z.]in-addr.arpa.
+	//   b) a-b.x.y.z.in-addr.arpa
+	const DEFAULT_IPV4_REVERSE_ZONE_PATTERN = '^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){1,3}in-addr\.arpa\.$';
+	const DEFAULT_IPV4_SUB_CLASS_C_SEPARATOR = '-';
+	const DEFAULT_IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN = '^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])-(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.)((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}in-addr\.arpa\.$';
+	const DEFAULT_IPV6_REVERSE_ZONE_PATTERN = '^((\d|[a-f]|[A-F])\.){1,31}ip6\.arpa\.$';
+
 	/**
 	 * Provides the zone that correspond to a FQDN
 	 *
@@ -34,7 +48,7 @@ class _Zone extends DNSObject {
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	static function GetZoneFromFqdn($sFqdn, $iView, $sMapping, $iOrgId) {
+	public static function GetZoneFromFqdn($sFqdn, $iView, $sMapping, $iOrgId): array {
 		$sError = '';
 		if ((strlen($sFqdn) == 0) || ($iOrgId == 0)) {
 			return array(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:CannotFindZone:'.$sMapping), 0);
@@ -53,94 +67,151 @@ class _Zone extends DNSObject {
 	}
 
 	/**
-	 * @inheritdoc
+	 * @param $sZoneName
+	 *
+	 * @return bool
 	 */
-	public function DoCheckToWrite() {
-		parent::DoCheckToWrite();
-
-		$sName = $this->Get('name');
-		$sMapping = $this->Get('mapping');
-		if ($sMapping == 'ipv4reverse') {
-			$sPattern = '/^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){1,3}in-addr\.arpa\.$/';
-			if (!preg_match($sPattern, $sName)) {
-				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V4:WrongFormat');
-
-				return;
-			}
-		} elseif ($sMapping == 'ipv6reverse') {
-			$sPattern = '/^((\d|[a-f]|[A-F])\.){1,31}ip6\.arpa\.$/';
-			if (!preg_match($sPattern, $sName)) {
-				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V6:WrongFormat');
-
-				return;
-			}
+	public static function IsIPv4ReverseZone($sZoneName): bool {
+		// Get user defined pattern if exists
+		$sUserPattern = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV4_REVERSE_ZONE_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : static::DEFAULT_IPV4_REVERSE_ZONE_PATTERN;
+		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
-	 * Displays data file
+	 * @param $sZoneName
 	 *
-	 * @param \iTopWebPage $oP
-	 * @param $aParams
-	 *
-	 * @return void
-	 * @throws \ApplicationException
-	 * @throws \ArchivedObjectException
-	 * @throws \CoreException
-	 * @throws \CoreUnexpectedValue
-	 * @throws \DictExceptionMissingString
-	 * @throws \MySQLException
-	 * @throws \OQLException
+	 * @return bool
 	 */
-	public function DisplayDataFile(iTopWebPage $oP, $aParams = array()) {
-		$this->DisplayBareTab($oP, 'UI:ZoneManagement:Action:DataFileDisplay:');
+	public static function IsIPv4SubClassCReverseZone($sZoneName): bool {
+		$sUserPattern = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : static::DEFAULT_IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN;
+		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
+			return true;
+		}
 
-		if ($this->Get('mapping') == 'direct') {
-			$id = $this->GetKey();
+		return false;
+	}
 
-			// Prepare context to switch display order and display button
-			$sUrl = utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', array());
-			$sHtml = "<form method=\"post\" action=\"".$sUrl."\">";
-			$sHtml .= "<input type=\"hidden\" name=\"class\" value=\"Zone\">";
-			$sHtml .= "<input type=\"hidden\" name=\"id\" value=\"$id\">";
-			$sHtml .= "<input type=\"hidden\" name=\"operation\" value=\"datafiledisplay\">";
-			$sHtml .= "<input type=\"hidden\" name=\"transaction_id\" value=\"".utils::GetNewTransactionId()."\">";
-			$sSortOrder = $aParams['sort-order'];
-			$sNewSortOrder = ($sSortOrder == 'sort_by_record') ? 'sort_by_char' : 'sort_by_record';
-			$sHtml .= "<input type=\"hidden\" name=\"sort_order\" value=\"$sNewSortOrder\">";
-			$oAppContext = new ApplicationContext();
-			$sHtml .= $oAppContext->GetForForm();
-			$sButton = "<button type=\"submit\" class=\"action\"><span>".Dict::S('UI:ZoneManagement:Action:DataFileDisplay:Zone:'.$sNewSortOrder)."</span></button>";
-			if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-				$sHtml .= "<br>".$sButton."<br>";
+	/**
+	 * @param $sZoneName
+	 *
+	 * @return bool
+	 */
+	public static function IsIPv6ReverseZone($sZoneName): bool {
+		$sUserPattern = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV6_REVERSE_ZONE_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : static::DEFAULT_IPV6_REVERSE_ZONE_PATTERN;
+		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param $sDigit
+	 * @param $sZoneName
+	 *
+	 * @return bool
+	 */
+	public static function IsInSubClassCReverseZone($sDigit, $sZoneName): bool {
+		$sUserSeparator = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV4_SUB_CLASS_C_SEPARATOR, '');
+		$sSeparator = ($sUserSeparator !== '') ? $sUserSeparator : static::DEFAULT_IPV4_SUB_CLASS_C_SEPARATOR;
+		$aLabels = explode('.', $sZoneName);
+		$aRangeDigits = explode($sSeparator, $aLabels[0]);
+		if (($aRangeDigits[0] <= $sDigit) && ($sDigit <= $aRangeDigits[1])) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Straighten reverse zone name if required
+	 *
+	 * @param $sMapping
+	 * @param $sName
+	 *
+	 * @return string
+	 */
+	private function StraightenReverse($sMapping, $sName): string {
+		if ($sMapping == 'ipv4reverse') {
+			if (substr($sName, -13) != 'in-addr.arpa.') {
+				if (substr($sName, -8) == 'in-addr.') {
+					return ($sName.'arpa.');
+				} elseif (substr($sName, -5) == 'arpa.') {
+					$sName = substr($sName, 0, -5);
+
+					return ($sName.'in-addr.arpa.');
+				} else {
+					return ($sName.'in-addr.arpa.');
+				}
 			} else {
-				$sHtml .= $sButton."<br><br>";
+				return ($sName);
 			}
-			$sHtml .= "</form>";
-			$oP->add($sHtml);
+		} elseif ($sMapping == 'ipv6reverse') {
+			if (substr($sName, -9) != 'ip6.arpa.') {
+				if (substr($sName, -4) == 'ip6.') {
+					return ($sName.'arpa.');
+				} elseif (substr($sName, -5) == 'arpa.') {
+					$sName = substr($sName, 0, -5);
+
+					return ($sName.'ip6.arpa.');
+				} else {
+					return ($sName.'ip6.arpa.');
+				}
+			} else {
+				return ($sName);
+			}
 		}
 
-		// Display text area
-		$sHtml = $this->GetDataFile($aParams['sort-order']);
-		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-			$oP->add(<<<HTML
-				<div id="zonedatafile" class="display_block">
-				<textarea>{$sHtml}</textarea>
-				</div>
-HTML
-			);
-			// Adjust the size of the block
-			$oP->add_ready_script(" $('#zonedatafile>textarea').height($('#zonedatafile').parent().height() - 220).width( $('#zonedatafile').parent().width() - 30);");
-		} else {
-			$sUITitle = Dict::Format('UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class', 'Zone', $this->GetName());
-			$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fa fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
-			$oP->add(<<<HTML
-				<div id="zonedatafile" class="ibo-is-code">
-				<pre>$sHtml</pre>
-				</div>
-HTML
-			);
+		return ($sName);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function OnInsert() {
+		parent::OnInsert();
+
+		// Add '.' at the end of name and sourcedname fields if not already set
+		$sName = strtolower($this->Get('name'));
+		if (substr($sName, -1) != '.') {
+			$this->Set('name', $sName.'.');
 		}
+		$sSourceDName = strtolower($this->Get('sourcedname'));
+		if (substr($sSourceDName, -1) != '.') {
+			$this->Set('sourcedname', $sSourceDName.'.');
+		}
+
+		// Check if reverse zone ends up with right arpa domain.
+		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
+		$this->Set('name', $sName);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function OnUpdate() {
+		parent::OnUpdate();
+
+		// Add '.' at the end of name and sourcedname fields if not already set
+		$sName = $this->Get('name');
+		if (substr($sName, -1) != '.') {
+			$this->Set('name', $sName.'.');
+		}
+		$sSourceDName = $this->Get('sourcedname');
+		if (substr($sSourceDName, -1) != '.') {
+			$this->Set('sourcedname', $sSourceDName.'.');
+		}
+
+		// Check if reverse zone ends up with right arpa domain.
+		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
+		$this->Set('name', $sName);
 	}
 
 	/**
@@ -258,6 +329,91 @@ HTML
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function DoCheckToWrite() {
+		parent::DoCheckToWrite();
+
+		$sMapping = $this->Get('mapping');
+		$sName = $this->Get('name');
+		if ($sMapping == 'ipv4reverse') {
+			if (!$this->IsIPv4ReverseZone($sName) && !$this->IsIPv4SubClassCReverseZone($sName)) {
+				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V4:WrongFormat');
+			}
+		} elseif ($sMapping == 'ipv6reverse') {
+			if (!$this->IsIPv6ReverseZone($sName)) {
+				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V6:WrongFormat');
+			}
+		}
+	}
+
+	/**
+	 * Displays data file
+	 *
+	 * @param \iTopWebPage $oP
+	 * @param $aParams
+	 *
+	 * @return void
+	 * @throws \ApplicationException
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \DictExceptionMissingString
+	 * @throws \MySQLException
+	 * @throws \OQLException
+	 */
+	public function DisplayDataFile(iTopWebPage $oP, $aParams = array()): void {
+		$this->DisplayBareTab($oP, 'UI:ZoneManagement:Action:DataFileDisplay:');
+
+		if ($this->Get('mapping') == 'direct') {
+			$id = $this->GetKey();
+
+			// Prepare context to switch display order and display button
+			$sUrl = utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', array());
+			$sHtml = "<form method=\"post\" action=\"".$sUrl."\">";
+			$sHtml .= "<input type=\"hidden\" name=\"class\" value=\"Zone\">";
+			$sHtml .= "<input type=\"hidden\" name=\"id\" value=\"$id\">";
+			$sHtml .= "<input type=\"hidden\" name=\"operation\" value=\"datafiledisplay\">";
+			$sHtml .= "<input type=\"hidden\" name=\"transaction_id\" value=\"".utils::GetNewTransactionId()."\">";
+			$sSortOrder = $aParams['sort-order'];
+			$sNewSortOrder = ($sSortOrder == 'sort_by_record') ? 'sort_by_char' : 'sort_by_record';
+			$sHtml .= "<input type=\"hidden\" name=\"sort_order\" value=\"$sNewSortOrder\">";
+			$oAppContext = new ApplicationContext();
+			$sHtml .= $oAppContext->GetForForm();
+			$sButton = "<button type=\"submit\" class=\"action\"><span>".Dict::S('UI:ZoneManagement:Action:DataFileDisplay:Zone:'.$sNewSortOrder)."</span></button>";
+			if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
+				$sHtml .= "<br>".$sButton."<br>";
+			} else {
+				$sHtml .= $sButton."<br><br>";
+			}
+			$sHtml .= "</form>";
+			$oP->add($sHtml);
+		}
+
+		// Display text area
+		$sHtml = $this->GetDataFile($aParams['sort-order']);
+		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
+			$oP->add(<<<HTML
+				<div id="zonedatafile" class="display_block">
+				<textarea>{$sHtml}</textarea>
+				</div>
+HTML
+			);
+			// Adjust the size of the block
+			$oP->add_ready_script(" $('#zonedatafile>textarea').height($('#zonedatafile').parent().height() - 220).width( $('#zonedatafile').parent().width() - 30);");
+		} else {
+			$sUITitle = Dict::Format('UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class', 'Zone', $this->GetName());
+			$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fa fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
+			$oP->add(<<<HTML
+				<div id="zonedatafile" class="ibo-is-code">
+				<pre>$sHtml</pre>
+				</div>
+HTML
+			);
+		}
+	}
+
+	/**
 	 * Provides zone in BIND format in a text field
 	 *
 	 * @param $sSortOrder
@@ -269,7 +425,7 @@ HTML
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public function GetDataFile($sSortOrder) {
+	public function GetDataFile($sSortOrder): string {
 		// Default TTL
 		$sHtml = "\$TTL ".$this->Get('ttl')."\n";
 
@@ -427,92 +583,9 @@ HTML
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function IncreaseSerial() {
+	public function IncreaseSerial(): void {
 		$iSerial = $this->Get('serial');
 		$this->Set('serial', $iSerial + 1);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	protected function OnInsert() {
-		parent::OnInsert();
-
-		// Add '.' at the end of name and sourcedname fields if not already set
-		$sName = strtolower($this->Get('name'));
-		if (substr($sName, -1) != '.') {
-			$this->Set('name', $sName.'.');
-		}
-		$sSourceDName = strtolower($this->Get('sourcedname'));
-		if (substr($sSourceDName, -1) != '.') {
-			$this->Set('sourcedname', $sSourceDName.'.');
-		}
-
-		// Check if reverse zone ends up with right arpa domain.
-		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
-		$this->Set('name', $sName);
-	}
-
-	/**
-	 * Straighten reverse zone name if required
-	 *
-	 * @param $sMapping
-	 * @param $sName
-	 *
-	 * @return string
-	 */
-	private function StraightenReverse($sMapping, $sName) {
-		if ($sMapping == 'ipv4reverse') {
-			if (substr($sName, -13) != 'in-addr.arpa.') {
-				if (substr($sName, -8) == 'in-addr.') {
-					return ($sName.'arpa.');
-				} elseif (substr($sName, -5) == 'arpa.') {
-					$sName = substr($sName, 0, -5);
-
-					return ($sName.'in-addr.arpa.');
-				} else {
-					return ($sName.'in-addr.arpa.');
-				}
-			} else {
-				return ($sName);
-			}
-		} elseif ($sMapping == 'ipv6reverse') {
-			if (substr($sName, -9) != 'ip6.arpa.') {
-				if (substr($sName, -4) == 'ip6.') {
-					return ($sName.'arpa.');
-				} elseif (substr($sName, -5) == 'arpa.') {
-					$sName = substr($sName, 0, -5);
-
-					return ($sName.'ip6.arpa.');
-				} else {
-					return ($sName.'ip6.arpa.');
-				}
-			} else {
-				return ($sName);
-			}
-		}
-
-		return ($sName);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	protected function OnUpdate() {
-		parent::OnUpdate();
-
-		// Add '.' at the end of name and sourcedname fields if not already set
-		$sName = $this->Get('name');
-		if (substr($sName, -1) != '.') {
-			$this->Set('name', $sName.'.');
-		}
-		$sSourceDName = $this->Get('sourcedname');
-		if (substr($sSourceDName, -1) != '.') {
-			$this->Set('sourcedname', $sSourceDName.'.');
-		}
-
-		// Check if reverse zone ends up with right arpa domain.
-		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
-		$this->Set('name', $sName);
-	}
 }
