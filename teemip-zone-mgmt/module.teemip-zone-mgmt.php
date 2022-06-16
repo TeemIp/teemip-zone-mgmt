@@ -7,7 +7,7 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'teemip-zone-mgmt/3.0.0',
+	'teemip-zone-mgmt/3.0.1',
 	array(
 		// Identification
 		//
@@ -17,9 +17,9 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => array(
-			'teemip-ip-mgmt/3.0.0',
-			'teemip-ipv6-mgmt/3.0.0',
-			'teemip-network-mgmt/3.0.0',
+			'teemip-ip-mgmt/3.0.1',
+			'teemip-ipv6-mgmt/3.0.1',
+			'teemip-network-mgmt/3.0.1',
 		),
 		'mandatory' => false,
 		'visible' => true,
@@ -86,8 +86,7 @@ if (!class_exists('ZoneManagementInstaller'))
 			// Migrate allocation_date and release_date from IPAddress to IPObject
 			// Delete allocation_date and release_date from IPAddress
 
-			if (($sPreviousVersion == '1.0.0') || ($sPreviousVersion == '1.1.0'))
-			{
+			if (($sPreviousVersion == '1.0.0') || ($sPreviousVersion == '1.1.0')) {
 				SetupLog::Info("Module teemip-zone-mgmt: remove ResourceRecord class from the DNSObject tree and move it directly under cmdbAbstractObject class");
 
 				$sDNSObjectTable = MetaModel::DBGetTable('DNSObject');
@@ -101,8 +100,7 @@ if (!class_exists('ZoneManagementInstaller'))
 				SetupLog::Info("Module teemip-zone-mgmt: migration done");
 			}
 
-			if (in_array($sPreviousVersion, array('2.7.0', '2.6.2', '2.6.1', '2.6.0','1.2.0')))
-			{
+			if (in_array($sPreviousVersion, array('2.7.0', '2.6.2', '2.6.1', '2.6.0', '1.2.0'))) {
 				SetupLog::Info("Module teemip-zone-mgmt: move zone authoritative servers from obsolete lnkServerToZone to new lnkFunctionalCIToZone");
 
 				$sDBSubname = $oConfiguration->Get('db_subname');
@@ -112,6 +110,38 @@ if (!class_exists('ZoneManagementInstaller'))
 				SetupLog::Info("Module teemip-zone-mgmt: migration done");
 			}
 
+			// Load audit category and rules related to the module
+			if (version_compare($sPreviousVersion, $sCurrentVersion, '!=')) {
+				$oDataLoader = new XMLDataLoader();
+
+				CMDBObject::SetTrackInfo("Initialization");
+				$oMyChange = CMDBObject::GetCurrentChange();
+
+				$sLang = null;
+				// Try to get app. language from configuration fil (app. upgrade)
+				$sConfigFileName = APPCONF.'production/'.ITOP_CONFIG_FILE;
+				if (file_exists($sConfigFileName)) {
+					$oFileConfig = new Config($sConfigFileName);
+					if (is_object($oFileConfig)) {
+						$sLang = str_replace(' ', '_', strtolower($oFileConfig->GetDefaultLanguage()));
+					}
+				}
+
+				// If still no language, get the default one
+				if (null === $sLang) {
+					$sLang = str_replace(' ', '_', strtolower($oConfiguration->GetDefaultLanguage()));
+				}
+
+				$sFileName = dirname(__FILE__)."/data/{$sLang}.data.teemip-zone-mgmt.xml";
+				SetupLog::Info("Searching file: $sFileName");
+				if (!file_exists($sFileName)) {
+					$sFileName = dirname(__FILE__)."/data/en_us.data.teemip-zone-mgmt.xml";
+				}
+				SetupLog::Info("Loading file: $sFileName");
+				$oDataLoader->StartSession($oMyChange);
+				$oDataLoader->LoadFile($sFileName, false, true);
+				$oDataLoader->EndSession();
+			}
 		}
 	}
 }
