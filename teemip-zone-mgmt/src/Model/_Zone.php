@@ -21,21 +21,30 @@ use WebPage;
 
 class _Zone extends DNSObject {
 	const MODULE_CODE = 'teemip-zone-mgmt';
+	const IPV4_PTR_PATTERN = 'ip4_ptr_pattern';
+	const IPV4_SUB_CLASS_C_PTR_PATTERN = 'ipv4_sub_class_c_ptr_pattern';
 	const IPV4_REVERSE_ZONE_PATTERN = 'ipv4_reverse_zone_pattern';
 	const IPV4_SUB_CLASS_C_SEPARATOR = 'ipv4_sub_class_c_separator';
 	const IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN = 'ipv4_sub_classC_reverse_zone_pattern';
+	const IPV6_PTR_PATTERN = 'ip6_ptr_pattern';
 	const IPV6_REVERSE_ZONE_PATTERN = 'ipv6_reverse_zone_pattern';
 
-	// Pattern for IPv4 reverse zone, including sub class C zones:
-	//   a) x.[y.][z.]in-addr.arpa.
-	//   b) a-b.x.y.z.in-addr.arpa
+	// x.y.z.t.in-addr.arpa.
+	const DEFAULT_IPV4_PTR_PATTERN = '^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){4}in-addr\.arpa\.$';
+	// w.u-v.x.y.z.in-addr.arpa.
+	const DEFAULT_IPV4_SUB_CLASS_C_PTR_PATTERN = '^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.)((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])-(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.)((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}in-addr\.arpa\.$';
+	// x.[y.][z.]in-addr.arpa.
 	const DEFAULT_IPV4_REVERSE_ZONE_PATTERN = '^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){1,3}in-addr\.arpa\.$';
 	const DEFAULT_IPV4_SUB_CLASS_C_SEPARATOR = '-';
+	// u-v.x.y.z.in-addr.arpa.
 	const DEFAULT_IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN = '^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])-(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.)((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}in-addr\.arpa\.$';
+	// x32.x31. ... .x2.x1.ip6..arpa.
+	const DEFAULT_IPV6_PTR_PATTERN = '^((\d|[a-f]|[A-F])\.){32}ip6\.arpa\.$';
+	// x32.[x31.]...[x1.]ip6..arpa.
 	const DEFAULT_IPV6_REVERSE_ZONE_PATTERN = '^((\d|[a-f]|[A-F])\.){1,31}ip6\.arpa\.$';
 
 	/**
-	 * Provides the zone that correspond to a FQDN
+	 * Provides the zone that correspond to a FQDN - Works recursively
 	 *
 	 * @param $sFqdn
 	 * @param $iView
@@ -50,31 +59,108 @@ class _Zone extends DNSObject {
 	 */
 	public static function GetZoneFromFqdn($sFqdn, $iView, $sMapping, $iOrgId): array {
 		$sError = '';
+		// Are we at the end of the recursive process ?
 		if ((strlen($sFqdn) == 0) || ($iOrgId == 0)) {
-			return array(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:CannotFindZone:'.$sMapping), 0);
+			return array(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:CannotFindZone:'.$sMapping), 0, '');
 		}
+		// Look for sub class C IPv4 reverse zone
+		if ($sMapping == 'ipv4reverse') {
+			list ($iZoneId, $sZoneName) = self::GetIPv4SubClassCReverseZoneFromFqdn($sFqdn, $iView, $iOrgId);
+			if ($iZoneId > 0) {
+				return array($sError, $iZoneId, $sZoneName);
+			}
+		}
+		// Continue lookup
 		$sOQL = "SELECT Zone WHERE org_id = :org_id AND view_id = :view_id AND name = :name";
 		$oZoneSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('org_id' => $iOrgId, 'view_id' => $iView, 'name' => $sFqdn));
 		if ($oZone = $oZoneSet->Fetch()) {
 			$iZoneId = $oZone->GetKey();
+			$sZoneName = $oZone->Get('name');
 		} else {
 			$i = strpos($sFqdn, '.');
 			$sNextFqdn = substr($sFqdn, $i + 1);
-			list($sError, $iZoneId) = static::GetZoneFromFqdn($sNextFqdn, $iView, $sMapping, $iOrgId);
+			list($sError, $iZoneId, $sZoneName) = self::GetZoneFromFqdn($sNextFqdn, $iView, $sMapping, $iOrgId);
 		}
 
-		return array($sError, $iZoneId);
+		return array($sError, $iZoneId, $sZoneName);
 	}
 
 	/**
+	 * Get the IPv4 sub class C reverse zone that correspond to the given FQDN
+	 *
+	 * @param $sFqdn
+	 * @param $iView
+	 * @param $iOrgId
+	 *
+	 * @return int
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \MySQLException
+	 * @throws \OQLException
+	 */
+	public static function GetIPv4SubClassCReverseZoneFromFqdn($sFqdn, $iView, $iOrgId): array {
+		if (self::IsIPv4PTR($sFqdn)) {
+			$sOQL = "SELECT Zone WHERE org_id = :org_id AND view_id = :view_id AND mapping = 'ipv4reverse'";
+			$oZoneSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('org_id' => $iOrgId, 'view_id' => $iView));
+			while ($oZone = $oZoneSet->Fetch()) {
+				$sZoneName = $oZone->Get('name');
+				if (self::IsIPv4SubClassCReverseZone($sZoneName) && self::IsInSubClassCReverseZone($sFqdn, $sZoneName)) {
+					return array($oZone->GetKey(), $sZoneName);
+				}
+			}
+		}
+
+		return array(0, '');
+	}
+
+	/**
+	 * Check is FQDN has IPv4 PTR format
+	 *
+	 * @param $sFqdn
+	 *
+	 * @return bool
+	 */
+	public static function IsIPv4PTR($sFqdn): bool {
+		// Get user defined pattern if exists
+		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_PTR_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_PTR_PATTERN;
+		if (preg_match('/'.$sPattern.'/', $sFqdn)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check is FQDN has IPv4 sub class C PTR format
+	 *
+	 * @param $sFqdn
+	 *
+	 * @return bool
+	 */
+	public static function IsIPv4SubClassCPTR($sFqdn): bool {
+		// Get user defined pattern if exists
+		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_SUB_CLASS_C_PTR_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_SUB_CLASS_C_PTR_PATTERN;
+		if (preg_match('/'.$sPattern.'/', $sFqdn)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if the given zone is an IPv4 reverse zone
+	 *
 	 * @param $sZoneName
 	 *
 	 * @return bool
 	 */
 	public static function IsIPv4ReverseZone($sZoneName): bool {
 		// Get user defined pattern if exists
-		$sUserPattern = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV4_REVERSE_ZONE_PATTERN, '');
-		$sPattern = ($sUserPattern !== '') ? $sUserPattern : static::DEFAULT_IPV4_REVERSE_ZONE_PATTERN;
+		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_REVERSE_ZONE_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_REVERSE_ZONE_PATTERN;
 		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
 			return true;
 		}
@@ -83,13 +169,15 @@ class _Zone extends DNSObject {
 	}
 
 	/**
+	 * Check if the given zone is an IPv4 sub class C reverse zone
+	 *
 	 * @param $sZoneName
 	 *
 	 * @return bool
 	 */
 	public static function IsIPv4SubClassCReverseZone($sZoneName): bool {
-		$sUserPattern = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN, '');
-		$sPattern = ($sUserPattern !== '') ? $sUserPattern : static::DEFAULT_IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN;
+		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN;
 		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
 			return true;
 		}
@@ -98,13 +186,33 @@ class _Zone extends DNSObject {
 	}
 
 	/**
+	 * Check is FQDN has IPv6 PTR format
+	 *
+	 * @param $sFqdn
+	 *
+	 * @return bool
+	 */
+	public static function IsIPv6PTR($sFqdn): bool {
+		// Get user defined pattern if exists
+		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV6_PTR_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV6_PTR_PATTERN;
+		if (preg_match('/'.$sPattern.'/', $sFqdn)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if the given zone is an IPv6 reverse zone
+	 *
 	 * @param $sZoneName
 	 *
 	 * @return bool
 	 */
 	public static function IsIPv6ReverseZone($sZoneName): bool {
-		$sUserPattern = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV6_REVERSE_ZONE_PATTERN, '');
-		$sPattern = ($sUserPattern !== '') ? $sUserPattern : static::DEFAULT_IPV6_REVERSE_ZONE_PATTERN;
+		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV6_REVERSE_ZONE_PATTERN, '');
+		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV6_REVERSE_ZONE_PATTERN;
 		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
 			return true;
 		}
@@ -113,21 +221,51 @@ class _Zone extends DNSObject {
 	}
 
 	/**
-	 * @param $sDigit
+	 * Check if the FQDN belongs to the sub class C IPv4 reverse zone
+	 *
+	 * @param $sFqdn
+	 *   . format is w1.[u1-v1].x1.y1.z1.in-addr.arpa.
 	 * @param $sZoneName
+	 *   . format is u2-v2.x2.y2.z2.in-addr.arpa.
 	 *
 	 * @return bool
 	 */
-	public static function IsInSubClassCReverseZone($sDigit, $sZoneName): bool {
-		$sUserSeparator = MetaModel::GetModuleSetting(static::MODULE_CODE, static::IPV4_SUB_CLASS_C_SEPARATOR, '');
-		$sSeparator = ($sUserSeparator !== '') ? $sUserSeparator : static::DEFAULT_IPV4_SUB_CLASS_C_SEPARATOR;
-		$aLabels = explode('.', $sZoneName);
-		$aRangeDigits = explode($sSeparator, $aLabels[0]);
-		if (($aRangeDigits[0] <= $sDigit) && ($sDigit <= $aRangeDigits[1])) {
-			return true;
+	public static function IsInSubClassCReverseZone($sFqdn, $sZoneName): bool {
+		// Make sure $sZoneName is a sub class C reverse zone
+		if (!self::IsIPv4SubClassCReverseZone($sZoneName)) {
+			return false;
+		}
+		$sClassCZoneFromZone = substr(strstr($sZoneName, '.', false), 1);
+		$sUserSeparator = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_SUB_CLASS_C_SEPARATOR, '');
+		$sSeparator = ($sUserSeparator !== '') ? $sUserSeparator : self::DEFAULT_IPV4_SUB_CLASS_C_SEPARATOR;
+		$aZoneLabels = explode('.', $sZoneName);
+		$aRange = explode($sSeparator, $aZoneLabels[0]);
+
+		if (self::IsIPv4PTR($sFqdn)) {
+			// Handle simple PTR first
+			$sClassCZoneFromFQDN = substr(strstr($sFqdn, '.', false), 1);
+			if ($sClassCZoneFromFQDN != $sClassCZoneFromZone) {
+				return false;
+			}
+		} elseif (self::IsIPv4SubClassCPTR($sFqdn)) {
+			// Handle sub class C PTR next
+			$sSubClassCZoneFromFQDN = substr(strstr($sFqdn, '.', false), 1);
+			$sClassCZoneFromFQDN = substr(strstr($sSubClassCZoneFromFQDN, '.', false), 1);
+			if (($sClassCZoneFromFQDN != $sClassCZoneFromZone) || ($sSubClassCZoneFromFQDN != $sZoneName)) {
+				return false;
+			}
+		} else {
+			return false;
 		}
 
-		return false;
+		// Check last digit of FQDN is in sub class C range
+		$aFqdnLabels = explode('.', $sFqdn);
+		$sLastDigit = $aFqdnLabels[0];
+		if (($sLastDigit < $aRange[0]) || ($aRange[1] < $sLastDigit)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
