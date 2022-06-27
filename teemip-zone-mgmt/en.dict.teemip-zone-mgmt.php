@@ -384,7 +384,7 @@ Dict::Add('EN US', 'English', 'English', array(
 //
 Dict::Add('EN US', 'English', 'English', array(
 	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit' => 'Wrong format: IPv4 PTR records are made of 4 / 5 "numbers" - x.y.z.t.in-addr.arpa. / w.u-v.x.y.z.in-addr.arpa. !',
-	'UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone' => 'Last digit of PTR in sub class C zone must belong to the range defined by the following digit (w in [u,v] for w.u-v.x.y.z.in-addr.arpa.) !',
+	'UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone' => 'Last digit of PTR in sub class C zone must belong to the range defined by the following digits (w in [u,v] for w.u-v.x.y.z.in-addr.arpa.) !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange' => 'Wrong format: IPv4 numbers are contained within 0 - 255 range!',
 	'UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat' => 'Wrong format: IPv4 PTR records format is x.y.z.t.in-addr.arpa. or w.u-v.x.y.z.in-addr.arpa !',
 	'UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit' => 'Wrong format: IPv6 PTR records are made of 32 numbers - x1.x2....x32.ip6.arpa. !',
