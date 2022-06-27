@@ -420,7 +420,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:DNSManagement+' => '',
 	'Menu:NameSpace' => 'Name Space',
 	'Menu:NameSpace+' => '',
-	'Menu:DNSSpace:MainObjects' => 'DNS Main Objects',
+	'Menu:DNSSpace:MainObjects' => 'Structural Objects',
 	'Title:Zones:DirectMapping' => 'Forward Zones',
 	'Title:Zones:V4ReverseMapping' => 'IPv4 reverse Zones',
 	'Title:Zones:V6ReverseMapping' => 'IPv6 reverse Zones',

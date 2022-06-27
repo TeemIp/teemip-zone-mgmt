@@ -420,7 +420,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:DNSManagement+' => '',
 	'Menu:NameSpace' => 'Espace de Nomage',
 	'Menu:NameSpace+' => '',
-	'Menu:DNSSpace:MainObjects' => 'Principaux objets DNS',
+	'Menu:DNSSpace:MainObjects' => 'Objets structurants',
 	'Title:Zones:DirectMapping' => 'Zones forward',
 	'Title:Zones:V4ReverseMapping' => 'Zones IPv4 inverse',
 	'Title:Zones:V6ReverseMapping' => 'Zones IPv6 inverse',
