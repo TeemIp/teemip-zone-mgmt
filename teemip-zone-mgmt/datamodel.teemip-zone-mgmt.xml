@@ -149,8 +149,7 @@
           <code><![CDATA[
     public function DoCheckUpdateRRs()
     {
-        $sError = '';
-        return($sError);
+        return array('', 'ok');
     }]]></code>
         </method>
       </methods>
@@ -170,21 +169,16 @@
     {
         $sOQL = "SELECT IPv4Address WHERE subnet_id = :id";
    	    $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $this->GetKey()));
-   	    while ($oIP = $oIPSet->Fetch())
-   	    {
-			$sError = $oIP->DoCheckUpdateRRs();
-			if ($sError != '')
-			{
-				IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasNotRun', $sError));
-			}
-			else
-			{
-				$sError = $oIP->UpdateRRs();
-				if ($sError != '')
-				{
-					IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasErrors', $sError));
-				}
-			}
+   	    while ($oIP = $oIPSet->Fetch()) {
+   	        list($sError, $sSeverity) = $oIP->DoCheckUpdateRRs();
+   	        if ($sError != '') {
+   	            IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasNotRun', $sError));
+   	        } else {
+   	            $sError = $oIP->UpdateRRs();
+   	            if ($sError != '') {
+   	                IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasErrors', $sError));
+   	            }
+   	        }
    	    }
         return '';
     }]]></code>
@@ -222,21 +216,16 @@
     {
         $sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
    	    $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $this->GetKey()));
-   	    while ($oIP = $oIPSet->Fetch())
-   	    {
-			$sError = $oIP->DoCheckUpdateRRs();
-			if ($sError != '')
-			{
-				IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasNotRun', $sError));
-			}
-			else
-			{
-				$sError = $oIP->UpdateRRs();
-				if ($sError != '')
-				{
-					IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasErrors', $sError));
-				}
-			}
+   	    while ($oIP = $oIPSet->Fetch()) {
+   	        list ($sError, $sSeverity) = $oIP->DoCheckUpdateRRs();
+   	        if ($sError != '') {
+   	            IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasNotRun', $sError));
+   	        } else {
+   	            $sError = $oIP->UpdateRRs();
+   	            if ($sError != '') {
+   	                IssueLog::Info(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:HasErrors', $sError));
+   	            }
+   	        }
    	    }
         return '';
     }]]></code>
@@ -284,37 +273,36 @@
           <access>public</access>
           <type>Custom</type>
           <code><![CDATA[
-    public function DoCheckUpdateRRs()
-    {
+    public function DoCheckUpdateRRs() {
         $sError = '';
+        $sSeverity = 'ok';
         // Check if Short Name exists
         $sShortName = $this->Get('short_name');
-        if ($sShortName == '')
-        {
-        	$sComputeFqdnWithEmptyShortname = IPConfig::GetFromGlobalIPConfig('compute_fqdn_with_empty_shortname', $this->Get('org_id'));
-			if ($sComputeFqdnWithEmptyShortname != 'yes')
-			{
+        if ($sShortName == '') {
+            $sComputeFqdnWithEmptyShortname = IPConfig::GetFromGlobalIPConfig('compute_fqdn_with_empty_shortname', $this->Get('org_id'));
+            if ($sComputeFqdnWithEmptyShortname != 'yes') {
                 $sError = Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:NoShortName');
+                $sSeverity = 'error';
             }
         }
 
         // Check if Domain Name exists
         $iDomainId = $this->Get('domain_id');
-        if ($iDomainId == 0)
-        {
+        if ($iDomainId == 0) {
             $sError .= ($sError == '') ? '' : ' ; ';
             $sError .= Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:NoDomainName');
+            $sSeverity = 'error';
         }
 
-        // Check if corresponding zone exists
-        list($sErrorZone, $iZoneId) = Zone::GetZoneFromFqdn($this->Get('fqdn'), $this->Get('view_id'), 'direct', $this->Get('org_id'));
-        if ($sErrorZone != '')
-        {
+        // Check if corresponding zones exist (direct)
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($this->Get('fqdn'), $this->Get('view_id'), 'direct', $this->Get('org_id'));
+        if ($sErrorZone != '') {
             $sError .= ($sError == '') ? '' : ' ; ';
             $sError .= $sErrorZone;
+            $sSeverity = 'warning';
         }
 
-        return($sError);
+        return array($sError, $sSeverity);
     }]]></code>
         </method>
         <method id="UpdateRRs" _delta="define">
@@ -331,8 +319,8 @@
         foreach ($aAliases as $sAlias)
         {
         	$sAliasFqdn = DNSObject::ComputeFqdn($sAlias, '.');
-    	    list($sError, $iZoneId) = Zone::GetZoneFromFqdn($sAliasFqdn, $this->Get('view_id'), 'direct', $this->Get('org_id'));
-	        if ($sError == '')
+    	    list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sAliasFqdn, $this->Get('view_id'), 'direct', $this->Get('org_id'));
+	        if ($sErrorZone == '')
 	        {
                 // Zone has been found, check if records exists
                 if (!$this->ExistCNAMERecord($sAliasFqdn))
@@ -508,17 +496,40 @@
     </class>
     <class id="IPv4Address" _delta="must_exist">
       <methods>
-        <method id="ConvertToZone" _delta="define">
+        <method id="ConvertToPtr" _delta="define">
           <comment/>
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
           <code><![CDATA[
-    public function ConvertToZone($sIp)
+    public function ConvertToPtr($sIp)
     {
         $aPtr = array_reverse(explode('.', $sIp));
         $sPtr = implode('.', $aPtr).'.in-addr.arpa.';
         return $sPtr;
+    }]]></code>
+        </method>
+        <method id="DoCheckUpdateRRs" _delta="define">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[
+    public function DoCheckUpdateRRs() {
+        list($sError, $sSeverity) = parent::DoCheckUpdateRRs();
+
+        // Check if corresponding zones exist (reverse)
+        $sPtr = $this->ConvertToPtr($this->Get('ip'));
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sPtr, $this->Get('view_id'), 'direct', $this->Get('org_id'));
+        if ($sErrorZone != '') {
+            $sError .= ($sError == '') ? '' : ' ; ';
+            $sError .= $sErrorZone;
+            if ($sSeverity != 'error') {
+                $sSeverity = 'warning';
+            }
+        }
+
+        return array($sError, $sSeverity);
     }]]></code>
         </method>
         <method id="UpdateRRs" _delta="define">
@@ -533,7 +544,7 @@
 
         // Update A Record
         $sFqdn = $this->Get('fqdn');
-        list($sErrorZone, $iZoneId) = Zone::GetZoneFromFqdn($sFqdn, $this->Get('view_id'), 'direct', $this->Get('org_id'));
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sFqdn, $this->Get('view_id'), 'direct', $this->Get('org_id'));
         if ($sErrorZone == '')
         {
             // Zone has been found, check if records exists
@@ -558,24 +569,30 @@
 
         // Update PTR Record
         $sIp = $this->Get('ip');
-        $sPtr = $this->ConvertToZone($sIp);
-        list($sErrorZone, $iZoneId) = Zone::GetZoneFromFqdn($sPtr, $this->Get('view_id'), 'ipv4reverse', $this->Get('org_id'));
+        $sRawPtr = $this->ConvertToPtr($sIp);
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $this->Get('view_id'), 'ipv4reverse', $this->Get('org_id'));
         if ($sErrorZone == '')
         {
-            // Zone has been found, check if records exists
+            // Zone has been found, compute final FQDN and check if records exists
+            if (Zone::IsIPv4SubClassCReverseZone($sZoneName)) {
+                $aDigits = explode('.', $sRawPtr);
+                $sPtr = $aDigits[0].'.'.$sZoneName;
+            } else {
+                $sPtr = $sRawPtr;
+            }
             if (!$this->ExistPTRRecord($sPtr, $iZoneId))
             {
-                // Clean existing wrong A record, if any
+                // Clean existing wrong PTR record, if any
                 $this->CleanPTRRecord($sPtr);
 
-                // Create correct A record now
+                // Create correct PTR record now
                 $this->CreatePTRRecord($sPtr, $iZoneId);
             }
         }
         else
         {
             // Clean existing wrong PTR record, if any
-            $this->CleanPTRRecord($sPtr);
+            $this->CleanPTRRecord($sRawPtr);
 
             // Add error
             $sError .= ($sError == '') ? '' : ' ; ';
@@ -600,9 +617,18 @@
 
         // Remove PTR record
         $sIp = $this->Get('ip');
-        $aPtr = array_reverse(explode('.', $sIp));
-        $sPtr = implode('.', $aPtr).'.in-addr.arpa.';
-        $this->CleanPTRRecord($sPtr);
+        $sRawPtr = $this->ConvertToPtr($sIp);
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $this->Get('view_id'), 'ipv4reverse', $this->Get('org_id'));
+        if ($sErrorZone == '') {
+            // Zone has been found, compute final FQDN and check if records exists
+            if (Zone::IsIPv4SubClassCReverseZone($sZoneName)) {
+                $aDigits = explode('.', $sRawPtr);
+                $sPtr = $aDigits[0].'.'.$sZoneName;
+            } else {
+                $sPtr = $sRawPtr;
+            }
+            $this->CleanPTRRecord($sPtr);
+        }
     }]]></code>
         </method>
         <method id="ExistARecord" _delta="define">
@@ -709,26 +735,49 @@
     </class>
     <class id="IPv6Address" _delta="must_exist">
       <methods>
-        <method id="ConvertToZone" _delta="define">
+        <method id="ConvertToPtr" _delta="define">
           <comment/>
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
           <code><![CDATA[
-    public function ConvertToZone($sIp)
+    public function ConvertToPtr($sIp)
     {
         $aPtr1 = array_reverse(explode(':', $sIp));
         $aPtr2 = array();
-        for ($i = 0; $i < IPV6_NIBBLE_NUMBER; $i++)
-        {
-        	$sNibble = $aPtr1[$i];
-        	$aPtr2[] = substr($sNibble, 3, 1);
-	        $aPtr2[] = substr($sNibble, 2, 1);
-	        $aPtr2[] = substr($sNibble, 1, 1);
-	        $aPtr2[] = substr($sNibble, 0, 1);
+        for ($i = 0; $i < IPV6_NIBBLE_NUMBER; $i++) {
+            $sNibble = $aPtr1[$i];
+            $aPtr2[] = substr($sNibble, 3, 1);
+            $aPtr2[] = substr($sNibble, 2, 1);
+            $aPtr2[] = substr($sNibble, 1, 1);
+            $aPtr2[] = substr($sNibble, 0, 1);
         }
-	    $sPtr = implode('.', $aPtr2).'.ip6.arpa.';
+        $sPtr = implode('.', $aPtr2).'.ip6.arpa.';
+
         return $sPtr;
+    }]]></code>
+        </method>
+        <method id="DoCheckUpdateRRs" _delta="define">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[
+    public function DoCheckUpdateRRs() {
+        list($sError, $sSeverity) = parent::DoCheckUpdateRRs();
+
+        // Check if corresponding zones exist (reverse)
+        $sPtr = $this->ConvertToPtr($this->Get('ip'));
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sPtr, $this->Get('view_id'), 'direct', $this->Get('org_id'));
+        if ($sErrorZone != '') {
+            $sError .= ($sError == '') ? '' : ' ; ';
+            $sError .= $sErrorZone;
+            if ($sSeverity != 'error') {
+                $sSeverity = 'warning';
+            }
+        }
+
+        return array($sError, $sSeverity);
     }]]></code>
         </method>
         <method id="UpdateRRs" _delta="define">
@@ -743,7 +792,7 @@
 
         // Update AAAAA Record
         $sFqdn = $this->Get('fqdn');
-        list($sErrorZone, $iZoneId) = Zone::GetZoneFromFqdn($sFqdn, $this->Get('view_id'), 'direct', $this->Get('org_id'));
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sFqdn, $this->Get('view_id'), 'direct', $this->Get('org_id'));
         if ($sErrorZone == '')
         {
             // Zone has been found, check if records exists
@@ -769,8 +818,8 @@
         // Update PTR Record
         // Look for appropriate reverse zone
         $sIp = $this->Get('ip')->GetAsCannonical();
-        $sPtr = $this->ConvertToZone($sIp);
-        list($sErrorZone, $iZoneId) = Zone::GetZoneFromFqdn($sPtr, $this->Get('view_id'), 'ipv6reverse', $this->Get('org_id'));
+        $sPtr = $this->ConvertToPtr($sIp);
+        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sPtr, $this->Get('view_id'), 'ipv6reverse', $this->Get('org_id'));
         if ($sErrorZone == '')
         {
             // zone has been found, check if records exists
@@ -808,7 +857,7 @@
 
         // Remove PTR record
         $sIp = $this->Get('ip')->GetAsCannonical();
-        $sPtr = $this->ConvertToZone($sIp);
+        $sPtr = $this->ConvertToPtr($sIp);
         $this->CleanPTRRecord($sPtr);
     }]]></code>
         </method>
@@ -2501,18 +2550,14 @@
             if ($sMapping == 'ipv4reverse') {
                 $aDigit = explode('.', strstr($sFqdn, '.in-addr.arpa.', true));
                 $iNbDigit = sizeof($aDigit);
-                $bSubClassC = TeemIp\TeemIp\Extension\ZoneManagement\Model\_Zone::IsIPv4SubClassCReverseZone($sZoneName);
+                $bSubClassC = Zone::IsIPv4SubClassCReverseZone($sZoneName);
                 if ($bSubClassC) {
                     if ($iNbDigit != 5) {
                         $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit');
                         return;
                     }
-                    if (!TeemIp\TeemIp\Extension\ZoneManagement\Model\_Zone::IsInSubClassCReverseZone($aDigit[0], $sZoneName)) {
+                    if (!Zone::IsInSubClassCReverseZone($sFqdn, $sZoneName)) {
                         $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone');
-                        return;
-                    }
-                    if (!((0 <= $aDigit[0]) && ($aDigit[0] <= 255))) {
-                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange');
                         return;
                     }
                 } else {
@@ -2526,9 +2571,7 @@
                             return;
                         }
                     }
-                    $sPattern ='/^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){4}in-addr\.arpa\.$/';
-                    $aMatches = array();
-                    if (!preg_match($sPattern, $sFqdn, $aMatches)) {
+                    if (!Zone::IsIPv4PTR($sFqdn)) {
                         $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat');
                         return;
                     }
@@ -2540,9 +2583,7 @@
                     $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit');
                     return;
                 }
-                $sPattern = '/^((\d|[a-f]|[A-F])\.){32}ip6\.arpa\.$/';
-                $aMatches = array();
-                if (!preg_match($sPattern, $sFqdn, $aMatches)) {
+                if (!Zone::IsIPv6PTR($sFqdn)) {
                     $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:IpNotInRange');
                     return;
                 }
@@ -3525,13 +3566,25 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 		    if (!$bEditMode) {
 		        $iRRecords = 0;
 
-	            // Search for PTR records
-		        $aDigit = explode('.', $oObject->Get('ip'));
-		        $sPtr = implode('.', array_reverse($aDigit)).'.in-addr.arpa.';
-		        $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-		        $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-		        $iPTRRecords = $oPTRRecordSet->Count();
-		        $iRRecords += $iPTRRecords;
+		        // Search for PTR records
+		        $sIp = $oObject->Get('ip');
+		        $sRawPtr = $oObject->ConvertToPtr($sIp);
+		        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $oObject->Get('view_id'), 'ipv4reverse', $oObject->Get('org_id'));
+		        if ($sErrorZone == '') {
+		            // Zone has been found, compute final FQDN and check if records exists
+		            if (Zone::IsIPv4SubClassCReverseZone($sZoneName)) {
+		                $aDigits = explode('.', $sRawPtr);
+		                $sPtr = $aDigits[0].'.'.$sZoneName;
+		            } else {
+		                $sPtr = $sRawPtr;
+		            }
+		            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
+		            $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+		            $iPTRRecords = $oPTRRecordSet->Count();
+		            $iRRecords += $iPTRRecords;
+		        } else {
+		            $iPTRRecords = 0;
+		        }
 
 		        // Search for A records
 		        $sOQL = "SELECT ARecord WHERE ip_id = :ip_id";
@@ -3594,7 +3647,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 
 	          // Search for PTR records
 	          $sIp = $oObject->Get('ip')->GetAsCannonical();
-	          $sPtr = $oObject->ConvertToZone($sIp);
+	          $sPtr = $oObject->ConvertToPtr($sIp);
 	          $sOQL = "SELECT PTRRecord WHERE name = :ptr";
 	          $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
 	          $iPTRRecords = $oPTRRecordSet->Count();
@@ -3666,12 +3719,22 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	          $iPTRRecords = 0;
 				    $oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
 	          while ($oIP = $oIPSet->Fetch()) {
-	              $aDigit = explode('.', $oIP->Get('ip'));
-		            $sPtr = implode('.', array_reverse($aDigit)).'.in-addr.arpa.';
-		            $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-	              $oIPPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-	              $oPTRRecordSet->Append($oIPPTRRecordSet);
-	              $iPTRRecords += $oIPPTRRecordSet->Count();
+	              $sIp = $oIP->Get('ip');
+	              $sRawPtr = $oIP->ConvertToPtr($sIp);
+	              list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $oIP->Get('view_id'), 'ipv4reverse', $oIP->Get('org_id'));
+	              if ($sErrorZone == '') {
+	                  // Zone has been found, compute final FQDN and check if records exists
+	                  if (Zone::IsIPv4SubClassCReverseZone($sZoneName)) {
+	                      $aDigits = explode('.', $sRawPtr);
+	                      $sPtr = $aDigits[0].'.'.$sZoneName;
+	                  } else {
+	                      $sPtr = $sRawPtr;
+	                  }
+	                  $sOQL = "SELECT PTRRecord WHERE name = :ptr";
+	                  $oIPPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+	                  $oPTRRecordSet->Append($oIPPTRRecordSet);
+	                  $iPTRRecords += $oIPPTRRecordSet->Count();
+		            }
 	          }
 	          $iRRecords += $iPTRRecords;
 
@@ -3748,7 +3811,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 				    $oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
 	          while ($oIP = $oIPSet->Fetch()) {
 		            $sIp = $oIP->Get('ip')->GetAsCannonical();
-	              $sPtr = $oIP->ConvertToZone($sIp);
+	              $sPtr = $oIP->ConvertToPtr($sIp);
 	              $sOQL = "SELECT PTRRecord WHERE name = :ptr";
 	              $oIPPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
 	              $oPTRRecordSet->Append($oIPPTRRecordSet);
@@ -3885,15 +3948,15 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	public function OnDBUpdate($oObject, $oChange = null) {
 		if ($oObject instanceof IPAddress) {
 		    // Update DNS records associated to IP if config requires it
-		    $sIpUpdateDNSRecords = TeemIp\TeemIp\Extension\Framework\Model\IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+		    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
 		    if ($sIpUpdateDNSRecords == 'yes') {
-				    $sError = $oObject->DoCheckUpdateRRs();
-				    if ($sError != '') {
+				    list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
+				    if (($sError != '') && ($sSeverity == 'error')) {
 				        $oObject->CleanRRs();
 				    } else {
 			          $oObject->UpdateRRs();
-				}
-			}
+			      }
+			  }
 		}
 	}
 
@@ -3905,8 +3968,8 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 		    // Create DNS records associated to IP if config requires it
 		    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
 		    if ($sIpUpdateDNSRecords == 'yes') {
-				    $sError = $oObject->DoCheckUpdateRRs();
-				    if ($sError != '') {
+				    list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
+				    if (($sError != '') && ($sSeverity == 'error')) {
 				        $oObject->CleanRRs();
 				    } else {
 					      $oObject->UpdateRRs();
