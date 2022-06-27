@@ -93,12 +93,12 @@ try {
 				$oP->P(Dict::S('UI:ObjectDoesNotExist'));
 			} else {
 				$sParentClass = 'IP'.substr($sClass, 4);
-				$sError = $oObj->DoCheckUpdateRRs();
+				list($sError, $sSeverity) = $oObj->DoCheckUpdateRRs();
 				if ($sError != '') {
 					// Report issue
 					$sMessage = Dict::Format('UI:ZoneManagement:Action:'.$sParentClass.':UpdateRRs:HasNotRun', $sError);
-					$sSeverity = 'error';
-
+				}
+				if ($sSeverity == 'error') {
 					$sCleanMessage = $oObj->CleanRRs();
 					$sCleanSeverity = 'info';
 				} else {
