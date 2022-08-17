@@ -1310,7 +1310,8 @@
         </field>
         <field id="zone_id" xsi:type="AttributeExternalKey">
           <filter><![CDATA[SELECT Zone AS mz WHERE mz.org_id = :this->org_id AND mz.mapping = 'direct' AND :this->finalclass != 'PTRRecord'
-                     UNION SELECT Zone AS mz WHERE mz.org_id = :this->org_id AND mz.mapping IN ('ipv4reverse', 'ipv6reverse') AND :this->finalclass IN ('NSRecord', 'PTRRecord')]]></filter>
+                     UNION SELECT Zone AS mz WHERE mz.org_id = :this->org_id AND mz.mapping = 'ipv4reverse' AND :this->finalclass IN ('CNAMERecord', 'NSRecord', 'PTRRecord')
+                     UNION SELECT Zone AS mz WHERE mz.org_id = :this->org_id AND mz.mapping = 'ipv6reverse' AND :this->finalclass IN ('NSRecord', 'PTRRecord')]]></filter>
           <dependencies>
             <attribute id="org_id"/>
           </dependencies>
@@ -4032,6 +4033,7 @@ class ZoneMgmtExtraMenus implements iPopupMenuExtension {
 						        case 'details':
 						        case 'doexpandsubnet':
 						        case 'doshrinksubnet':
+						        case 'explodefqdn':
 						            $aParams['operation'] = 'updaterrs';
 						            $sMenu = 'UI:ZoneManagement:Action:IPObject:UpdateRR';
 						            $aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
