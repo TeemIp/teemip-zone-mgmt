@@ -451,6 +451,15 @@ class _Zone extends DNSObject {
 					break;
 
 				case 'ipv4reverse':
+					// Tab for CNAME records for non sub class C reverse zones
+					if (!$this->IsIPv4SubClassCReverseZone($this->GetName())) {
+						$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
+						$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
+						$sName = Dict::Format('Class:Zone/Tab:cnamerecords_list');
+						$sTitle = Dict::Format('Class:Zone/Tab:cnamerecords_list+');
+						IPUtils::DisplayTabContent($oP, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet);
+					}
+
 				case 'ipv6reverse':
 					// Tab for PTR records
 					$sOQL = "SELECT PTRRecord WHERE zone_id = :zone_id";
@@ -695,6 +704,19 @@ HTML
 				break;
 
 			case 'ipv4reverse':
+				if (!$this->IsIPv4SubClassCReverseZone($this->GetName())) {
+					$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
+					$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
+
+					// CNAMES records section
+					if ($oCNAMERecordSet->Count() != 0) {
+						$sHtml .= Dict::S('Class:Zone/DataFile:cnames')."\n";
+						while ($oCNAMERecord = $oCNAMERecordSet->Fetch()) {
+							$sHtml .= $oCNAMERecord->GetDataString();
+						}
+					}
+				}
+
 			case 'ipv6reverse':
 				$sOQL = "SELECT PTRRecord WHERE zone_id = :zone_id";
 				$oPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
