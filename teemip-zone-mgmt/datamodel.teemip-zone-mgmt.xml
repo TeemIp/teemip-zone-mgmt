@@ -2313,7 +2313,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-server.svg</icon>
+        <icon>asset/img/icons8-server.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2773,7 +2773,7 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-service.svg</icon>
+        <icon>asset/img/icons8-service.png</icon>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
