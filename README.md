@@ -1,4 +1,4 @@
-# <img src="https://wiki.teemip.net/lib/exe/fetch.php?media=extensions:icons8-zone-48.png"> TeemIp Zone Management
+# ![](https://wiki.teemip.net/lib/exe/fetch.php?media=extensions:icons8-zone-48.png "") TeemIp Zone Management
 
 TeemIp extension that provides zone management features
 
