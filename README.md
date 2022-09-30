@@ -9,7 +9,9 @@ relation with TeemIp objects already defined in the IP space and in the CMDB.
 
 ## Documentation
 
-Comprehensive documentation can be found on TeemIp’s [wiki][1], namely in the chapter dedicated to the extension: [DNS Zone Management][2]
+Comprehensive documentation can be found on TeemIp’s [wiki][1], namely in the chapter dedicated to the extension:
+
+[DNS Zone Management][2]
 
 [1]: https://wiki.teemip.net
 
