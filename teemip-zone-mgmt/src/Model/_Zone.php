@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2021 TeemIp
+ * @copyright   Copyright (C) 2023 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -19,7 +19,8 @@ use TeemIp\TeemIp\Extension\Framework\Helper\IPUtils;
 use utils;
 use WebPage;
 
-class _Zone extends DNSObject {
+class _Zone extends DNSObject
+{
 	const MODULE_CODE = 'teemip-zone-mgmt';
 	const IPV4_PTR_PATTERN = 'ip4_ptr_pattern';
 	const IPV4_SUB_CLASS_C_PTR_PATTERN = 'ipv4_sub_class_c_ptr_pattern';
@@ -57,7 +58,8 @@ class _Zone extends DNSObject {
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public static function GetZoneFromFqdn($sFqdn, $iView, $sMapping, $iOrgId): array {
+	public static function GetZoneFromFqdn($sFqdn, $iView, $sMapping, $iOrgId): array
+	{
 		$sError = '';
 		// Are we at the end of the recursive process ?
 		if ((strlen($sFqdn) == 0) || ($iOrgId == 0)) {
@@ -99,7 +101,8 @@ class _Zone extends DNSObject {
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public static function GetIPv4SubClassCReverseZoneFromFqdn($sFqdn, $iView, $iOrgId): array {
+	public static function GetIPv4SubClassCReverseZoneFromFqdn($sFqdn, $iView, $iOrgId): array
+	{
 		if (self::IsIPv4PTR($sFqdn)) {
 			$sOQL = "SELECT Zone WHERE org_id = :org_id AND view_id = :view_id AND mapping = 'ipv4reverse'";
 			$oZoneSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('org_id' => $iOrgId, 'view_id' => $iView));
@@ -121,7 +124,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsIPv4PTR($sFqdn): bool {
+	public static function IsIPv4PTR($sFqdn): bool
+	{
 		// Get user defined pattern if exists
 		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_PTR_PATTERN, '');
 		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_PTR_PATTERN;
@@ -139,7 +143,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsIPv4SubClassCPTR($sFqdn): bool {
+	public static function IsIPv4SubClassCPTR($sFqdn): bool
+	{
 		// Get user defined pattern if exists
 		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_SUB_CLASS_C_PTR_PATTERN, '');
 		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_SUB_CLASS_C_PTR_PATTERN;
@@ -157,7 +162,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsIPv4ReverseZone($sZoneName): bool {
+	public static function IsIPv4ReverseZone($sZoneName): bool
+	{
 		// Get user defined pattern if exists
 		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_REVERSE_ZONE_PATTERN, '');
 		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_REVERSE_ZONE_PATTERN;
@@ -175,7 +181,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsIPv4SubClassCReverseZone($sZoneName): bool {
+	public static function IsIPv4SubClassCReverseZone($sZoneName): bool
+	{
 		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN, '');
 		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV4_SUB_CLASS_C_REVERSE_ZONE_PATTERN;
 		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
@@ -192,7 +199,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsIPv6PTR($sFqdn): bool {
+	public static function IsIPv6PTR($sFqdn): bool
+	{
 		// Get user defined pattern if exists
 		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV6_PTR_PATTERN, '');
 		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV6_PTR_PATTERN;
@@ -210,7 +218,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsIPv6ReverseZone($sZoneName): bool {
+	public static function IsIPv6ReverseZone($sZoneName): bool
+	{
 		$sUserPattern = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV6_REVERSE_ZONE_PATTERN, '');
 		$sPattern = ($sUserPattern !== '') ? $sUserPattern : self::DEFAULT_IPV6_REVERSE_ZONE_PATTERN;
 		if (preg_match('/'.$sPattern.'/', $sZoneName)) {
@@ -230,7 +239,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return bool
 	 */
-	public static function IsInSubClassCReverseZone($sFqdn, $sZoneName): bool {
+	public static function IsInSubClassCReverseZone($sFqdn, $sZoneName): bool
+	{
 		// Make sure $sZoneName is a sub class C reverse zone
 		if (!self::IsIPv4SubClassCReverseZone($sZoneName)) {
 			return false;
@@ -276,7 +286,8 @@ class _Zone extends DNSObject {
 	 *
 	 * @return string
 	 */
-	private function StraightenReverse($sMapping, $sName): string {
+	private function StraightenReverse($sMapping, $sName): string
+	{
 		if ($sMapping == 'ipv4reverse') {
 			if (substr($sName, -13) != 'in-addr.arpa.') {
 				if (substr($sName, -8) == 'in-addr.') {
@@ -313,7 +324,8 @@ class _Zone extends DNSObject {
 	/**
 	 * @inheritdoc
 	 */
-	protected function OnInsert() {
+	protected function OnInsert()
+	{
 		parent::OnInsert();
 
 		// Add '.' at the end of name and sourcedname fields if not already set
@@ -334,7 +346,8 @@ class _Zone extends DNSObject {
 	/**
 	 * @inheritdoc
 	 */
-	protected function OnUpdate() {
+	protected function OnUpdate()
+	{
 		parent::OnUpdate();
 
 		// Add '.' at the end of name and sourcedname fields if not already set
@@ -355,7 +368,8 @@ class _Zone extends DNSObject {
 	/**
 	 * @inheritdoc
 	 */
-	public function DisplayBareRelations(WebPage $oP, $bEditMode = false) {
+	public function DisplayBareRelations(WebPage $oP, $bEditMode = false)
+	{
 		// Execute parent function first
 		parent::DisplayBareRelations($oP, $bEditMode);
 
@@ -412,35 +426,23 @@ class _Zone extends DNSObject {
 						$oP->SetCurrentTab($sName.' ('.$iOtherRecords.')');
 						$oP->p($sTitle);
 						if ($iMXRecords > 0) {
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-								$oP->p(MetaModel::GetClassIcon('MXRecord').'&nbsp;'.Dict::Format('Class:Zone/Tab:mxrecords_list', $iMXRecords));
-							} else {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('MXRecord', false));
-								$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:mxrecords_list', MetaModel::GetName('MXRecord')))->AddCSSClass('ibo-block-list--medallion');
-								$oP->AddUiBlock($oClassIcon);
-							}
+							$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('MXRecord', false));
+							$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:mxrecords_list', MetaModel::GetName('MXRecord')))->AddCSSClass('ibo-block-list--medallion');
+							$oP->AddUiBlock($oClassIcon);
 							$oBlock = new DisplayBlock($oMXRecordSet->GetFilter(), 'list', false);
 							$oBlock->Display($oP, 'mx_records', array('menu' => false));
 						}
 						if ($iSRVRecords > 0) {
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-								$oP->p(MetaModel::GetClassIcon('SRVRecord').'&nbsp;'.Dict::Format('Class:Zone/Tab:srvrecords_list', $iSRVRecords));
-							} else {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('SRVRecord', false));
-								$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:srvrecords_list', MetaModel::GetName('SRVRecord')))->AddCSSClass('ibo-block-list--medallion');
-								$oP->AddUiBlock($oClassIcon);
-							}
+							$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('SRVRecord', false));
+							$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:srvrecords_list', MetaModel::GetName('SRVRecord')))->AddCSSClass('ibo-block-list--medallion');
+							$oP->AddUiBlock($oClassIcon);
 							$oBlock = new DisplayBlock($oSRVRecordSet->GetFilter(), 'list', false);
 							$oBlock->Display($oP, 'srv_records', array('menu' => false));
 						}
 						if ($iTXTRecords > 0) {
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-								$oP->p(MetaModel::GetClassIcon('TXTRecord').'&nbsp;'.Dict::Format('Class:Zone/Tab:txtrecords_list', $iTXTRecords));
-							} else {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('TXTRecord', false));
-								$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:txtrecords_list', MetaModel::GetName('TXTRecord')))->AddCSSClass('ibo-block-list--medallion');
-								$oP->AddUiBlock($oClassIcon);
-							}
+							$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('TXTRecord', false));
+							$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:txtrecords_list', MetaModel::GetName('TXTRecord')))->AddCSSClass('ibo-block-list--medallion');
+							$oP->AddUiBlock($oClassIcon);
 							$oBlock = new DisplayBlock($oTXTRecordSet->GetFilter(), 'list', false);
 							$oBlock->Display($oP, 'txt_records', array('menu' => false));
 						}
@@ -478,7 +480,8 @@ class _Zone extends DNSObject {
 	/**
 	 * @inheritdoc
 	 */
-	public function DoCheckToWrite() {
+	public function DoCheckToWrite()
+	{
 		parent::DoCheckToWrite();
 
 		$sMapping = $this->Get('mapping');
@@ -509,7 +512,8 @@ class _Zone extends DNSObject {
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public function DisplayDataFile(iTopWebPage $oP, $aParams = array()): void {
+	public function DisplayDataFile(iTopWebPage $oP, $aParams = array()): void
+	{
 		$this->DisplayBareTab($oP, 'UI:ZoneManagement:Action:DataFileDisplay:');
 
 		if ($this->Get('mapping') == 'direct') {
@@ -528,36 +532,21 @@ class _Zone extends DNSObject {
 			$oAppContext = new ApplicationContext();
 			$sHtml .= $oAppContext->GetForForm();
 			$sButton = "<button type=\"submit\" class=\"action\"><span>".Dict::S('UI:ZoneManagement:Action:DataFileDisplay:Zone:'.$sNewSortOrder)."</span></button>";
-			if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-				$sHtml .= "<br>".$sButton."<br>";
-			} else {
-				$sHtml .= $sButton."<br><br>";
-			}
+			$sHtml .= $sButton."<br><br>";
 			$sHtml .= "</form>";
 			$oP->add($sHtml);
 		}
 
 		// Display text area
 		$sHtml = $this->GetDataFile($aParams['sort-order']);
-		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-			$oP->add(<<<HTML
-				<div id="zonedatafile" class="display_block">
-				<textarea>{$sHtml}</textarea>
-				</div>
-HTML
-			);
-			// Adjust the size of the block
-			$oP->add_ready_script(" $('#zonedatafile>textarea').height($('#zonedatafile').parent().height() - 220).width( $('#zonedatafile').parent().width() - 30);");
-		} else {
-			$sUITitle = Dict::Format('UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class', 'Zone', $this->GetName());
-			$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fa fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
-			$oP->add(<<<HTML
+		$sUITitle = Dict::Format('UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class', 'Zone', $this->GetName());
+		$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fa fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
+		$oP->add(<<<HTML
 				<div id="zonedatafile" class="ibo-is-code">
 				<pre>$sHtml</pre>
 				</div>
 HTML
-			);
-		}
+		);
 	}
 
 	/**
@@ -572,7 +561,8 @@ HTML
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public function GetDataFile($sSortOrder): string {
+	public function GetDataFile($sSortOrder): string
+	{
 		// Default TTL
 		$sHtml = "\$TTL ".$this->Get('ttl')."\n";
 
@@ -743,7 +733,8 @@ HTML
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function IncreaseSerial(): void {
+	public function IncreaseSerial(): void
+	{
 		$iSerial = $this->Get('serial');
 		$this->Set('serial', $iSerial + 1);
 	}

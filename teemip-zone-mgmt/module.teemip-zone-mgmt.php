@@ -39,8 +39,8 @@ SetupWebPage::AddModule(
 
 		// Documentation
 		//
-		'doc.manual_setup' => '', // hyperlink to manual setup documentation, if any
-		'doc.more_information' => '', // hyperlink to more information, if any
+		'doc.manual_setup' => '',
+		'doc.more_information' => '',
 
 		// Default settings
 		//

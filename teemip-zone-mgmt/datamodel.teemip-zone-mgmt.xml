@@ -48,7 +48,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-3d-glasses-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-3d-glasses-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -975,7 +977,9 @@
             <attribute id="full_name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-zone-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-zone-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1559,7 +1563,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-rj45-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-rj45-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1733,7 +1739,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-rj45v6-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-rj45v6-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -1908,7 +1916,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-duplicate-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-duplicate-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2105,7 +2115,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-mail-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-mail-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2313,7 +2325,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-server.png</icon>
+        <style>
+          <icon>asset/img/icons8-server.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2514,7 +2528,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-hand-right-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-hand-right-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -2773,7 +2789,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-service.png</icon>
+        <style>
+          <icon>asset/img/icons8-service.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
@@ -3003,7 +3021,9 @@
             <attribute id="name"/>
           </attributes>
         </naming>
-        <icon>asset/img/icons8-signing-a-document-48.png</icon>
+        <style>
+          <icon>asset/img/icons8-signing-a-document-48.png</icon>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="name"/>
