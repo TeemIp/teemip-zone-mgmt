@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.7">
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0">
   <classes>
     <class id="IPConfig" _delta="must_exist">
       <fields>
         <field id="ip_update_dns_records" xsi:type="AttributeEnum" _delta="define">
-          <values>
-            <value>no</value>
-            <value>yes</value>
-          </values>
           <sql>ip_update_dns_records</sql>
+          <values>
+            <value id="yes">
+              <code>yes</code>
+            </value>
+            <value id="no">
+              <code>no</code>
+            </value>
+          </values>
           <default_value>no</default_value>
           <is_null_allowed>false</is_null_allowed>
           <display_style>radio_horizontal</display_style>
@@ -147,8 +151,7 @@
           <arguments>
             <argument>string</argument>
           </arguments>
-          <code><![CDATA[
-    public function DoCheckUpdateRRs()
+          <code><![CDATA[    public function DoCheckUpdateRRs()
     {
         return array('', 'ok');
     }]]></code>
@@ -165,8 +168,7 @@
           <arguments>
             <argument>string</argument>
           </arguments>
-          <code><![CDATA[
-    public function UpdateRRs()
+          <code><![CDATA[    public function UpdateRRs()
     {
         $sOQL = "SELECT IPv4Address WHERE subnet_id = :id";
    	    $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $this->GetKey()));
@@ -189,8 +191,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanRRs()
+          <code><![CDATA[    public function CleanRRs()
     {
         $sOQL = "SELECT IPv4Address WHERE subnet_id = :id";
    	    $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $this->GetKey()));
@@ -212,8 +213,7 @@
           <arguments>
             <argument>string</argument>
           </arguments>
-          <code><![CDATA[
-    public function UpdateRRs()
+          <code><![CDATA[    public function UpdateRRs()
     {
         $sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
    	    $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $this->GetKey()));
@@ -236,8 +236,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanRRs()
+          <code><![CDATA[    public function CleanRRs()
     {
         $sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
    	    $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $this->GetKey()));
@@ -273,8 +272,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function DoCheckUpdateRRs() {
+          <code><![CDATA[    public function DoCheckUpdateRRs() {
         $sError = '';
         $sSeverity = 'ok';
         // Check if Short Name exists
@@ -311,8 +309,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function UpdateRRs()
+          <code><![CDATA[    public function UpdateRRs()
     {
         // Update CNAME Record(s)
         $sAliases = $this->Get('aliases');
@@ -349,8 +346,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanRRs()
+          <code><![CDATA[    public function CleanRRs()
     {
         // Remove CNAME Record(s)
         $sAliases = $this->Get('aliases');
@@ -367,8 +363,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function ExistCNAMERecord($sAlias)
+          <code><![CDATA[    public function ExistCNAMERecord($sAlias)
     {
 	    $sOQL = "SELECT CNAMERecord WHERE name = :alias AND cname = :fqdn AND org_id = :org_id";
 	    $oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('alias' => $sAlias, 'fqdn' => $this->Get('fqdn'), 'org_id' => $this->Get('org_id')));
@@ -387,8 +382,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CreateCNAMERecord($sAlias, $iZoneId)
+          <code><![CDATA[    public function CreateCNAMERecord($sAlias, $iZoneId)
     {
 	    $oCNAMERecord = MetaModel::NewObject('CNAMERecord');
 	    $oCNAMERecord->Set('org_id', $this->Get('org_id'));
@@ -403,8 +397,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanCNAMERecord($sAlias)
+          <code><![CDATA[    public function CleanCNAMERecord($sAlias)
     {
         // Delete obsolete CNAMERecords, if any (zone may have change...)
         // Note: all CNAME with name = alias will be delete, what ever the organization it belongs to.
@@ -422,8 +415,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function ExistPTRRecord($sPtr, $iZoneId)
+          <code><![CDATA[    public function ExistPTRRecord($sPtr, $iZoneId)
     {
         $sOQL = "SELECT PTRRecord WHERE name = :ptr AND hostname = :hostname AND zone_id = :zone_id";
         $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr, 'hostname' => $this->Get('fqdn'), 'zone_id' => $iZoneId));
@@ -442,8 +434,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CreatePTRRecord($sPtr, $iZoneId)
+          <code><![CDATA[    public function CreatePTRRecord($sPtr, $iZoneId)
     {
         $oPTRRecord = MetaModel::NewObject('PTRRecord');
         $oPTRRecord->Set('org_id', $this->Get('org_id'));
@@ -458,8 +449,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanPTRRecord($sPtr)
+          <code><![CDATA[    public function CleanPTRRecord($sPtr)
     {
         // Delete obsolete PTRRecord, if any (zone may have change...)
         $sOQL = "SELECT PTRRecord AS p JOIN Zone AS z ON p.zone_id = z.id JOIN View AS v ON z.view_id = v.id WHERE p.name = :ptr AND p.org_id = :org_id AND v.id = :view_id UNION SELECT PTRRecord AS p JOIN Zone AS z ON p.zone_id = z.id WHERE z.view_id = 0 AND p.name = :ptr AND p.org_id = :org_id";
@@ -502,8 +492,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function ConvertToPtr($sIp)
+          <code><![CDATA[    public function ConvertToPtr($sIp)
     {
         $aPtr = array_reverse(explode('.', $sIp));
         $sPtr = implode('.', $aPtr).'.in-addr.arpa.';
@@ -515,8 +504,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function DoCheckUpdateRRs() {
+          <code><![CDATA[    public function DoCheckUpdateRRs() {
         list($sError, $sSeverity) = parent::DoCheckUpdateRRs();
 
         // Check if corresponding zones exist (reverse)
@@ -538,8 +526,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function UpdateRRs()
+          <code><![CDATA[    public function UpdateRRs()
     {
         $sError = parent::UpdateRRs();
 
@@ -608,8 +595,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanRRs()
+          <code><![CDATA[    public function CleanRRs()
     {
         parent::CleanRRs();
 
@@ -637,8 +623,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function ExistARecord($iZoneId)
+          <code><![CDATA[    public function ExistARecord($iZoneId)
     {
         // ARecord exists if FQDN points to IP in its Zone
         $sOQL = "SELECT ARecord AS ar JOIN IPAddress AS ip ON ar.ip_id = ip.id WHERE ip_id = :ip_id AND ((ar.name = ip.fqdn AND ip.short_name != '') OR (ar.name = '@' AND ip.short_name = '')) AND zone_id = :zone_id";
@@ -658,8 +643,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CreateARecord($iZoneId)
+          <code><![CDATA[    public function CreateARecord($iZoneId)
     {
         $oARecord = MetaModel::NewObject('ARecord');
         $oARecord->Set('org_id', $this->Get('org_id'));
@@ -681,8 +665,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanARecord()
+          <code><![CDATA[    public function CleanARecord()
     {
         // Delete obsolete ARecords, if any (zone may have changed...)
         $sOQL = "SELECT ARecord WHERE ip_id = :ip_id";
@@ -702,9 +685,9 @@
                 <item id="fieldset:Class:IPAddress:dnsinfo" _delta="must_exist">
                   <rank>10</rank>
                   <items>
- 		            <item id="view_id" _delta="define">
-              		  <rank>25</rank>
-            		</item>
+                    <item id="view_id" _delta="define">
+                      <rank>25</rank>
+                    </item>
                   </items>
                 </item>
               </items>
@@ -741,8 +724,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function ConvertToPtr($sIp)
+          <code><![CDATA[    public function ConvertToPtr($sIp)
     {
         $aPtr1 = array_reverse(explode(':', $sIp));
         $aPtr2 = array();
@@ -763,8 +745,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function DoCheckUpdateRRs() {
+          <code><![CDATA[    public function DoCheckUpdateRRs() {
         list($sError, $sSeverity) = parent::DoCheckUpdateRRs();
 
         // Check if corresponding zones exist (reverse)
@@ -786,8 +767,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function UpdateRRs()
+          <code><![CDATA[    public function UpdateRRs()
     {
         $sError = parent::UpdateRRs();
 
@@ -850,8 +830,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanRRs()
+          <code><![CDATA[    public function CleanRRs()
     {
         // Remove AAAA record
         $this->CleanAAAARecord();
@@ -867,8 +846,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function ExistAAAARecord($iZoneId)
+          <code><![CDATA[    public function ExistAAAARecord($iZoneId)
     {
         // AAAARecord exists if FQDN points to IP in its Zone
         $sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id AND name = :fqdn AND zone_id = :zone_id";
@@ -888,8 +866,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CreateAAAARecord($iZoneId)
+          <code><![CDATA[    public function CreateAAAARecord($iZoneId)
     {
         $oAAAARecord = MetaModel::NewObject('AAAARecord');
         $oAAAARecord->Set('org_id', $this->Get('org_id'));
@@ -904,8 +881,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[
-    public function CleanAAAARecord()
+          <code><![CDATA[    public function CleanAAAARecord()
     {
         // Delete obsolete AAAARecords, if any (zone may have changed...)
         $sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id";
@@ -925,9 +901,9 @@
                 <item id="fieldset:Class:IPAddress:dnsinfo" _delta="must_exist">
                   <rank>10</rank>
                   <items>
- 		            <item id="view_id" _delta="define">
-              		  <rank>25</rank>
-            		</item>
+                    <item id="view_id" _delta="define">
+                      <rank>25</rank>
+                    </item>
                   </items>
                 </item>
               </items>
@@ -1008,12 +984,18 @@
           <target_attcode>name</target_attcode>
         </field>
         <field id="mapping" xsi:type="AttributeEnum">
-          <values>
-            <value>direct</value>
-            <value>ipv4reverse</value>
-            <value>ipv6reverse</value>
-          </values>
           <sql>mapping</sql>
+          <values>
+            <value id="direct">
+              <code>direct</code>
+            </value>
+            <value id="ipv4reverse">
+              <code>ipv4reverse</code>
+            </value>
+            <value id="ipv6reverse">
+              <code>ipv6reverse</code>
+            </value>
+          </values>
           <default_value>direct</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
@@ -1088,7 +1070,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
    {
       parent::OnInsert();
 
@@ -1110,7 +1092,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
    {
       parent::OnUpdate();
 
@@ -1131,7 +1113,7 @@
     }]]></code>
         </method>
       </methods>
-       <presentation>
+      <presentation>
         <details>
           <items>
             <item id="col:col1">
@@ -1189,10 +1171,10 @@
                     <item id="expire">
                       <rank>60</rank>
                     </item>
-                     <item id="minimum">
+                    <item id="minimum">
                       <rank>70</rank>
                     </item>
-                 </items>
+                  </items>
                 </item>
               </items>
             </item>
@@ -1223,25 +1205,25 @@
             </item>
           </items>
         </search>
-         <default_search>
-           <items>
-             <item id="org_id">
-               <rank>10</rank>
-             </item>
-             <item id="view_id">
-               <rank>20</rank>
-             </item>
-             <item id="mapping">
-               <rank>30</rank>
-             </item>
-             <item id="name">
-               <rank>40</rank>
-             </item>
-             <item id="sourcedname">
-               <rank>50</rank>
-             </item>
-           </items>
-         </default_search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="view_id">
+              <rank>20</rank>
+            </item>
+            <item id="mapping">
+              <rank>30</rank>
+            </item>
+            <item id="name">
+              <rank>40</rank>
+            </item>
+            <item id="sourcedname">
+              <rank>50</rank>
+            </item>
+          </items>
+        </default_search>
         <list>
           <items>
             <item id="view_id">
@@ -1327,11 +1309,15 @@
           <target_attcode>name</target_attcode>
         </field>
         <field id="overwrite_zone_ttl" xsi:type="AttributeEnum">
-          <values>
-            <value>yes</value>
-            <value>no</value>
-          </values>
           <sql>overwrite_zone_ttl</sql>
+          <values>
+            <value id="yes">
+              <code>yes</code>
+            </value>
+            <value id="no">
+              <code>no</code>
+            </value>
+          </values>
           <default_value>no</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
@@ -1346,7 +1332,7 @@
           <static>true</static>
           <access>public</access>
           <type>Internal</type>
-          <code><![CDATA[ public static function ComputeFqdn($sName, $sZoneName)
+          <code><![CDATA[    public static function ComputeFqdn($sName, $sZoneName)
 	{
 		// Note: $sZoneName attribut must be fully qualified
 
@@ -1378,10 +1364,10 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
    {
       parent::OnInsert();
-      
+
       $sName = $this->Get('name');
       if ($sName != '@')
       {
@@ -1399,10 +1385,10 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
    {
       parent::OnUpdate();
-      
+
       $sName = $this->Get('name');
       if ($sName != '@')
       {
@@ -1420,7 +1406,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function AfterInsert()
+          <code><![CDATA[    protected function AfterInsert()
    {
       parent::AfterInsert();
 
@@ -1438,7 +1424,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function AfterUpdate()
+          <code><![CDATA[    protected function AfterUpdate()
    {
       parent::AfterUpdate();
 
@@ -1456,7 +1442,7 @@
         <static>false</static>
         <access>protected</access>
         <type>Overload-cmdbAbstractObject</type>
-        <code><![CDATA[ protected function AfterDelete()
+        <code><![CDATA[    protected function AfterDelete()
    {
       parent::AfterDelete();
 
@@ -1474,7 +1460,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function GetDataNameForDataString()
+          <code><![CDATA[    protected function GetDataNameForDataString()
    {
     	$sZoneName = $this->Get('zone_name');
    		$sOwner = $this->Get('name');
@@ -1592,7 +1578,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
      	$sDataName = $this->GetDataNameForDataString();
         $oIp = MetaModel::GetObject('IPv4Address', $this->Get('ip_id'), true /* MustBeFound */);
@@ -1639,7 +1625,7 @@
                     <item id="name">
                       <rank>30</rank>
                     </item>
-                     <item id="overwrite_zone_ttl">
+                    <item id="overwrite_zone_ttl">
                       <rank>40</rank>
                     </item>
                     <item id="ttl">
@@ -1768,7 +1754,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
      	$sDataName = $this->GetDataNameForDataString();
         $oIp = MetaModel::GetObject('IPv6Address', $this->Get('ip_id'), true /* MustBeFound */);
@@ -1815,7 +1801,7 @@
                     <item id="name">
                       <rank>30</rank>
                     </item>
-                     <item id="overwrite_zone_ttl">
+                    <item id="overwrite_zone_ttl">
                       <rank>40</rank>
                     </item>
                     <item id="ttl">
@@ -1896,6 +1882,203 @@
         </list>
       </presentation>
     </class>
+    <class id="CAARecord" _delta="define">
+      <parent>ResourceRecord</parent>
+      <properties>
+        <category>bizmodel,searchable,dnsmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>caarecord</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <style>
+          <icon>asset/img/icons8-public-safety.svg</icon>
+        </style>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="org_id"/>
+            <attribute id="org_name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="flag" xsi:type="AttributeInteger">
+          <sql>flag</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="tag" xsi:type="AttributeEnum">
+          <sql>tag</sql>
+          <values>
+            <value id="issue">
+              <code>issue</code>
+            </value>
+            <value id="issuewild">
+              <code>issuewild</code>
+            </value>
+            <value id="iodef">
+              <code>iodef</code>
+            </value>
+          </values>
+          <default_value>issue</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="value" xsi:type="AttributeString">
+          <sql>value</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+    	$sDataName = $this->GetDataNameForDataString();
+     	if ($this->Get('overwrite_zone_ttl') == 'yes')
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+     	}
+     	else
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+      	}
+     	$sComment = $this->Get('comment');
+     	if ($sComment == '')
+     	{
+     		$sHtml .= "\n";
+     	}
+     	else
+     	{
+     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+     	}
+     	return $sHtml;
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:ResourceRecord:Zone">
+                  <items>
+                    <item id="org_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="zone_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:Record">
+                  <items>
+                    <item id="name">
+                      <rank>30</rank>
+                    </item>
+                    <item id="overwrite_zone_ttl">
+                      <rank>40</rank>
+                    </item>
+                    <item id="ttl">
+                      <rank>50</rank>
+                    </item>
+                    <item id="flag">
+                      <rank>60</rank>
+                    </item>
+                    <item id="tag">
+                      <rank>70</rank>
+                    </item>
+                    <item id="value">
+                      <rank>80</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>90</rank>
+                    </item>
+                  </items>
+                  <rank>20</rank>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="overwrite_zone_ttl">
+              <rank>40</rank>
+            </item>
+            <item id="ttl">
+              <rank>50</rank>
+            </item>
+            <item id="value">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="value">
+              <rank>60</rank>
+            </item>
+          </items>
+        </default_search>
+        <list>
+          <items>
+            <item id="overwrite_zone_ttl">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="flag">
+              <rank>30</rank>
+            </item>
+            <item id="tag">
+              <rank>40</rank>
+            </item>
+            <item id="value">
+              <rank>50</rank>
+            </item>
+            <item id="zone_id">
+              <rank>60</rank>
+            </item>
+            <item id="comment">
+              <rank>70</rank>
+            </item>
+            <item id="org_id">
+              <rank>80</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
     <class id="CNAMERecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
@@ -1934,15 +2117,15 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
     {
 	  	parent::OnInsert();
-		
+
 		// Add '.' at the end of cname field if not already set
 		$sCName = $this->Get('cname');
 		if (substr($sCName, - 1) != '.')
 		{
-			$this->Set('cname', $sCName.'.');			
+			$this->Set('cname', $sCName.'.');
     	}
     }]]></code>
         </method>
@@ -1951,7 +2134,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
     {
         parent::OnUpdate();
 
@@ -1959,7 +2142,7 @@
 		$sCName = $this->Get('cname');
 		if (substr($sCName, - 1) != '.')
 		{
-			$this->Set('cname', $sCName.'.');			
+			$this->Set('cname', $sCName.'.');
 		}
     }]]></code>
         </method>
@@ -1968,7 +2151,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
      	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
@@ -2013,7 +2196,7 @@
                     <item id="name">
                       <rank>30</rank>
                     </item>
-                     <item id="overwrite_zone_ttl">
+                    <item id="overwrite_zone_ttl">
                       <rank>40</rank>
                     </item>
                     <item id="ttl">
@@ -2094,6 +2277,203 @@
         </list>
       </presentation>
     </class>
+    <class id="DSRecord" _delta="define">
+      <parent>ResourceRecord</parent>
+      <properties>
+        <category>bizmodel,searchable,dnsmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>dsrecord</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <style>
+          <icon>asset/img/icons8-signature.svg</icon>
+        </style>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="org_id"/>
+            <attribute id="org_name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="key_tag" xsi:type="AttributeInteger">
+          <sql>key_tag</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="algorithm" xsi:type="AttributeInteger">
+          <sql>algorithm</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="digest_type" xsi:type="AttributeInteger">
+          <sql>digest_type</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="digest" xsi:type="AttributeString">
+          <sql>digest</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+    	$sDataName = $this->GetDataNameForDataString();
+     	if ($this->Get('overwrite_zone_ttl') == 'yes')
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN DS    ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+     	}
+     	else
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN DS    ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+      	}
+     	$sComment = $this->Get('comment');
+     	if ($sComment == '')
+     	{
+     		$sHtml .= "\n";
+     	}
+     	else
+     	{
+     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+     	}
+     	return $sHtml;
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:ResourceRecord:Zone">
+                  <items>
+                    <item id="org_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="zone_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:Record">
+                  <items>
+                    <item id="name">
+                      <rank>30</rank>
+                    </item>
+                    <item id="overwrite_zone_ttl">
+                      <rank>40</rank>
+                    </item>
+                    <item id="ttl">
+                      <rank>50</rank>
+                    </item>
+                    <item id="key_tag">
+                      <rank>60</rank>
+                    </item>
+                    <item id="algorithm">
+                      <rank>70</rank>
+                    </item>
+                    <item id="digest_type">
+                      <rank>80</rank>
+                    </item>
+                    <item id="digest">
+                      <rank>90</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>100</rank>
+                    </item>
+                  </items>
+                  <rank>20</rank>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="overwrite_zone_ttl">
+              <rank>40</rank>
+            </item>
+            <item id="ttl">
+              <rank>50</rank>
+            </item>
+            <item id="digest">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="digest">
+              <rank>60</rank>
+            </item>
+          </items>
+        </default_search>
+        <list>
+          <items>
+            <item id="overwrite_zone_ttl">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="key_tag">
+              <rank>30</rank>
+            </item>
+            <item id="algorithm">
+              <rank>40</rank>
+            </item>
+            <item id="digest_type">
+              <rank>50</rank>
+            </item>
+            <item id="digest">
+              <rank>60</rank>
+            </item>
+            <item id="zone_id">
+              <rank>70</rank>
+            </item>
+            <item id="comment">
+              <rank>80</rank>
+            </item>
+            <item id="org_id">
+              <rank>90</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
     <class id="MXRecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
@@ -2137,15 +2517,15 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
     {
 	  	parent::OnInsert();
-		
+
 		// Add '.' at the end of exchange field if not already set
 		$sExchange = $this->Get('exchange');
 		if (substr($sExchange, - 1) != '.')
 		{
-			$this->Set('exchange', $sExchange.'.');			
+			$this->Set('exchange', $sExchange.'.');
 		}
     }]]></code>
         </method>
@@ -2154,7 +2534,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
     {
         parent::OnUpdate();
 
@@ -2162,7 +2542,7 @@
 		$sExchange = $this->Get('exchange');
 		if (substr($sExchange, - 1) != '.')
 		{
-			$this->Set('exchange', $sExchange.'.');			
+			$this->Set('exchange', $sExchange.'.');
 		}
     }]]></code>
         </method>
@@ -2171,7 +2551,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
@@ -2341,15 +2721,15 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
     {
 	  	parent::OnInsert();
-		
+
 		// Add '.' at the end of nsname field if not already set
 		$sNSName = $this->Get('nsname');
 		if (substr($sNSName, - 1) != '.')
 		{
-			$this->Set('nsname', $sNSName.'.');			
+			$this->Set('nsname', $sNSName.'.');
 		}
     }]]></code>
         </method>
@@ -2358,7 +2738,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
     {
         parent::OnUpdate();
 
@@ -2366,7 +2746,7 @@
 		$sNSName = $this->Get('nsname');
 		if (substr($sNSName, - 1) != '.')
 		{
-			$this->Set('nsname', $sNSName.'.');			
+			$this->Set('nsname', $sNSName.'.');
 		}
     }]]></code>
         </method>
@@ -2375,7 +2755,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
     	$sDataName = $this->GetDataNameForDataString();
     	if ($sDataName == '@')
@@ -2505,6 +2885,170 @@
         </list>
       </presentation>
     </class>
+    <class id="OPENPGPKEYRecord" _delta="define">
+      <parent>ResourceRecord</parent>
+      <properties>
+        <category>bizmodel,searchable,dnsmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>openpgpkeyrecord</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <style>
+          <icon>asset/img/icons8-secured-mail.svg</icon>
+        </style>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="org_id"/>
+            <attribute id="org_name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="key" xsi:type="AttributeText">
+          <sql>key</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+    	$sDataName = $this->GetDataNameForDataString();
+     	if ($this->Get('overwrite_zone_ttl') == 'yes')
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+     	}
+     	else
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+      	}
+     	$sComment = $this->Get('comment');
+     	if ($sComment == '')
+     	{
+     		$sHtml .= "\n";
+     	}
+     	else
+     	{
+     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+     	}
+     	return $sHtml;
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:ResourceRecord:Zone">
+                  <items>
+                    <item id="org_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="zone_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:Record">
+                  <items>
+                    <item id="name">
+                      <rank>30</rank>
+                    </item>
+                    <item id="overwrite_zone_ttl">
+                      <rank>40</rank>
+                    </item>
+                    <item id="ttl">
+                      <rank>50</rank>
+                    </item>
+                    <item id="key">
+                      <rank>60</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>70</rank>
+                    </item>
+                  </items>
+                  <rank>20</rank>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="overwrite_zone_ttl">
+              <rank>40</rank>
+            </item>
+            <item id="ttl">
+              <rank>50</rank>
+            </item>
+            <item id="key">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="key">
+              <rank>60</rank>
+            </item>
+          </items>
+        </default_search>
+        <list>
+          <items>
+            <item id="overwrite_zone_ttl">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="key">
+              <rank>30</rank>
+            </item>
+            <item id="zone_id">
+              <rank>40</rank>
+            </item>
+            <item id="comment">
+              <rank>50</rank>
+            </item>
+            <item id="org_id">
+              <rank>60</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
     <class id="PTRRecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
@@ -2543,12 +3087,12 @@
           <static>false</static>
           <access>public</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ public function DoCheckToWrite()
+          <code><![CDATA[    public function DoCheckToWrite()
     {
         parent::DoCheckToWrite();
-		
+
         $iZoneId = $this->Get('zone_id');
-        $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */); 
+        $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
         if (!is_null($oZone)) {
             $sMapping = $oZone->Get('mapping');
             $sZoneName = $oZone->Get('name');
@@ -2604,15 +3148,15 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
     {
       parent::OnInsert();
-      
+
       // Add '.' at the end of hostname field if not already set
       $sNSName = $this->Get('hostname');
       if (substr($sNSName, - 1) != '.')
       {
-         $this->Set('hostname', $sNSName.'.');       
+         $this->Set('hostname', $sNSName.'.');
       }
     }]]></code>
         </method>
@@ -2621,7 +3165,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
     {
         parent::OnUpdate();
 
@@ -2629,7 +3173,7 @@
       $sNSName = $this->Get('hostname');
       if (substr($sNSName, - 1) != '.')
       {
-         $this->Set('hostname', $sNSName.'.');       
+         $this->Set('hostname', $sNSName.'.');
       }
     }]]></code>
         </method>
@@ -2638,7 +3182,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
     	$sPrependedDomainName = ".".$this->Get('zone_name');
    		$sOwner = $this->Get('name');
@@ -2690,7 +3234,7 @@
                     <item id="ttl">
                       <rank>50</rank>
                     </item>
-                   <item id="hostname">
+                    <item id="hostname">
                       <rank>60</rank>
                     </item>
                     <item id="comment">
@@ -2818,15 +3362,15 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
     {
 	  	parent::OnInsert();
-		
+
 		// Add '.' at the end of target field if not already set
 		$sTarget = $this->Get('target');
 		if (substr($sTarget, - 1) != '.')
 		{
-			$this->Set('target', $sTarget.'.');			
+			$this->Set('target', $sTarget.'.');
 		}
     }]]></code>
         </method>
@@ -2835,7 +3379,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
     {
         parent::OnUpdate();
 
@@ -2843,7 +3387,7 @@
 		$sTarget = $this->Get('target');
 		if (substr($sTarget, - 1) != '.')
 		{
-			$this->Set('target', $sTarget.'.');			
+			$this->Set('target', $sTarget.'.');
 		}
     }]]></code>
         </method>
@@ -2852,7 +3396,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
@@ -2996,6 +3540,389 @@
         </list>
       </presentation>
     </class>
+    <class id="SSHFPRecord" _delta="define">
+      <parent>ResourceRecord</parent>
+      <properties>
+        <category>bizmodel,searchable,dnsmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>sshfprecord</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <style>
+          <icon>asset/img/icons8-fingerprint.svg</icon>
+        </style>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="org_id"/>
+            <attribute id="org_name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="algorithm" xsi:type="AttributeInteger">
+          <sql>algorithm</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="type" xsi:type="AttributeInteger">
+          <sql>type</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="fingerprint" xsi:type="AttributeString">
+          <sql>fingerprint</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+    	$sDataName = $this->GetDataNameForDataString();
+     	if ($this->Get('overwrite_zone_ttl') == 'yes')
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SSHFP ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+     	}
+     	else
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SSHFP ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+      	}
+     	$sComment = $this->Get('comment');
+     	if ($sComment == '')
+     	{
+     		$sHtml .= "\n";
+     	}
+     	else
+     	{
+     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+     	}
+     	return $sHtml;
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:ResourceRecord:Zone">
+                  <items>
+                    <item id="org_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="zone_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:Record">
+                  <items>
+                    <item id="name">
+                      <rank>30</rank>
+                    </item>
+                    <item id="overwrite_zone_ttl">
+                      <rank>40</rank>
+                    </item>
+                    <item id="ttl">
+                      <rank>50</rank>
+                    </item>
+                    <item id="algorithm">
+                      <rank>60</rank>
+                    </item>
+                    <item id="type">
+                      <rank>70</rank>
+                    </item>
+                    <item id="fingerprint">
+                      <rank>80</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>90</rank>
+                    </item>
+                  </items>
+                  <rank>20</rank>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="overwrite_zone_ttl">
+              <rank>40</rank>
+            </item>
+            <item id="ttl">
+              <rank>50</rank>
+            </item>
+            <item id="fingerprint">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="fingerprint">
+              <rank>60</rank>
+            </item>
+          </items>
+        </default_search>
+        <list>
+          <items>
+            <item id="overwrite_zone_ttl">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="algorithm">
+              <rank>30</rank>
+            </item>
+            <item id="type">
+              <rank>40</rank>
+            </item>
+            <item id="fingerprint">
+              <rank>50</rank>
+            </item>
+            <item id="zone_id">
+              <rank>60</rank>
+            </item>
+            <item id="comment">
+              <rank>70</rank>
+            </item>
+            <item id="org_id">
+              <rank>80</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+    <class id="TLSARecord" _delta="define">
+      <parent>ResourceRecord</parent>
+      <properties>
+        <category>bizmodel,searchable,dnsmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>tlsarecord</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <style>
+          <icon>asset/img/icons8-certificate.svg</icon>
+        </style>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="org_id"/>
+            <attribute id="org_name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="certificate_usage" xsi:type="AttributeInteger">
+          <sql>certificate_usage</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="selector" xsi:type="AttributeInteger">
+          <sql>selector</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="matching_type" xsi:type="AttributeInteger">
+          <sql>matching_type</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="data" xsi:type="AttributeString">
+          <sql>data</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+    	$sDataName = $this->GetDataNameForDataString();
+     	if ($this->Get('overwrite_zone_ttl') == 'yes')
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TLSA  ".$this->Get('certificate_usage')." ".$this->Get('selector')." ".$this->Get('matching_type')." ".$this->Get('data');
+     	}
+     	else
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TLSA  ".$this->Get('certificate_usage')." ".$this->Get('selector')." ".$this->Get('matching_type')." ".$this->Get('data');
+      	}
+     	$sComment = $this->Get('comment');
+     	if ($sComment == '')
+     	{
+     		$sHtml .= "\n";
+     	}
+     	else
+     	{
+     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+     	}
+     	return $sHtml;
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:ResourceRecord:Zone">
+                  <items>
+                    <item id="org_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="zone_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:Record">
+                  <items>
+                    <item id="name">
+                      <rank>30</rank>
+                    </item>
+                    <item id="overwrite_zone_ttl">
+                      <rank>40</rank>
+                    </item>
+                    <item id="ttl">
+                      <rank>50</rank>
+                    </item>
+                    <item id="certificate_usage">
+                      <rank>60</rank>
+                    </item>
+                    <item id="selector">
+                      <rank>70</rank>
+                    </item>
+                    <item id="matching_type">
+                      <rank>80</rank>
+                    </item>
+                    <item id="data">
+                      <rank>90</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>100</rank>
+                    </item>
+                  </items>
+                  <rank>20</rank>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="overwrite_zone_ttl">
+              <rank>40</rank>
+            </item>
+            <item id="ttl">
+              <rank>50</rank>
+            </item>
+            <item id="data">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="data">
+              <rank>60</rank>
+            </item>
+          </items>
+        </default_search>
+        <list>
+          <items>
+            <item id="overwrite_zone_ttl">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="certificate_usage">
+              <rank>30</rank>
+            </item>
+            <item id="selector">
+              <rank>40</rank>
+            </item>
+            <item id="matching_type">
+              <rank>50</rank>
+            </item>
+            <item id="data">
+              <rank>60</rank>
+            </item>
+            <item id="zone_id">
+              <rank>70</rank>
+            </item>
+            <item id="comment">
+              <rank>80</rank>
+            </item>
+            <item id="org_id">
+              <rank>90</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
     <class id="TXTRecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
@@ -3034,10 +3961,10 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnInsert()
+          <code><![CDATA[    protected function OnInsert()
     {
       parent::OnInsert();
-      
+
       // Add '"' at the front and the end of txt field if not already set
       $sTxt = $this->Get('txt');
       if (substr($sTxt, - 1) != '"')
@@ -3045,9 +3972,9 @@
          $sTxt = $sTxt.'"';
          if ($sTxt[0] != '"')
          {
-            $sTxt = '"'.$sTxt;   
-         }        
-         $this->Set('txt', $sTxt);        
+            $sTxt = '"'.$sTxt;
+         }
+         $this->Set('txt', $sTxt);
       }
     }]]></code>
         </method>
@@ -3056,7 +3983,7 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ protected function OnUpdate()
+          <code><![CDATA[    protected function OnUpdate()
     {
         parent::OnUpdate();
 
@@ -3067,9 +3994,9 @@
          $sTxt = $sTxt.'"';
          if ($sTxt[0] != '"')
          {
-            $sTxt = '"'.$sTxt;   
-         }        
-         $this->Set('txt', $sTxt);        
+            $sTxt = '"'.$sTxt;
+         }
+         $this->Set('txt', $sTxt);
       }
     }]]></code>
         </method>
@@ -3078,7 +4005,7 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[ public function GetDataString()
+          <code><![CDATA[    public function GetDataString()
     {
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
@@ -3252,13 +4179,21 @@
           <target_attcode>name</target_attcode>
         </field>
         <field id="authority" xsi:type="AttributeEnum">
-          <values>
-            <value>master</value>
-            <value>slave</value>
-            <value>hidden_master</value>
-            <value>hidden_slave</value>
-          </values>
           <sql>authority</sql>
+          <values>
+            <value id="master">
+              <code>master</code>
+            </value>
+            <value id="slave">
+              <code>slave</code>
+            </value>
+            <value id="hidden_master">
+              <code>hidden_master</code>
+            </value>
+            <value id="hidden_slave">
+              <code>hidden_slave</code>
+            </value>
+          </values>
           <default_value>slave</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
@@ -3269,21 +4204,21 @@
           <static>false</static>
           <access>protected</access>
           <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[ public function DoCheckToWrite()
- {
-    parent::DoCheckToWrite();
+          <code><![CDATA[    public function DoCheckToWrite()
+    {
+    	parent::DoCheckToWrite();
 
-    $iCI = $this->Get('functionalci_id');
-    $oCI = MetaModel::GetObject('FunctionalCI', $iCI, false);
-	if (!is_null($oCI))
-	{
-		if (!in_array($oCI->Get('finalclass'), array('Server', 'VirtualMachine')))
-		{
-			$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass');
+    	$iCI = $this->Get('functionalci_id');
+    	$oCI = MetaModel::GetObject('FunctionalCI', $iCI, false);
+    	if (!is_null($oCI))
+    	{
+			if (!in_array($oCI->Get('finalclass'), array('Server', 'VirtualMachine')))
+			{
+				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass');
+			}
 		}
-	}
-    return;
- }]]></code>
+    	return;
+	}]]></code>
         </method>
       </methods>
       <presentation>
@@ -3347,7 +4282,7 @@
         <title/>
         <cells>
           <cell id="teemip-dns-100">
-		  	<rank>1</rank>
+            <rank>1</rank>
             <dashlets>
               <dashlet id="teemip-dns-101" xsi:type="DashletHeaderStatic">
                 <rank>1</rank>
@@ -3380,7 +4315,7 @@
             </dashlets>
           </cell>
           <cell id="teemip-dns-200">
-		  	<rank>3</rank>
+            <rank>3</rank>
             <dashlets>
               <dashlet id="teemip-dns-201" xsi:type="DashletHeaderStatic">
                 <rank>1</rank>
@@ -3418,6 +4353,50 @@
               <dashlet id="teemip-dns-218" xsi:type="DashletBadge">
                 <rank>9</rank>
                 <class>TXTRecord</class>
+              </dashlet>
+            </dashlets>
+          </cell>
+          <cell id="teemip-dns-300">
+            <rank>4</rank>
+            <dashlets>
+              <dashlet id="teemip-dns-301" xsi:type="DashletHeaderStatic">
+                <rank>1</rank>
+                <title>Menu:DNSSpace:SecurityResourceRecords</title>
+                <icon>teemip-ip-mgmt/asset/img/icons8-internet-folder-48.png</icon>
+              </dashlet>
+              <dashlet id="teemip-dns-311" xsi:type="DashletBadge">
+                <rank>2</rank>
+                <class>CAARecord</class>
+              </dashlet>
+              <dashlet id="teemip-dns-312" xsi:type="DashletBadge">
+                <rank>3</rank>
+                <class>DSRecord</class>
+              </dashlet>
+              <dashlet id="teemip-dns-313" xsi:type="DashletBadge">
+                <rank>4</rank>
+                <class>OPENPGPKEYRecord</class>
+              </dashlet>
+              <dashlet id="teemip-dns-314" xsi:type="DashletBadge">
+                <rank>5</rank>
+                <class>SSHFPRecord</class>
+              </dashlet>
+              <dashlet id="teemip-dns-315" xsi:type="DashletBadge">
+                <rank>6</rank>
+                <class>TLSARecord</class>
+              </dashlet>
+            </dashlets>
+          </cell>
+          <cell id="teemip-dns-400">
+            <rank>5</rank>
+            <dashlets>
+              <dashlet id="teemip-dns-401" xsi:type="DashletHeaderStatic">
+                <rank>1</rank>
+                <title>Menu:DNSSpace:GenericResourceRecords</title>
+                <icon>teemip-ip-mgmt/asset/img/icons8-internet-folder-48.png</icon>
+              </dashlet>
+              <dashlet id="teemip-dns-411" xsi:type="DashletBadge">
+                <rank>2</rank>
+                <class>GenericRecord</class>
               </dashlet>
             </dashlets>
           </cell>
@@ -3469,38 +4448,68 @@
       <oql>SELECT AAAARecord</oql>
       <do_search>1</do_search>
     </menu>
-    <menu id="CNAMERecord" xsi:type="OQLMenuNode" _delta="define">
+    <menu id="CAARecord" xsi:type="OQLMenuNode" _delta="define">
       <rank>50</rank>
+      <parent>ZoneManagement:ResourceRecords</parent>
+      <oql>SELECT CAARecord</oql>
+      <do_search>1</do_search>
+    </menu>
+    <menu id="CNAMERecord" xsi:type="OQLMenuNode" _delta="define">
+      <rank>60</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT CNAMERecord</oql>
       <do_search>1</do_search>
     </menu>
+    <menu id="DSRecord" xsi:type="OQLMenuNode" _delta="define">
+      <rank>70</rank>
+      <parent>ZoneManagement:ResourceRecords</parent>
+      <oql>SELECT DSRecord</oql>
+      <do_search>1</do_search>
+    </menu>
     <menu id="MXRecord" xsi:type="OQLMenuNode" _delta="define">
-      <rank>60</rank>
+      <rank>80</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT MXRecord</oql>
       <do_search>1</do_search>
     </menu>
     <menu id="NSRecord" xsi:type="OQLMenuNode" _delta="define">
-      <rank>70</rank>
+      <rank>90</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT NSRecord</oql>
       <do_search>1</do_search>
     </menu>
+    <menu id="OPENPGPKEYRecord" xsi:type="OQLMenuNode" _delta="define">
+      <rank>100</rank>
+      <parent>ZoneManagement:ResourceRecords</parent>
+      <oql>SELECT OPENPGPKEYRecord</oql>
+      <do_search>1</do_search>
+    </menu>
     <menu id="PTRRecord" xsi:type="OQLMenuNode" _delta="define">
-      <rank>80</rank>
+      <rank>110</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT PTRRecord</oql>
       <do_search>1</do_search>
     </menu>
     <menu id="SRVRecord" xsi:type="OQLMenuNode" _delta="define">
-      <rank>90</rank>
+      <rank>120</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT SRVRecord</oql>
       <do_search>1</do_search>
     </menu>
+    <menu id="SSHFPRecord" xsi:type="OQLMenuNode" _delta="define">
+      <rank>130</rank>
+      <parent>ZoneManagement:ResourceRecords</parent>
+      <oql>SELECT SSHFPRecord</oql>
+      <do_search>1</do_search>
+    </menu>
+    <menu id="TLSARecord" xsi:type="OQLMenuNode" _delta="define">
+      <rank>140</rank>
+      <parent>ZoneManagement:ResourceRecords</parent>
+      <oql>SELECT TLSARecord</oql>
+      <do_search>1</do_search>
+    </menu>
     <menu id="TXTRecord" xsi:type="OQLMenuNode" _delta="define">
-      <rank>100</rank>
+      <rank>150</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT TXTRecord</oql>
       <do_search>1</do_search>
@@ -3508,7 +4517,7 @@
   </menus>
   <user_rights>
     <groups>
-       <group id="DNSObject" _delta="must_exist">
+      <group id="DNSObject" _delta="must_exist">
         <classes>
           <class id="View" _delta="define"/>
           <class id="ResourceRecord" _delta="define"/>
@@ -3526,7 +4535,7 @@
               <action id="action:bulk write">allow</action>
               <action id="action:delete">allow</action>
               <action id="action:bulk delete">allow</action>
-             </actions>
+            </actions>
           </group>
           <group id="*">
             <actions>
@@ -4097,8 +5106,7 @@ class ZoneMgmtExtraMenus implements iPopupMenuExtension {
 		}
 		return $aResult;
 	}
-}
-]]></content>
+}]]></content>
     </snippet>
   </snippets>
 </itop_design>
