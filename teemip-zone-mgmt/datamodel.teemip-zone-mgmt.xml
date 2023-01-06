@@ -1585,11 +1585,11 @@
         $sIp = $oIp->Get('ip');
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN A     ".$sIp;
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN A          ".$sIp;
      	}
      	else
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN A     ".$sIp;
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN A          ".$sIp;
      	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -1761,11 +1761,11 @@
         $sIp = $oIp->GetName();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN AAAA  ".$sIp;
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN AAAA       ".$sIp;
      	}
      	else
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN AAAA  ".$sIp;
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN AAAA       ".$sIp;
      	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -1946,11 +1946,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CAA        ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CAA        ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -2156,11 +2156,11 @@
      	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CNAME ".$this->Get('cname');
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CNAME      ".$this->Get('cname');
      	}
      	else
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CNAME ".$this->Get('cname');
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CNAME      ".$this->Get('cname');
      	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -2335,11 +2335,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN DS    ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN DS         ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN DS    ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN DS         ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -2474,6 +2474,170 @@
         </list>
       </presentation>
     </class>
+    <class id="GENERICRecord" _delta="define">
+      <parent>ResourceRecord</parent>
+      <properties>
+        <category>bizmodel,searchable,dnsmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>genericrecord</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <style>
+          <icon>asset/img/icons8-music-record.svg</icon>
+        </style>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="org_id"/>
+            <attribute id="org_name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="payload" xsi:type="AttributeString">
+          <sql>payload</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+    	$sDataName = $this->GetDataNameForDataString();
+     	if ($this->Get('overwrite_zone_ttl') == 'yes')
+     	{
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN ".$this->Get('payload');
+     	}
+     	else
+     	{
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN ".$this->Get('payload');
+      	}
+     	$sComment = $this->Get('comment');
+     	if ($sComment == '')
+     	{
+     		$sHtml .= "\n";
+     	}
+     	else
+     	{
+     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+     	}
+     	return $sHtml;
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:ResourceRecord:Zone">
+                  <items>
+                    <item id="org_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="zone_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:Record">
+                  <items>
+                    <item id="name">
+                      <rank>30</rank>
+                    </item>
+                    <item id="overwrite_zone_ttl">
+                      <rank>40</rank>
+                    </item>
+                    <item id="ttl">
+                      <rank>50</rank>
+                    </item>
+                    <item id="payload">
+                      <rank>60</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>70</rank>
+                    </item>
+                  </items>
+                  <rank>20</rank>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="overwrite_zone_ttl">
+              <rank>40</rank>
+            </item>
+            <item id="ttl">
+              <rank>50</rank>
+            </item>
+            <item id="payload">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="zone_id">
+              <rank>20</rank>
+            </item>
+            <item id="name">
+              <rank>30</rank>
+            </item>
+            <item id="payload">
+              <rank>60</rank>
+            </item>
+          </items>
+        </default_search>
+        <list>
+          <items>
+            <item id="overwrite_zone_ttl">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="payload">
+              <rank>30</rank>
+            </item>
+            <item id="zone_id">
+              <rank>40</rank>
+            </item>
+            <item id="comment">
+              <rank>50</rank>
+            </item>
+            <item id="org_id">
+              <rank>60</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
     <class id="MXRecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
@@ -2556,11 +2720,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN MX    ".$this->Get('preference')." ".$this->Get('exchange');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN MX         ".$this->Get('preference')." ".$this->Get('exchange');
      	}
      	else
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN MX    ".$this->Get('preference')." ".$this->Get('exchange');
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN MX         ".$this->Get('preference')." ".$this->Get('exchange');
      	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -2764,11 +2928,11 @@
     	}
    		if ($this->Get('overwrite_zone_ttl') == 'yes')
    		{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN NS    ".$this->Get('nsname');
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN NS         ".$this->Get('nsname');
    		}
    		else
    		{
-   			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN NS    ".$this->Get('nsname');
+   			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN NS         ".$this->Get('nsname');
    		}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -2928,11 +3092,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN OPENPGPKEY ".$this->Get('key');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN CAA   ".$this->Get('flag')." ".$this->Get('tag')." ".$this->Get('value');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN OPENPGPKEY ".$this->Get('key');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -3401,11 +3565,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SRV   ".$this->Get('priority')." ".$this->Get('weight')." ".$this->Get('port')." ".$this->Get('target');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SRV        ".$this->Get('priority')." ".$this->Get('weight')." ".$this->Get('port')." ".$this->Get('target');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SRV   ".$this->Get('priority')." ".$this->Get('weight')." ".$this->Get('port')." ".$this->Get('target');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SRV        ".$this->Get('priority')." ".$this->Get('weight')." ".$this->Get('port')." ".$this->Get('target');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -3593,11 +3757,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SSHFP ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SSHFP      ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SSHFP ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SSHFP      ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -3784,11 +3948,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TLSA  ".$this->Get('certificate_usage')." ".$this->Get('selector')." ".$this->Get('matching_type')." ".$this->Get('data');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TLSA       ".$this->Get('certificate_usage')." ".$this->Get('selector')." ".$this->Get('matching_type')." ".$this->Get('data');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TLSA  ".$this->Get('certificate_usage')." ".$this->Get('selector')." ".$this->Get('matching_type')." ".$this->Get('data');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TLSA       ".$this->Get('certificate_usage')." ".$this->Get('selector')." ".$this->Get('matching_type')." ".$this->Get('data');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -4010,11 +4174,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TXT   ".$this->Get('txt');
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TXT        ".$this->Get('txt');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TXT   ".$this->Get('txt');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TXT        ".$this->Get('txt');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -4512,6 +4676,12 @@
       <rank>150</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
       <oql>SELECT TXTRecord</oql>
+      <do_search>1</do_search>
+    </menu>
+    <menu id="GENERICRecord" xsi:type="OQLMenuNode" _delta="define">
+      <rank>160</rank>
+      <parent>ZoneManagement:ResourceRecords</parent>
+      <oql>SELECT GENERICRecord</oql>
       <do_search>1</do_search>
     </menu>
   </menus>
