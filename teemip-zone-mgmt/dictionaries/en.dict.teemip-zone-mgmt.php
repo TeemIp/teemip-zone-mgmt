@@ -160,7 +160,7 @@ Dict::Add('EN US', 'English', 'English', array(
 ;
 ; Addresses point to canonical names
 ;',
-'Class:Zone/DataFile:srv' => '
+	'Class:Zone/DataFile:srv' => '
 ;
 ; Locate services
 ;',
@@ -219,17 +219,17 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:ResourceRecord/Attribute:comment' => 'Comment',
 	'Class:ResourceRecord/Attribute:comment+' => '',
 	'Class:ResourceRecord/Attribute:zone_id' => 'Zone',
-	'Class:ResourceRecord/Attribute:zone_id+' => '',
+	'Class:ResourceRecord/Attribute:zone_id+' => 'Zone that the record belongs to',
 	'Class:ResourceRecord/Attribute:zone_name' => 'Zone name',
 	'Class:ResourceRecord/Attribute:zone_name+' => '',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl' => 'Overwrite zone TTL',
-	'Class:ResourceRecord/Attribute:overwrite_zone_ttl+' => '',
+	'Class:ResourceRecord/Attribute:overwrite_zone_ttl+' => 'Overwrite the TTL defined at the zone level or not',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:no' => 'No',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:no+' => '',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:yes' => 'Yes',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:yes+' => '',
 	'Class:ResourceRecord/Attribute:ttl' => 'TTL',
-	'Class:ResourceRecord/Attribute:ttl+' => '',
+	'Class:ResourceRecord/Attribute:ttl+' => 'Time To Live',
 	'ResourceRecord:Zone' => 'Zone',
 	'ResourceRecord:Record' => 'RRs attributes',
 ));
@@ -240,12 +240,12 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:ARecord' => 'A',
-	'Class:ARecord+' => '',
+	'Class:ARecord+' => 'IPv4 Address Record',
 	'Class:ARecord/Attribute:ip_id' => 'IPv4 Address',
 	'Class:ARecord/Attribute:ip_id+' => '',
 	'Class:ARecord/Attribute:ip_fqdn' => 'IPv4 Address FQDN',
 	'Class:ARecord/Attribute:ip_fqdn+' => '',
-	));
+));
 
 //
 // Class: AAAARecord
@@ -253,11 +253,32 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:AAAARecord' => 'AAAA',
-	'Class:AAAARecord+' => '',
+	'Class:AAAARecord+' => 'IPv6 Address Record',
 	'Class:AAAARecord/Attribute:ip_id' => 'IPv6 Address',
 	'Class:AAAARecord/Attribute:ip_id+' => '',
 	'Class:AAAARecord/Attribute:ip_fqdn' => 'IPv6 Address FQDN',
 	'Class:AAAARecord/Attribute:ip_fqdn+' => '',
+));
+
+//
+// Class: CAARecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:CAARecord' => 'CAA',
+	'Class:CAARecord+' => 'DNS Certification Authority Authorization Record',
+	'Class:CAARecord/Attribute:flag' => 'Flag',
+	'Class:CAARecord/Attribute:flag+' => 'Integer',
+	'Class:CAARecord/Attribute:tag' => 'Tag',
+	'Class:CAARecord/Attribute:tag+' => '',
+	'Class:CAARecord/Attribute:tag/Value:issue' => 'Issue',
+	'Class:CAARecord/Attribute:tag/Value:issue+' => '',
+	'Class:CAARecord/Attribute:tag/Value:issuewild' => 'Issue Wild',
+	'Class:CAARecord/Attribute:tag/Value:issuewild+' => '',
+	'Class:CAARecord/Attribute:tag/Value:iodef' => 'Iodef',
+	'Class:CAARecord/Attribute:tag/Value:iodef+' => '',
+	'Class:CAARecord/Attribute:value' => 'Value',
+	'Class:CAARecord/Attribute:value+' => 'Strings associated with tags.',
 ));
 
 //
@@ -266,9 +287,26 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:CNAMERecord' => 'CNAME',
-	'Class:CNAMERecord+' => '',
+	'Class:CNAMERecord+' => 'Canonical Name Record',
 	'Class:CNAMERecord/Attribute:cname' => 'Canonical Name',
-	'Class:CNAMERecord/Attribute:cname+' => '',
+	'Class:CNAMERecord/Attribute:cname+' => 'Canonical name or true name',
+));
+
+//
+// Class: DSRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:DSRecord' => 'DS',
+	'Class:DSRecord+' => 'Delegation Signer Record',
+	'Class:DSRecord/Attribute:key_tag' => 'Key Tag',
+	'Class:DSRecord/Attribute:key_tag+' => 'A short numeric value which can help quickly identify the referenced DNSKEY-record',
+	'Class:DSRecord/Attribute:algorithm' => 'Algorithm',
+	'Class:DSRecord/Attribute:algorithm+' => 'The algorithm of the referenced DNSKEY-record',
+	'Class:DSRecord/Attribute:digest_type' => 'Digest Type',
+	'Class:DSRecord/Attribute:digest_type+' => 'Cryptographic hash algorithm used to create the Digest value',
+	'Class:DSRecord/Attribute:digest' => 'Digest',
+	'Class:DSRecord/Attribute:digest+' => 'A cryptographic hash value of the referenced DNSKEY-record',
 ));
 
 //
@@ -277,11 +315,11 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:MXRecord' => 'MX',
-	'Class:MXRecord+' => '',
+	'Class:MXRecord+' => 'Mail Exchanger Record',
 	'Class:MXRecord/Attribute:preference' => 'Preference',
-	'Class:MXRecord/Attribute:preference+' => '',
+	'Class:MXRecord/Attribute:preference+' => 'An integer that represents the preference for an email server',
 	'Class:MXRecord/Attribute:exchange' => 'Mail exchange server',
-	'Class:MXRecord/Attribute:exchange+' => '',
+	'Class:MXRecord/Attribute:exchange+' => 'The domain name of the email server',
 ));
 
 //
@@ -290,9 +328,20 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:NSRecord' => 'NS',
-	'Class:NSRecord+' => '',
+	'Class:NSRecord+' => 'Name Server Record',
 	'Class:NSRecord/Attribute:nsname' => 'Name server',
-	'Class:NSRecord/Attribute:nsname+' => '',
+	'Class:NSRecord/Attribute:nsname+' => 'The hostname of the name server',
+));
+
+//
+// Class: OPENPGPKEYRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:OPENPGPKEYRecord' => 'OPENPGPKEY',
+	'Class:OPENPGPKEYRecord+' => 'OpenPGP Public Key Record',
+	'Class:OPENPGPKEYRecord/Attribute:key' => 'OpenPGP Public Key',
+	'Class:OPENPGPKEYRecord/Attribute:key+' => 'A OpenPGP Transferable Public Key',
 ));
 
 //
@@ -301,9 +350,9 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:PTRRecord' => 'PTR',
-	'Class:PTRRecord+' => '',
+	'Class:PTRRecord+' => 'Pointer Record',
 	'Class:PTRRecord/Attribute:hostname' => 'Hostname',
-	'Class:PTRRecord/Attribute:hostname+' => '',
+	'Class:PTRRecord/Attribute:hostname+' => 'The server name associated with the IP address',
 ));
 
 //
@@ -312,7 +361,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:SOARecord' => 'SOA',
-	'Class:SOARecord+' => '',
+	'Class:SOARecord+' => 'Start of Authority Record',
 	'Class:SOARecord/Attribute:sourcedname' => 'Master server',
 	'Class:SOARecord/Attribute:sourcedname+' => '',
 	'Class:SOARecord/Attribute:mbox' => 'Hostmaster mailbox',
@@ -326,18 +375,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:SOARecord/Attribute:expire' => 'Expire',
 	'Class:SOARecord/Attribute:expire+' => '',
 	'Class:SOARecord/Attribute:minimum' => 'Minimum',
-	'Class:SOARecord/Attribute:minimum+' => '',
-));
-
-//
-// Class: TXTRecord
-//
-
-Dict::Add('EN US', 'English', 'English', array(
-	'Class:TXTRecord' => 'TXT',
-	'Class:TXTRecord+' => '',
-	'Class:TXTRecord/Attribute:txt' => 'Text',
-	'Class:TXTRecord/Attribute:txt+' => '',
+	'Class:SOARecord/Attribute:minimum+' => 'The negative result TTL',
 ));
 
 //
@@ -346,15 +384,58 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:SRVRecord' => 'SRV',
-	'Class:SRVRecord+' => '',
+	'Class:SRVRecord+' => 'Service Record',
 	'Class:SRVRecord/Attribute:priority' => 'Priority',
-	'Class:SRVRecord/Attribute:priority+' => '',
+	'Class:SRVRecord/Attribute:priority+' => 'An integer that decides the priority of this target host',
 	'Class:SRVRecord/Attribute:weight' => 'Weight',
-	'Class:SRVRecord/Attribute:weight+' => '',
+	'Class:SRVRecord/Attribute:weight+' => 'Relative weight for entries with the same priority',
 	'Class:SRVRecord/Attribute:port' => 'Port',
-	'Class:SRVRecord/Attribute:port+' => '',
+	'Class:SRVRecord/Attribute:port+' => 'TCP or UDP port where the specified service can be found',
 	'Class:SRVRecord/Attribute:target' => 'Target',
-	'Class:SRVRecord/Attribute:target+' => '',
+	'Class:SRVRecord/Attribute:target+' => 'The domain name of the target host that will be providing this service',
+));
+
+//
+// Class: SSHFPRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:SSHFPRecord' => 'SSHFP',
+	'Class:SSHFPRecord+' => 'Secure SHell Fingerprint Record',
+	'Class:SSHFPRecord/Attribute:algorithm' => 'Algorithm',
+	'Class:SSHFPRecord/Attribute:algorithm+' => 'The algorithm of the referenced SSHFP-record',
+	'Class:SSHFPRecord/Attribute:type' => 'Digest Type',
+	'Class:SSHFPRecord/Attribute:type+' => 'Cryptographic hash algorithm used to create the Digest value',
+	'Class:SSHFPRecord/Attribute:fingerprint' => 'Fingerprint',
+	'Class:SSHFPRecord/Attribute:fingerprint+' => 'The hexadecimal representation of the hash value of the SSH key as text',
+));
+
+//
+// Class: TLSARecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:TLSARecord' => 'TLSA',
+	'Class:TLSARecord+' => 'TLSA Certificate Association Record',
+	'Class:TLSARecord/Attribute:certificate_usage' => 'Certificate Usage',
+	'Class:TLSARecord/Attribute:certificate_usage+' => 'Integer',
+	'Class:TLSARecord/Attribute:selector' => 'Selector',
+	'Class:TLSARecord/Attribute:selector+' => 'Interger',
+	'Class:TLSARecord/Attribute:matching_type' => 'Matching Type',
+	'Class:TLSARecord/Attribute:matching_type+' => 'Interger',
+	'Class:TLSARecord/Attribute:data' => 'Certificate Association Data',
+	'Class:TLSARecord/Attribute:data+' => 'The actual data to be matched given the settings of the other fields',
+));
+
+//
+// Class: TXTRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:TXTRecord' => 'TXT',
+	'Class:TXTRecord+' => 'Text Record',
+	'Class:TXTRecord/Attribute:txt' => 'Text',
+	'Class:TXTRecord/Attribute:txt+' => 'Free form text of any type',
 ));
 
 //
@@ -378,7 +459,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'UI:ZoneManagement:Action:DataFileDisplay:Zone:sort_by_char' => 'Display data file sorted by alphabetical order',
 	'UI:ZoneManagement:Action:Details:Zone:Menu' => 'Details',
 ));
-	
+
 //
 // Management of records
 //
@@ -424,7 +505,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Title:Zones:DirectMapping' => 'Forward Zones',
 	'Title:Zones:V4ReverseMapping' => 'IPv4 reverse Zones',
 	'Title:Zones:V6ReverseMapping' => 'IPv6 reverse Zones',
-	'Menu:DNSSpace:ResourceRecords' => 'Resource Records',
+	'Menu:DNSSpace:ResourceRecords' => 'Common Resource Records',
+	'Menu:DNSSpace:SecurityResourceRecords' => 'Security Resource Records',
+	'Menu:DNSSpace:GenericResourceRecords' => 'Generic Resource Records',
 	'Menu:View' => 'Views',
 	'Menu:View+' => 'DNS Views',
 	'Menu:Domain' => 'Domains',
@@ -441,18 +524,30 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:ARecord+' => 'A Records',
 	'Menu:AAAARecord' => 'AAAA',
 	'Menu:AAAARecord+' => 'AAAA Records',
+	'Menu:CAARecord' => 'CAA',
+	'Menu:CAARecord+' => 'CAA Records',
 	'Menu:CNAMERecord' => 'CNAME',
 	'Menu:CNAMERecord+' => 'CNAME Records',
+	'Menu:DSRecord' => 'DS',
+	'Menu:DSRecord+' => 'DS Records',
 	'Menu:MXRecord' => 'MX',
 	'Menu:MXRecord+' => 'MX Records',
 	'Menu:NSRecord' => 'NS',
 	'Menu:NSRecord+' => 'NS Records',
+	'Menu:OPENPGPKEYRecord' => 'OPENPGPKEY',
+	'Menu:OPENPGPKEYRecord+' => 'OPENPGPKEY Records',
 	'Menu:PTRRecord' => 'PTR',
 	'Menu:PTRRecord+' => 'PTR Records',
 	'Menu:SOARecord' => 'SOA',
 	'Menu:SOARecord+' => 'SOA Records',
-	'Menu:TXTRecord' => 'TXT',
-	'Menu:TXTRecord+' => 'TXT Records',
 	'Menu:SRVRecord' => 'SRV',
 	'Menu:SRVRecord+' => 'SRV Records',
+	'Menu:SSHFPRecord' => 'SSHFP',
+	'Menu:SSHFPRecord+' => 'SSHFP Records',
+	'Menu:TLSAERecord' => 'TLSA',
+	'Menu:TLSARecord+' => 'TLSA Records',
+	'Menu:TXTRecord' => 'TXT',
+	'Menu:TXTRecord+' => 'TXT Records',
+	'Menu:GENERICRecord' => 'GENERIC',
+	'Menu:GENERICRecord+' => 'GENERIC Records',
 ));
