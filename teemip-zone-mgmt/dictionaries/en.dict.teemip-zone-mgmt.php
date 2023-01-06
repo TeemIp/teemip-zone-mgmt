@@ -310,6 +310,17 @@ Dict::Add('EN US', 'English', 'English', array(
 ));
 
 //
+// Class: GenericRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:GenericRecord' => 'GENERIC',
+	'Class:GenericRecord+' => 'Generic Record',
+	'Class:GenericRecord/Attribute:payload' => 'Payload',
+	'Class:GenericRecord/Attribute:payload+' => 'All what the db file should see behind IN statement',
+));
+
+//
 // Class: MXRecord
 //
 
@@ -544,10 +555,10 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:SRVRecord+' => 'SRV Records',
 	'Menu:SSHFPRecord' => 'SSHFP',
 	'Menu:SSHFPRecord+' => 'SSHFP Records',
-	'Menu:TLSAERecord' => 'TLSA',
+	'Menu:TLSARecord' => 'TLSA',
 	'Menu:TLSARecord+' => 'TLSA Records',
 	'Menu:TXTRecord' => 'TXT',
 	'Menu:TXTRecord+' => 'TXT Records',
-	'Menu:GENERICRecord' => 'GENERIC',
-	'Menu:GENERICRecord+' => 'GENERIC Records',
+	'Menu:GenericRecord' => 'GENERIC',
+	'Menu:GenericRecord+' => 'GENERIC Records',
 ));

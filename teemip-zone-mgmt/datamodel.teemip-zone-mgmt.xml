@@ -2474,7 +2474,7 @@
         </list>
       </presentation>
     </class>
-    <class id="GENERICRecord" _delta="define">
+    <class id="GenericRecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
         <category>bizmodel,searchable,dnsmgmt</category>
@@ -4678,10 +4678,10 @@
       <oql>SELECT TXTRecord</oql>
       <do_search>1</do_search>
     </menu>
-    <menu id="GENERICRecord" xsi:type="OQLMenuNode" _delta="define">
+    <menu id="GenericRecord" xsi:type="OQLMenuNode" _delta="define">
       <rank>160</rank>
       <parent>ZoneManagement:ResourceRecords</parent>
-      <oql>SELECT GENERICRecord</oql>
+      <oql>SELECT GenericRecord</oql>
       <do_search>1</do_search>
     </menu>
   </menus>
