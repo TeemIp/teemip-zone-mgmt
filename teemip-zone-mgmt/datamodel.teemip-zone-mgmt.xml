@@ -1531,6 +1531,85 @@
         </list>
       </presentation>
     </class>
+    <class id="ResourceRecordType" _delta="define">
+      <parent>Typology</parent>
+      <properties>
+        <category>bizmodel,searchable,configmgmt</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>resourcerecordtype</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </reconciliation>
+        <uniqueness_rules>
+          <rule id="name">
+            <attributes>
+              <attribute id="name"/>
+            </attributes>
+            <filter/>
+            <disabled>false</disabled>
+            <is_blocking>true</is_blocking>
+          </rule>
+        </uniqueness_rules>
+      </properties>
+      <fields>
+        <field id="description" xsi:type="AttributeString">
+          <sql>description</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details>
+          <items>
+            <item id="name">
+              <rank>20</rank>
+            </item>
+            <item id="description">
+              <rank>30</rank>
+            </item>
+          </items>
+        </details>
+        <list>
+          <items>
+            <item id="description">
+              <rank>20</rank>
+            </item>
+          </items>
+        </list>
+        <default_search>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="description">
+              <rank>20</rank>
+            </item>
+          </items>
+        </default_search>
+        <search>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="description">
+              <rank>20</rank>
+            </item>
+          </items>
+        </search>
+      </presentation>
+    </class>
     <class id="ARecord" _delta="define">
       <parent>ResourceRecord</parent>
       <properties>
@@ -2500,6 +2579,18 @@
         </reconciliation>
       </properties>
       <fields>
+        <field id="rrtype_id" xsi:type="AttributeExternalKey">
+          <filter/>
+          <dependencies/>
+          <sql>rrtype_id</sql>
+          <is_null_allowed>false</is_null_allowed>
+          <target_class>ResourceRecordType</target_class>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="rrtype_name" xsi:type="AttributeExternalField">
+          <extkey_attcode>rrtype_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
         <field id="payload" xsi:type="AttributeString">
           <sql>payload</sql>
           <default_value/>
@@ -2517,11 +2608,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN ".$this->Get('payload');
+     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN ".str_pad($this->Get('rrtype_name'), SPACE_RRTYPE_TO_PAYLOAD).$this->Get('payload');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN ".$this->Get('payload');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN ".str_pad($this->Get('rrtype_name'), SPACE_RRTYPE_TO_PAYLOAD).$this->Get('payload');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -2563,11 +2654,14 @@
                     <item id="ttl">
                       <rank>50</rank>
                     </item>
-                    <item id="payload">
+                    <item id="rrtype_id">
                       <rank>60</rank>
                     </item>
-                    <item id="comment">
+                    <item id="payload">
                       <rank>70</rank>
+                    </item>
+                    <item id="comment">
+                      <rank>80</rank>
                     </item>
                   </items>
                   <rank>20</rank>
@@ -2593,8 +2687,11 @@
             <item id="ttl">
               <rank>50</rank>
             </item>
-            <item id="payload">
+            <item id="rrtype_id">
               <rank>60</rank>
+            </item>
+            <item id="payload">
+              <rank>70</rank>
             </item>
           </items>
         </search>
@@ -2609,8 +2706,11 @@
             <item id="name">
               <rank>30</rank>
             </item>
-            <item id="payload">
+            <item id="rrtype_id">
               <rank>60</rank>
+            </item>
+            <item id="payload">
+              <rank>70</rank>
             </item>
           </items>
         </default_search>
@@ -2622,17 +2722,20 @@
             <item id="ttl">
               <rank>20</rank>
             </item>
-            <item id="payload">
+            <item id="rrtype_id">
               <rank>30</rank>
             </item>
-            <item id="zone_id">
+            <item id="payload">
               <rank>40</rank>
             </item>
-            <item id="comment">
+            <item id="zone_id">
               <rank>50</rank>
             </item>
-            <item id="org_id">
+            <item id="comment">
               <rank>60</rank>
+            </item>
+            <item id="org_id">
+              <rank>70</rank>
             </item>
           </items>
         </list>
@@ -3757,11 +3860,11 @@
     	$sDataName = $this->GetDataNameForDataString();
      	if ($this->Get('overwrite_zone_ttl') == 'yes')
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SSHFP      ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN SSHFP      ".$this->Get('algorithm')." ".$this->Get('type')." ".$this->Get('fingerprint');
      	}
      	else
      	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SSHFP      ".$this->Get('key_tag')." ".$this->Get('algorithm')." ".$this->Get('digest_type')." ".$this->Get('digest');
+    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN SSHFP      ".$this->Get('algorithm')." ".$this->Get('type')." ".$this->Get('fingerprint');
       	}
      	$sComment = $this->Get('comment');
      	if ($sComment == '')
@@ -4684,6 +4787,20 @@
       <oql>SELECT GenericRecord</oql>
       <do_search>1</do_search>
     </menu>
+    <menu id="Typology" xsi:type="DashboardMenuNode" _created_in="itop-config-mgmt" _delta="must_exist">
+      <definition>
+        <cells>
+          <cell id="IPMgmt" _delta="must_exist">
+            <dashlets>
+              <dashlet id="21" xsi:type="DashletBadge" _delta="define">
+                <rank>20</rank>
+                <class>ResourceRecordType</class>
+              </dashlet>
+            </dashlets>
+          </cell>
+        </cells>
+      </definition>
+    </menu>
   </menus>
   <user_rights>
     <groups>
@@ -4725,6 +4842,7 @@
     <constant id="SPACE_OWNER_TO_TTL" xsi:type="integer" _delta="define">40</constant>
     <constant id="SPACE_PTR_OWNER_TO_TTL" xsi:type="integer" _delta="define">4</constant>
     <constant id="SPACE_TTL_TO_CLASS" xsi:type="integer" _delta="define">7</constant>
+    <constant id="SPACE_RRTYPE_TO_PAYLOAD" xsi:type="integer" _delta="define">11</constant>
     <constant id="SPACE_TO_COMMENT" xsi:type="integer" _delta="define">120</constant>
   </constants>
   <snippets>
