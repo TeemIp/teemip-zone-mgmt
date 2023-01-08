@@ -136,35 +136,59 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:Zone/Tab:srvrecords_list_empty' => 'There are no SRV records in the zone',
 	'Class:Zone/Tab:txtrecords_list' => 'List of all %1$s TXT records of the zone',
 	'Class:Zone/Tab:txtrecords_list_empty' => 'There are no TXT records in the zone',
-	'Class:Zone/DataFile:ns' => '
+	'Class:Zone/DataFile:NSRecord' => '
 ;
 ; Name servers
 ;',
-	'Class:Zone/DataFile:ipv4' => '
+	'Class:Zone/DataFile:ARecord' => '
 ;
 ; IPv4 addresses for the canonical names
 ;',
-	'Class:Zone/DataFile:ipv6' => '
+	'Class:Zone/DataFile:AAAARecord' => '
 ;
 ; IPv6 addresses for the canonical names
 ;',
-	'Class:Zone/DataFile:cnames' => '
+	'Class:Zone/DataFile:CAARecord' => '
+;
+; Certification Authority Authorization
+;',
+	'Class:Zone/DataFile:CNAMERecord' => '
 ;
 ; Aliases
 ;',
-	'Class:Zone/DataFile:mx' => '
+	'Class:Zone/DataFile:DSRecord' => '
+;
+; Delegation signers
+;',
+	'Class:Zone/DataFile:GenericRecord' => '
+;
+; Other records
+;',
+	'Class:Zone/DataFile:MXRecord' => '
 ;
 ; Mail exchangers
 ;',
-	'Class:Zone/DataFile:ptr' => '
+	'Class:Zone/DataFile:OPENPGPKEYRecord' => '
+;
+; OpenPGP public keys
+;',
+	'Class:Zone/DataFile:PTRRecord' => '
 ;
 ; Addresses point to canonical names
 ;',
-	'Class:Zone/DataFile:srv' => '
+	'Class:Zone/DataFile:SRVRecord' => '
 ;
 ; Locate services
 ;',
-	'Class:Zone/DataFile:txt' => '
+	'Class:Zone/DataFile:SSHFPRecord' => '
+;
+; SSH Public Key Fingerprints
+;',
+	'Class:Zone/DataFile:TLSARecord' => '
+;
+; TLSA certificate associations
+;',
+	'Class:Zone/DataFile:TXTRecord' => '
 ;
 ; Text
 ;',
@@ -232,6 +256,19 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:ResourceRecord/Attribute:ttl+' => 'Time To Live',
 	'ResourceRecord:Zone' => 'Zone',
 	'ResourceRecord:Record' => 'RRs attributes',
+));
+
+//
+// Class: ResourceRecordType
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:ResourceRecordType' => 'Resource Record Type',
+	'Class:ResourceRecordType+' => 'Type of Resource Record that is not covered by a dedicated class',
+	'Class:ResourceRecordType/Attribute:name' => 'Type',
+	'Class:ResourceRecordType/Attribute:name+' => 'Type as it appears in a DB file',
+	'Class:ResourceRecordType/Attribute:description' => 'Description',
+	'Class:ResourceRecordType/Attribute:description+' => '',
 ));
 
 //
@@ -316,8 +353,10 @@ Dict::Add('EN US', 'English', 'English', array(
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:GenericRecord' => 'GENERIC',
 	'Class:GenericRecord+' => 'Generic Record',
+	'Class:GenericRecord/Attribute:rrtype id' => 'Type',
+	'Class:GenericRecord/Attribute:rrtype id+' => 'Resource Record Type',
 	'Class:GenericRecord/Attribute:payload' => 'Payload',
-	'Class:GenericRecord/Attribute:payload+' => 'All what the db file should see behind IN statement',
+	'Class:GenericRecord/Attribute:payload+' => 'All what the db file should see behind Resource Record statement',
 ));
 
 //
