@@ -44,6 +44,8 @@ class _Zone extends DNSObject
 	// x32.[x31.]...[x1.]ip6..arpa.
 	const DEFAULT_IPV6_REVERSE_ZONE_PATTERN = '^((\d|[a-f]|[A-F])\.){1,31}ip6\.arpa\.$';
 
+	private $aRecordClasses = ['ARecord', 'AAAARecord', 'CAARecord', 'CNAMERecord', 'DSRecord', 'MXRecord', 'OPENPGPKEYRecord', 'SSHFPRecord', 'SRVRecord', 'TLSARecord', 'TXTRecord', 'GenericRecord'];
+
 	/**
 	 * Provides the zone that correspond to a FQDN - Works recursively
 	 *
@@ -585,7 +587,7 @@ HTML
 		$sHtml .= str_pad("", SPACE_TO_SOA)." ".str_pad($this->Get('minimum')." )", SPACE_SOA_TO_COMMENT)."; Negative caching\n";
 
 		// NS records section
-		$sHtml .= Dict::S('Class:Zone/DataFile:ns')."\n";
+		$sHtml .= Dict::S('Class:Zone/DataFile:NSRecord')."\n";
 		$sOQL = "SELECT NSRecord WHERE zone_id = :zone_id";
 		$oNSRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 		while ($oNSRecord = $oNSRecordSet->Fetch()) {
@@ -595,93 +597,30 @@ HTML
 		// Retrieve records
 		switch ($this->Get('mapping')) {
 			case 'direct':
-				$sOQL = "SELECT ARecord WHERE zone_id = :zone_id";
-				$oARecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-				$sOQL = "SELECT AAAARecord WHERE zone_id = :zone_id";
-				$oAAAARecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-				$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
-				$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-				$sOQL = "SELECT MXRecord WHERE zone_id = :zone_id";
-				$oMXRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-				$sOQL = "SELECT SRVRecord WHERE zone_id = :zone_id";
-				$oSRVRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-				$sOQL = "SELECT TXTRecord WHERE zone_id = :zone_id";
-				$oTXTRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
+				$aRecordSets = [];
+				foreach ($this->aRecordClasses as $sClass) {
+					$sOQL = "SELECT ".$sClass." WHERE zone_id = :zone_id";
+					$aRecordSets[$sClass] = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
+				}
 
 				if ($sSortOrder == 'sort_by_record') {
-					// A records section
-					$sHtml .= Dict::S('Class:Zone/DataFile:ipv4')."\n";
-					while ($oARecord = $oARecordSet->Fetch()) {
-						$sHtml .= $oARecord->GetDataString();
-					}
-
-					// AAAA records section
-					$sHtml .= Dict::S('Class:Zone/DataFile:ipv6')."\n";
-					while ($oAAAARecord = $oAAAARecordSet->Fetch()) {
-						$sHtml .= $oAAAARecord->GetDataString();
-					}
-
-					// CNAMES records section
-					$sHtml .= Dict::S('Class:Zone/DataFile:cnames')."\n";
-					while ($oCNAMERecord = $oCNAMERecordSet->Fetch()) {
-						$sHtml .= $oCNAMERecord->GetDataString();
-					}
-
-					// MX records section
-					$sHtml .= Dict::S('Class:Zone/DataFile:mx')."\n";
-					while ($oMXRecord = $oMXRecordSet->Fetch()) {
-						$sHtml .= $oMXRecord->GetDataString();
-					}
-
-					// SRV records section
-					$sHtml .= Dict::S('Class:Zone/DataFile:srv')."\n";
-					while ($oSRVRecord = $oSRVRecordSet->Fetch()) {
-						$sHtml .= $oSRVRecord->GetDataString();
-					}
-
-					// TXT records section
-					$sHtml .= Dict::S('Class:Zone/DataFile:txt')."\n";
-					while ($oTXTRecord = $oTXTRecordSet->Fetch()) {
-						$sHtml .= $oTXTRecord->GetDataString();
+					// Display by record type
+					foreach ($this->aRecordClasses as $sClass) {
+						$sHtml .= Dict::S('Class:Zone/DataFile:'.$sClass)."\n";
+						while ($oRecord = $aRecordSets[$sClass]->Fetch()) {
+							$sHtml .= $oRecord->GetDataString();
+						}
 					}
 				} else {
 					// List zone records in an array
 					$aZoneRecords = array();
-					while ($oARecord = $oARecordSet->Fetch()) {
-						$aZoneRecord = array();
-						$aZoneRecord['name'] = $oARecord->Get('name');
-						$aZoneRecord['data-string'] = $oARecord->GetDataString();
-						$aZoneRecords[] = $aZoneRecord;
-					}
-					while ($oAAAARecord = $oAAAARecordSet->Fetch()) {
-						$aZoneRecord = array();
-						$aZoneRecord['name'] = $oAAAARecord->Get('name');
-						$aZoneRecord['data-string'] = $oAAAARecord->GetDataString();
-						$aZoneRecords[] = $aZoneRecord;
-					}
-					while ($oCNAMERecord = $oCNAMERecordSet->Fetch()) {
-						$aZoneRecord = array();
-						$aZoneRecord['name'] = $oCNAMERecord->Get('name');
-						$aZoneRecord['data-string'] = $oCNAMERecord->GetDataString();
-						$aZoneRecords[] = $aZoneRecord;
-					}
-					while ($oMXRecord = $oMXRecordSet->Fetch()) {
-						$aZoneRecord = array();
-						$aZoneRecord['name'] = $oMXRecord->Get('name');
-						$aZoneRecord['data-string'] = $oMXRecord->GetDataString();
-						$aZoneRecords[] = $aZoneRecord;
-					}
-					while ($oSRVRecord = $oSRVRecordSet->Fetch()) {
-						$aZoneRecord = array();
-						$aZoneRecord['name'] = $oSRVRecord->Get('name');
-						$aZoneRecord['data-string'] = $oSRVRecord->GetDataString();
-						$aZoneRecords[] = $aZoneRecord;
-					}
-					while ($oTXTRecord = $oTXTRecordSet->Fetch()) {
-						$aZoneRecord = array();
-						$aZoneRecord['name'] = $oTXTRecord->Get('name');
-						$aZoneRecord['data-string'] = $oTXTRecord->GetDataString();
-						$aZoneRecords[] = $aZoneRecord;
+					foreach ($this->aRecordClasses as $sClass) {
+						while ($oARecord = $aRecordSets[$sClass]->Fetch()) {
+							$aZoneRecord = array();
+							$aZoneRecord['name'] = $oARecord->Get('name');
+							$aZoneRecord['data-string'] = $oARecord->GetDataString();
+							$aZoneRecords[] = $aZoneRecord;
+						}
 					}
 
 					// Sort array and display it
@@ -700,7 +639,7 @@ HTML
 
 					// CNAMES records section
 					if ($oCNAMERecordSet->Count() != 0) {
-						$sHtml .= Dict::S('Class:Zone/DataFile:cnames')."\n";
+						$sHtml .= Dict::S('Class:Zone/DataFile:CNAMERecord')."\n";
 						while ($oCNAMERecord = $oCNAMERecordSet->Fetch()) {
 							$sHtml .= $oCNAMERecord->GetDataString();
 						}
@@ -712,7 +651,7 @@ HTML
 				$oPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 
 				// PTR records section
-				$sHtml .= Dict::S('Class:Zone/DataFile:ptr')."\n";
+				$sHtml .= Dict::S('Class:Zone/DataFile:PTRRecord')."\n";
 				while ($oPTRRecord = $oPTRRecordSet->Fetch()) {
 					$sHtml .= $oPTRRecord->GetDataString();
 				}
