@@ -130,12 +130,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:Zone/Tab:ptrrecords_list+' => 'List of all PTR records of the zone',
 	'Class:Zone/Tab:otherrecords_list' => 'Other Records',
 	'Class:Zone/Tab:otherrecords_list+' => 'List of all other Records of the zone',
-	'Class:Zone/Tab:mxrecords_list' => 'List of all %1$s MX records of the zone',
-	'Class:Zone/Tab:mxrecords_list_empty' => 'There are no MX records in the zone',
-	'Class:Zone/Tab:srvrecords_list' => 'List of all %1$s SRV records of the zone',
-	'Class:Zone/Tab:srvrecords_list_empty' => 'There are no SRV records in the zone',
-	'Class:Zone/Tab:txtrecords_list' => 'List of all %1$s TXT records of the zone',
-	'Class:Zone/Tab:txtrecords_list_empty' => 'There are no TXT records in the zone',
+	'Class:Zone/Tab:records_list' => 'List of all %1$s records of the zone',
+	'Class:Zone/Tab:records_list_empty' => 'There are no %1$s records in the zone',
 	'Class:Zone/DataFile:NSRecord' => '
 ;
 ; Name servers

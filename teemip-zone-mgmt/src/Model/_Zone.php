@@ -45,6 +45,9 @@ class _Zone extends DNSObject
 	const DEFAULT_IPV6_REVERSE_ZONE_PATTERN = '^((\d|[a-f]|[A-F])\.){1,31}ip6\.arpa\.$';
 
 	private $aRecordClasses = ['ARecord', 'AAAARecord', 'CAARecord', 'CNAMERecord', 'DSRecord', 'MXRecord', 'OPENPGPKEYRecord', 'SSHFPRecord', 'SRVRecord', 'TLSARecord', 'TXTRecord', 'GenericRecord'];
+	private $aPrimaryRecordClasses = ['ARecord', 'AAAARecord', 'CNAMERecord'];
+	private $aSecondaryRecordClasses = ['CAARecord', 'DSRecord', 'MXRecord', 'OPENPGPKEYRecord', 'SSHFPRecord', 'SRVRecord', 'TLSARecord', 'TXTRecord', 'GenericRecord'];
+
 
 	/**
 	 * Provides the zone that correspond to a FQDN - Works recursively
@@ -385,68 +388,39 @@ class _Zone extends DNSObject
 
 			switch ($this->Get('mapping')) {
 				case 'direct':
-					// Tab for A records
-					$sOQL = "SELECT ARecord WHERE zone_id = :zone_id";
-					$oARecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-					$sName = Dict::Format('Class:Zone/Tab:arecords_list');
-					$sTitle = Dict::Format('Class:Zone/Tab:arecords_list+');
-					IPUtils::DisplayTabContent($oP, $sName, 'a_records', 'ARecord', $sTitle, '', $oARecordSet);
-
-					// Tab for AAAA records
-					$sOQL = "SELECT AAAARecord WHERE zone_id = :zone_id";
-					$oAAAARecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-					$sName = Dict::Format('Class:Zone/Tab:aaaarecords_list');
-					$sTitle = Dict::Format('Class:Zone/Tab:aaaarecords_list+');
-					IPUtils::DisplayTabContent($oP, $sName, 'aaaa_records', 'AAAARecord', $sTitle, '', $oAAAARecordSet);
-
-					// Tab for CNAME records
-					$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
-					$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-					$sName = Dict::Format('Class:Zone/Tab:cnamerecords_list');
-					$sTitle = Dict::Format('Class:Zone/Tab:cnamerecords_list+');
-					IPUtils::DisplayTabContent($oP, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet);
+					// Tabs for "primary" records
+					foreach ($this->aPrimaryRecordClasses as $sClass) {
+						$sOQL = "SELECT ".$sClass." WHERE zone_id = :zone_id";
+						$oRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
+						$sName = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list');
+						$sTitle = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list+');
+						IPUtils::DisplayTabContent($oP, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet);
+					}
 
 					// Tab for Other records
-					$sOQL = "SELECT MXRecord WHERE zone_id = :zone_id";
-					$oMXRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-					$iMXRecords = $oMXRecordSet->Count();
-					$iOtherRecords = $iMXRecords;
-
-					$sOQL = "SELECT SRVRecord WHERE zone_id = :zone_id";
-					$oSRVRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-					$iSRVRecords = $oSRVRecordSet->Count();
-					$iOtherRecords += $iSRVRecords;
-
-					$sOQL = "SELECT TXTRecord WHERE zone_id = :zone_id";
-					$oTXTRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
-					$iTXTRecords = $oTXTRecordSet->Count();
-					$iOtherRecords += $iTXTRecords;
+					$aRecordSets = [];
+					$iOtherRecords = 0;
+					foreach ($this->aSecondaryRecordClasses as $sClass) {
+						$sOQL = "SELECT ".$sClass." WHERE zone_id = :zone_id";
+						$oRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
+						$aRecordSets[$sClass] = $oRecordSet;
+						$iOtherRecords += $oRecordSet->Count();
+					}
 
 					$sName = Dict::Format('Class:Zone/Tab:otherrecords_list');
 					$sTitle = Dict::Format('Class:Zone/Tab:otherrecords_list+');
 					if ($iOtherRecords > 0) {
 						$oP->SetCurrentTab($sName.' ('.$iOtherRecords.')');
 						$oP->p($sTitle);
-						if ($iMXRecords > 0) {
-							$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('MXRecord', false));
-							$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:mxrecords_list', MetaModel::GetName('MXRecord')))->AddCSSClass('ibo-block-list--medallion');
-							$oP->AddUiBlock($oClassIcon);
-							$oBlock = new DisplayBlock($oMXRecordSet->GetFilter(), 'list', false);
-							$oBlock->Display($oP, 'mx_records', array('menu' => false));
-						}
-						if ($iSRVRecords > 0) {
-							$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('SRVRecord', false));
-							$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:srvrecords_list', MetaModel::GetName('SRVRecord')))->AddCSSClass('ibo-block-list--medallion');
-							$oP->AddUiBlock($oClassIcon);
-							$oBlock = new DisplayBlock($oSRVRecordSet->GetFilter(), 'list', false);
-							$oBlock->Display($oP, 'srv_records', array('menu' => false));
-						}
-						if ($iTXTRecords > 0) {
-							$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('TXTRecord', false));
-							$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:txtrecords_list', MetaModel::GetName('TXTRecord')))->AddCSSClass('ibo-block-list--medallion');
-							$oP->AddUiBlock($oClassIcon);
-							$oBlock = new DisplayBlock($oTXTRecordSet->GetFilter(), 'list', false);
-							$oBlock->Display($oP, 'txt_records', array('menu' => false));
+						foreach ($this->aSecondaryRecordClasses as $sClass) {
+							$oRecordSet = $aRecordSets[$sClass];
+							if ($oRecordSet->Count() > 0) {
+								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
+								$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:records_list', MetaModel::GetName($sClass)))->AddCSSClass('ibo-block-list--medallion');
+								$oP->AddUiBlock($oClassIcon);
+								$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
+								$oBlock->Display($oP, strtolower($sClass), array('menu' => false));
+							}
 						}
 					} else {
 						$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
