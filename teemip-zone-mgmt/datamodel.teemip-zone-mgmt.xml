@@ -266,6 +266,23 @@
           <target_attcode>name</target_attcode>
         </field>
       </fields>
+      <event_listeners>
+        <listener id="OnIPAddressCreateRequestedByZoneMgmt" _delta="define">
+          <event>EVENT_DB_CREATE_DONE</event>
+          <callback>OnIPAddressCreateRequestedByZoneMgmt</callback>
+          <rank>100</rank>
+        </listener>
+        <listener id="OnIPAddressUpdateRequestedByZoneMgmt" _delta="define">
+          <event>EVENT_DB_UPDATE_DONE</event>
+          <callback>OnIPAddressUpdateRequestedByZoneMgmt</callback>
+          <rank>100</rank>
+        </listener>
+        <listener id="OnIPAddressDeleteRequestedByZoneMgmt" _delta="define">
+          <event>EVENT_DB_DELETE_DONE</event>
+          <callback>OnIPAddressDeleteRequestedByZoneMgmt</callback>
+          <rank>100</rank>
+        </listener>
+      </event_listeners>
       <methods>
         <method id="DoCheckUpdateRRs" _delta="define">
           <comment/>
@@ -458,6 +475,58 @@
         {
             $oPTRRecord->DBDelete();
         }
+    }]]></code>
+        </method>
+        <method id="OnIPAddressCreateRequestedByZoneMgmt" _delta="define">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnIPAddressCreateRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
+    {
+		// Create DNS records associated to IP if config requires it
+		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
+		if ($sIpUpdateDNSRecords == 'yes') {
+			list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
+			if (($sError != '') && ($sSeverity == 'error')) {
+				$this->CleanRRs();
+			} else {
+				$this->UpdateRRs();
+			}
+	    }
+    }]]></code>
+        </method>
+        <method id="OnIPAddressUpdateRequestedByZoneMgmt" _delta="define">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnIPAddressUpdateRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
+    {
+    	// Update DNS records associated to IP if config requires it
+		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
+		if ($sIpUpdateDNSRecords == 'yes') {
+			list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
+			if (($sError != '') && ($sSeverity == 'error')) {
+				$this->CleanRRs();
+			} else {
+		    	$this->UpdateRRs();
+		    }
+		}
+    }]]></code>
+        </method>
+        <method id="OnIPAddressDeleteRequestedByZoneMgmt" _delta="define">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnIPAddressDeleteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
+    {
+    	// Cleanup DNS records associated to IP if config requires it
+		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
+		if ($sIpUpdateDNSRecords == 'yes') {
+			$this->CleanRRs();
+		}
     }]]></code>
         </method>
       </methods>
@@ -5252,17 +5321,19 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	 * @inheritdoc
 	 */
 	public function OnDBUpdate($oObject, $oChange = null) {
-		if ($oObject instanceof IPAddress) {
-		    // Update DNS records associated to IP if config requires it
-		    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
-		    if ($sIpUpdateDNSRecords == 'yes') {
+		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
+			if ($oObject instanceof IPAddress) {
+			    // Update DNS records associated to IP if config requires it
+			    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+		    	if ($sIpUpdateDNSRecords == 'yes') {
 				    list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
 				    if (($sError != '') && ($sSeverity == 'error')) {
 				        $oObject->CleanRRs();
 				    } else {
 			          $oObject->UpdateRRs();
 			      }
-			  }
+				}
+			}
 		}
 	}
 
@@ -5270,17 +5341,19 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	 * @inheritdoc
 	 */
 	public function OnDBInsert($oObject, $oChange = null) {
-		if ($oObject instanceof IPAddress) {
-		    // Create DNS records associated to IP if config requires it
-		    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
-		    if ($sIpUpdateDNSRecords == 'yes') {
-				    list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
+		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
+			if ($oObject instanceof IPAddress) {
+			    // Create DNS records associated to IP if config requires it
+			    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+		    	if ($sIpUpdateDNSRecords == 'yes') {
+					list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
 				    if (($sError != '') && ($sSeverity == 'error')) {
 				        $oObject->CleanRRs();
 				    } else {
 					      $oObject->UpdateRRs();
 				    }
-	      }
+	    		}
+			}
 		}
 	}
 
@@ -5288,12 +5361,14 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	 * @inheritdoc
 	 */
 	public function OnDBDelete($oObject, $oChange = null) {
-		if ($oObject instanceof IPAddress) {
-		    // Cleanup DNS records associated to IP if config requires it
-		    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
-		    if ($sIpUpdateDNSRecords == 'yes') {
-				    $oObject->CleanRRs();
-		    }
+		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
+			if ($oObject instanceof IPAddress) {
+				// Cleanup DNS records associated to IP if config requires it
+				$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
+				if ($sIpUpdateDNSRecords == 'yes') {
+						$oObject->CleanRRs();
+				}
+			}
 		}
 	}
 
