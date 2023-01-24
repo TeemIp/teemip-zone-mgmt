@@ -17,6 +17,20 @@
           <is_null_allowed>false</is_null_allowed>
           <display_style>radio_horizontal</display_style>
         </field>
+        <field id="remove_rr_on_ip_obsolete" xsi:type="AttributeEnum" _delta="define">
+          <sql>remove_rr_on_ip_obsolete</sql>
+          <values>
+            <value id="yes">
+              <code>yes</code>
+            </value>
+            <value id="no">
+              <code>no</code>
+            </value>
+          </values>
+          <default_value>no</default_value>
+          <is_null_allowed>false</is_null_allowed>
+          <display_style>radio_horizontal</display_style>
+        </field>
       </fields>
       <presentation>
         <details>
@@ -27,6 +41,9 @@
                   <items>
                     <item id="ip_update_dns_records" _delta="define">
                       <rank>50</rank>
+                    </item>
+                    <item id="remove_rr_on_ip_obsolete" _delta="define">
+                      <rank>60</rank>
                     </item>
                   </items>
                 </item>
@@ -284,6 +301,25 @@
         </listener>
       </event_listeners>
       <methods>
+        <method id="DoCheckRemoveRRsOnStatus" _delta="define">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function DoCheckRemoveRRsOnStatus()
+    {
+    	$sRemoveRROnIPObsolete = IPConfig::GetFromGlobalIPConfig('remove_rr_on_ip_obsolete', $this->Get('org_id'));
+    	if ($sRemoveRROnIPObsolete == 'yes') {
+	    	$aObsoleteStatusList = TeemIp\TeemIp\Extension\ZoneManagement\Hook\ReleaseRRsFromObsoleteIPs::GetObsoleteStatusList();
+	    	if (in_array($this->Get('status'), $aObsoleteStatusList)) {
+
+	    		return true;
+	    	}
+	    }
+
+	    return false;
+    }]]></code>
+        </method>
         <method id="DoCheckUpdateRRs" _delta="define">
           <comment/>
           <static>false</static>
@@ -487,11 +523,14 @@
 		// Create DNS records associated to IP if config requires it
 		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
 		if ($sIpUpdateDNSRecords == 'yes') {
-			list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
-			if (($sError != '') && ($sSeverity == 'error')) {
-				$this->CleanRRs();
-			} else {
-				$this->UpdateRRs();
+		    // Don't create records if these should not exist when IP is obsolete
+		    if (!$this->DoCheckRemoveRRsOnStatus()) {
+				list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
+				if (($sError != '') && ($sSeverity == 'error')) {
+					$this->CleanRRs();
+				} else {
+					$this->UpdateRRs();
+				}
 			}
 	    }
     }]]></code>
@@ -506,12 +545,16 @@
     	// Update DNS records associated to IP if config requires it
 		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
 		if ($sIpUpdateDNSRecords == 'yes') {
-			list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
-			if (($sError != '') && ($sSeverity == 'error')) {
-				$this->CleanRRs();
-			} else {
-		    	$this->UpdateRRs();
-		    }
+		    if ($this->DoCheckRemoveRRsOnStatus()) {
+		        $this->CleanRRs();
+		    } else {
+				list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
+				if (($sError != '') && ($sSeverity == 'error')) {
+					$this->CleanRRs();
+				} else {
+					$this->UpdateRRs();
+				}
+			}
 		}
     }]]></code>
         </method>
@@ -4548,7 +4591,7 @@
     	$oCI = MetaModel::GetObject('FunctionalCI', $iCI, false);
     	if (!is_null($oCI))
     	{
-			if (!in_array($oCI->Get('finalclass'), array('Server', 'VirtualMachine')))
+			if (!in_array($oCI->Get('finalclass'), array('Server', 'VirtualMachine', 'NetworkDevice', 'ClusterNetwork' , 'ApplicationSolution')))
 			{
 				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass');
 			}
@@ -5279,12 +5322,17 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 			    // Update DNS records associated to IP if config requires it
 			    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
 		    	if ($sIpUpdateDNSRecords == 'yes') {
-				    list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
-				    if (($sError != '') && ($sSeverity == 'error')) {
-				        $oObject->CleanRRs();
-				    } else {
-			          $oObject->UpdateRRs();
-			      }
+		    		// Don't update records if these should not exist when IP is obsolete
+		    		if ($oObject->DoCheckRemoveRRsOnStatus()) {
+						$oObject->CleanRRs();
+		    		} else {
+						list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
+						if (($sError != '') && ($sSeverity == 'error')) {
+							$oObject->CleanRRs();
+						} else {
+						  $oObject->UpdateRRs();
+						}
+					}
 				}
 			}
 		}
@@ -5299,12 +5347,15 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 			    // Create DNS records associated to IP if config requires it
 			    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
 		    	if ($sIpUpdateDNSRecords == 'yes') {
-					list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
-				    if (($sError != '') && ($sSeverity == 'error')) {
-				        $oObject->CleanRRs();
-				    } else {
-					      $oObject->UpdateRRs();
-				    }
+		    		// Don't create records if these should not exist when IP is obsolete
+		    		if (!$oObject->DoCheckRemoveRRsOnStatus()) {
+						list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
+				    	if (($sError != '') && ($sSeverity == 'error')) {
+					        $oObject->CleanRRs();
+				    	} else {
+					    	$oObject->UpdateRRs();
+					    }
+	    			}
 	    		}
 			}
 		}
@@ -5357,22 +5408,30 @@ class ZoneMgmtExtraMenus implements iPopupMenuExtension {
 					$aParams['class'] = $sClass;
 					$aParams['id'] = $id;
 
-				        $operation = utils::ReadParam('operation', '');
-				        switch ($operation)
-				        {
-						        case 'apply_modify':
-						        case 'apply_new':
-						        case 'details':
-						        case 'doexpandsubnet':
-						        case 'doshrinksubnet':
-						        case 'explodefqdn':
-						            $aParams['operation'] = 'updaterrs';
-						            $sMenu = 'UI:ZoneManagement:Action:IPObject:UpdateRR';
-						            $aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
-						            $aParams['operation'] = 'deleterrs';
-						            $sMenu = 'UI:ZoneManagement:Action:IPObject:DeleteRR';
-						            $aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
-						        break;
+					$bUpdateMenu = true;
+					if ($oObj instanceof IPAddress) {
+						// Disable Update Menu of obsolete IP if 'remove_rr_on_ip_obsolete' is set
+						if ($oObj->DoCheckRemoveRRsOnStatus()) {
+				        	$bUpdateMenu = false;
+				        }
+				    }
+					$operation = utils::ReadParam('operation', '');
+					switch ($operation) {
+						case 'apply_modify':
+						case 'apply_new':
+						case 'details':
+						case 'doexpandsubnet':
+						case 'doshrinksubnet':
+						case 'explodefqdn':
+							if ($bUpdateMenu) {
+								$aParams['operation'] = 'updaterrs';
+								$sMenu = 'UI:ZoneManagement:Action:IPObject:UpdateRR';
+								$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
+							}
+							$aParams['operation'] = 'deleterrs';
+							$sMenu = 'UI:ZoneManagement:Action:IPObject:DeleteRR';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
+						    break;
 
 						default:
 						    break;
