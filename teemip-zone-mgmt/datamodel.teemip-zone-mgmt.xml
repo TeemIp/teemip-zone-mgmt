@@ -4926,17 +4926,20 @@
 use Combodo\iTop\Application\UI\Base\Component\MedallionIcon\MedallionIcon;
 use TeemIp\TeemIp\Extension\Framework\Helper\IPUtils;
 
-class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExtension {
+class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExtension
+{
 	/**
 	 * @inheritdoc
 	 */
-	public function OnDisplayProperties($oObject, WebPage $oPage, $bEditMode = false) {
+	public function OnDisplayProperties($oObject, WebPage $oPage, $bEditMode = false)
+	{
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function OnDisplayRelations($oObject, WebPage $oPage, $bEditMode = false) {
+	public function OnDisplayRelations($oObject, WebPage $oPage, $bEditMode = false)
+	{
 		if ($oObject instanceof IPv4Address) {
 		    if (!$bEditMode) {
 		        $iRRecords = 0;
@@ -4973,290 +4976,240 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 		        $iCNAMERecords = $oCNAMERecordSet->Count();
 		        $iRRecords += $iCNAMERecords;
 
-	          $sName = Dict::Format('Class:IPAddress/Tab:rrecords_list');
-				    $sTitle = Dict::Format('Class:IPAddress/Tab:rrecords_list+');
+		        $sName = Dict::Format('Class:IPAddress/Tab:rrecords_list');
+				$sTitle = Dict::Format('Class:IPAddress/Tab:rrecords_list+');
+				if ($iRRecords > 0) {
+					$oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
+					$oPage->p($sTitle);
+					if ($iPTRRecords > 0) {
+		                $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
+				        $oPage->AddUiBlock($oClassIcon);
+	                	$oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+	                	$oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+	            	}
+	            	if ($iARecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:arecords_list', MetaModel::GetName('ARecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+	                	$oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
+	                	$oBlock->Display($oPage, 'a_records', array('menu' => false));
+	            	}
+	            	if ($iCNAMERecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+	            		$oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+	                	$oBlock->Display($oPage, 'cname_records', array('menu' => false));
+	              	}
+	        	} else {
+					$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
+			        TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+	          	}
+	    	}
+		} elseif ($oObject instanceof IPv6Address) {
+	    	if (!$bEditMode) {
+	        	$iRRecords = 0;
+
+	        	// Search for PTR records
+				$sIp = $oObject->Get('ip')->GetAsCannonical();
+				$sPtr = $oObject->ConvertToPtr($sIp);
+				$sOQL = "SELECT PTRRecord WHERE name = :ptr";
+				$oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+				$iPTRRecords = $oPTRRecordSet->Count();
+				$iRRecords += $iPTRRecords;
+
+				// Search for AAAA records
+				$sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id";
+				$oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $oObject->GetKey()));
+				$iAAAARecords = $oAAAARecordSet->Count();
+				$iRRecords += $iAAAARecords;
+
+				// Searh for CNAME records
+				$sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+				$oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oObject->Get('fqdn')));
+				$iCNAMERecords = $oCNAMERecordSet->Count();
+				$iRRecords += $iCNAMERecords;
+
+		    	$sName = Dict::Format('Class:IPAddress/Tab:rrecords_list');
+				$sTitle = Dict::Format('Class:IPAddress/Tab:rrecords_list+');
 		        if ($iRRecords > 0) {
-				        $oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
-			          $oPage->p($sTitle);
-	              if ($iPTRRecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:ptrrecords_list', $iPTRRecords));
-				            } else {
-				                $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
-					              $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
-					              $oPage->AddUiBlock($oClassIcon);
-					          }
-	                  $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
-	              }
-	              if ($iARecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                    $oPage->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:arecords_list', $iARecords));
-						        } else {
-							          $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
-							          $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:arecords_list', MetaModel::GetName('ARecord')))->AddCSSClass('ibo-block-list--medallion');
-							          $oPage->AddUiBlock($oClassIcon);
-						        }
-	                  $oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'a_records', array('menu' => false));
-	              }
-	              if ($iCNAMERecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:cnamerecords_list', $iCNAMERecords));
-						        } else {
-							          $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
-							          $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
-							          $oPage->AddUiBlock($oClassIcon);
-						        }
-	                  $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'cname_records', array('menu' => false));
-	              }
-	          } else {
-				        $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-			          TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
-	          }
-	      }
-	  } elseif ($oObject instanceof IPv6Address) {
-	      if (!$bEditMode) {
-	          $iRRecords = 0;
-
-	          // Search for PTR records
-	          $sIp = $oObject->Get('ip')->GetAsCannonical();
-	          $sPtr = $oObject->ConvertToPtr($sIp);
-	          $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-	          $oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-	          $iPTRRecords = $oPTRRecordSet->Count();
-	          $iRRecords += $iPTRRecords;
-
-	          // Search for AAAA records
-	          $sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id";
-	          $oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $oObject->GetKey()));
-	          $iAAAARecords = $oAAAARecordSet->Count();
-	          $iRRecords += $iAAAARecords;
-
-	          // Searh for CNAME records
-	          $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
-	          $oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oObject->Get('fqdn')));
-	          $iCNAMERecords = $oCNAMERecordSet->Count();
-	          $iRRecords += $iCNAMERecords;
-
-		    		$sName = Dict::Format('Class:IPAddress/Tab:rrecords_list');
-				    $sTitle = Dict::Format('Class:IPAddress/Tab:rrecords_list+');
-	          if ($iRRecords > 0) {
-	              $oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
-					      $oPage->p($sTitle);
-	              if ($iPTRRecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:ptrrecords_list', $iPTRRecords));
-						        } else {
-							          $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
-						            $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
-							          $oPage->AddUiBlock($oClassIcon);
-						        }
-	                  $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
-					      }
-	              if ($iAAAARecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-	                      $oPage->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:aaaarecords_list', $iAAAARecords));
-						        } else {
-					              $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
-							          $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:aaaarecords_list', MetaModel::GetName('AAAARecord')))->AddCSSClass('ibo-block-list--medallion');
-							              $oPage->AddUiBlock($oClassIcon);
-						        }
-	                  $oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'aaaa_records', array('menu' => false));
-	              }
-	              if ($iCNAMERecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                    $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPAddress/Tab:cnamerecords_list', $iCNAMERecords));
-						        } else {
-                        $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
-					              $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
-					              $oPage->AddUiBlock($oClassIcon);
-						        }
-	                  $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'cname_records', array('menu' => false));
-	              }
-	          } else {
-				        $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-				        TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
-	          }
-	      }
+		            $oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
+					$oPage->p($sTitle);
+	            	if ($iPTRRecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+	                	$oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+	                	$oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+					}
+	            	if ($iAAAARecords > 0) {
+				    	$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:aaaarecords_list', MetaModel::GetName('AAAARecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+	                	$oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
+	                	$oBlock->Display($oPage, 'aaaa_records', array('menu' => false));
+	            	}
+	            	if ($iCNAMERecords > 0) {
+                   		$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
+				        $oClassIcon->SetDescription(Dict::Format('Class:IPAddress/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
+				        $oPage->AddUiBlock($oClassIcon);
+	                	$oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+	                	$oBlock->Display($oPage, 'cname_records', array('menu' => false));
+	            	}
+	        	} else {
+					$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
+				    TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+	        	}
+	    	}
 		} elseif ($oObject instanceof IPv4Subnet) {
 		    if (!$bEditMode) {
-	          $iRRecords = 0;
+	        	$iRRecords = 0;
 
 		        $sOQL = "SELECT IPv4Address WHERE subnet_id = :id";
-   	        $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $oObject->GetKey()));
+   	        	$oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $oObject->GetKey()));
 
-	          // Search for PTR records
-	          $iPTRRecords = 0;
-				    $oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
-	          while ($oIP = $oIPSet->Fetch()) {
-	              $sIp = $oIP->Get('ip');
-	              $sRawPtr = $oIP->ConvertToPtr($sIp);
-	              list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $oIP->Get('view_id'), 'ipv4reverse', $oIP->Get('org_id'));
-	              if ($sErrorZone == '') {
-	                  // Zone has been found, compute final FQDN and check if records exists
-	                  if (Zone::IsIPv4SubClassCReverseZone($sZoneName)) {
-	                      $aDigits = explode('.', $sRawPtr);
-	                      $sPtr = $aDigits[0].'.'.$sZoneName;
-	                  } else {
-	                      $sPtr = $sRawPtr;
-	                  }
-	                  $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-	                  $oIPPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-	                  $oPTRRecordSet->Append($oIPPTRRecordSet);
-	                  $iPTRRecords += $oIPPTRRecordSet->Count();
+	        	// Search for PTR records
+	        	$iPTRRecords = 0;
+				$oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
+	        	while ($oIP = $oIPSet->Fetch()) {
+	            	$sIp = $oIP->Get('ip');
+	            	$sRawPtr = $oIP->ConvertToPtr($sIp);
+	            	list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $oIP->Get('view_id'), 'ipv4reverse', $oIP->Get('org_id'));
+					if ($sErrorZone == '') {
+	                	// Zone has been found, compute final FQDN and check if records exists
+	                	if (Zone::IsIPv4SubClassCReverseZone($sZoneName)) {
+	                    	$aDigits = explode('.', $sRawPtr);
+	                    	$sPtr = $aDigits[0].'.'.$sZoneName;
+	                	} else {
+	                    	$sPtr = $sRawPtr;
+	                	}
+	                	$sOQL = "SELECT PTRRecord WHERE name = :ptr";
+	                	$oIPPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+	                	$oPTRRecordSet->Append($oIPPTRRecordSet);
+	                	$iPTRRecords += $oIPPTRRecordSet->Count();
 		            }
-	          }
-	          $iRRecords += $iPTRRecords;
+	        	}
+	        	$iRRecords += $iPTRRecords;
 
-	          // Search for A records
-	          $sOQL = "SELECT ARecord AS ar JOIN IPv4Address AS ip ON ar.ip_id = ip.id WHERE ip.subnet_id = :subnet_id";
-	          $oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('subnet_id' => $oObject->GetKey()));
-	          $iARecords = $oARecordSet->Count();
-	          $iRRecords += $iARecords;
+	        	// Search for A records
+	        	$sOQL = "SELECT ARecord AS ar JOIN IPv4Address AS ip ON ar.ip_id = ip.id WHERE ip.subnet_id = :subnet_id";
+	        	$oARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('subnet_id' => $oObject->GetKey()));
+	        	$iARecords = $oARecordSet->Count();
+	        	$iRRecords += $iARecords;
 
-	          // Searh for CNAME records
-    				$iCNAMERecords = 0;
-				    $oCNAMERecordSet = DBObjectSet::FromScratch('CNAMERecord');
-				    $oIPSet->Rewind();
-	          while ($oIP = $oIPSet->Fetch()) {
-		            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
-		            $oIPCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oIP->Get('fqdn')));
-	              $oCNAMERecordSet->Append($oIPCNAMERecordSet);
-	              $iCNAMERecords += $oIPCNAMERecordSet->Count();
-	          }
-	          $iRRecords += $iCNAMERecords;
+	        	// Searh for CNAME records
+    			$iCNAMERecords = 0;
+				$oCNAMERecordSet = DBObjectSet::FromScratch('CNAMERecord');
+				$oIPSet->Rewind();
+	        	while ($oIP = $oIPSet->Fetch()) {
+		    		$sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+		    	    $oIPCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oIP->Get('fqdn')));
+	        	    $oCNAMERecordSet->Append($oIPCNAMERecordSet);
+	        	    $iCNAMERecords += $oIPCNAMERecordSet->Count();
+	        	}
+	        	$iRRecords += $iCNAMERecords;
 
-				    $sName = Dict::Format('Class:IPSubnet/Tab:rrecords_list');
-				    $sTitle = Dict::Format('Class:IPSubnet/Tab:rrecords_list+');
-	          if ($iRRecords > 0) {
-					      $oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
-					      $oPage->p($sTitle);
-	              if ($iPTRRecords > 0) {
-						        if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                    $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', $iPTRRecords));
-						        } else {
-							          $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
-							          $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
-							          $oPage->AddUiBlock($oClassIcon);
-						        }
-	                  $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
-	                  $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
-	              }
-                if ($iARecords > 0) {
-                    if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-                        $oPage->p(MetaModel::GetClassIcon('ARecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:arecords_list', $iARecords));
-                    } else {
-                        $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
-                        $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:arecords_list', MetaModel::GetName('ARecord')))->AddCSSClass('ibo-block-list--medallion');
-                        $oPage->AddUiBlock($oClassIcon);
-                    }
-                    $oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oPage, 'a_records', array('menu' => false));
-                }
-                if ($iCNAMERecords > 0) {
-                    if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-                        $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', $iCNAMERecords));
-                    } else {
-                        $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
-                        $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
-                        $oPage->AddUiBlock($oClassIcon);
-                    }
-                    $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
-                    $oBlock->Display($oPage, 'cname_records', array('menu' => false));
-                }
-            } else {
-                $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-                TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
-            }
-	      }
+				$sName = Dict::Format('Class:IPSubnet/Tab:rrecords_list');
+				$sTitle = Dict::Format('Class:IPSubnet/Tab:rrecords_list+');
+	        	if ($iRRecords > 0) {
+					$oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
+					$oPage->p($sTitle);
+	        	    if ($iPTRRecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+		        	    $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+		        	    $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+	    	    	}
+            		if ($iARecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
+            	        $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:arecords_list', MetaModel::GetName('ARecord')))->AddCSSClass('ibo-block-list--medallion');
+            	        $oPage->AddUiBlock($oClassIcon);
+            	    	$oBlock = new DisplayBlock($oARecordSet->GetFilter(), 'list', false);
+            	    	$oBlock->Display($oPage, 'a_records', array('menu' => false));
+            		}
+            		if ($iCNAMERecords > 0) {
+    					$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
+            	        $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
+            	        $oPage->AddUiBlock($oClassIcon);
+						$oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+            			$oBlock->Display($oPage, 'cname_records', array('menu' => false));
+					}
+            	} else {
+                	$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
+                	TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+            	}
+	    	}
 		} elseif ($oObject instanceof IPv6Subnet) {
-	      if (!$bEditMode) {
-	          $iRRecords = 0;
+	    	if (!$bEditMode) {
+	        	$iRRecords = 0;
 
-		        $sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
-   	        $oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $oObject->GetKey()));
+	        	$sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
+   	        	$oIPSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('id' => $oObject->GetKey()));
 
-	          // Search for PTR records
-	          $iPTRRecords = 0;
-				    $oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
-	          while ($oIP = $oIPSet->Fetch()) {
-		            $sIp = $oIP->Get('ip')->GetAsCannonical();
-	              $sPtr = $oIP->ConvertToPtr($sIp);
-	              $sOQL = "SELECT PTRRecord WHERE name = :ptr";
-	              $oIPPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
-	              $oPTRRecordSet->Append($oIPPTRRecordSet);
-	              $iPTRRecords += $oIPPTRRecordSet->Count();
-	          }
-	          $iRRecords += $iPTRRecords;
+   	        	// Search for PTR records$iPTRRecords = 0;
+				$oPTRRecordSet = DBObjectSet::FromScratch('PTRRecord');
+				while ($oIP = $oIPSet->Fetch()) {
+					$sIp = $oIP->Get('ip')->GetAsCannonical();
+					$sPtr = $oIP->ConvertToPtr($sIp);
+					$sOQL = "SELECT PTRRecord WHERE name = :ptr";
+					$oIPPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
+					$oPTRRecordSet->Append($oIPPTRRecordSet);
+					$iPTRRecords += $oIPPTRRecordSet->Count();
+				}
+				$iRRecords += $iPTRRecords;
 
-	          // Search for AAAA records
-	          $sOQL = "SELECT AAAARecord AS ar JOIN IPv6Address AS ip ON ar.ip_id = ip.id WHERE ip.subnet_id = :subnet_id";
-	          $oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('subnet_id' => $oObject->GetKey()));
-	          $iAAAARecords = $oAAAARecordSet->Count();
-	          $iRRecords += $iAAAARecords;
+				// Search for AAAA records
+				$sOQL = "SELECT AAAARecord AS ar JOIN IPv6Address AS ip ON ar.ip_id = ip.id WHERE ip.subnet_id = :subnet_id";
+				$oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('subnet_id' => $oObject->GetKey()));
+				$iAAAARecords = $oAAAARecordSet->Count();
+				$iRRecords += $iAAAARecords;
 
-	          // Searh for CNAME records
-				    $iCNAMERecords = 0;
-				    $oCNAMERecordSet = DBObjectSet::FromScratch('CNAMERecord');
-				    $oIPSet->Rewind();
-            while ($oIP = $oIPSet->Fetch()) {
-		            $sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
+				// Searh for CNAME records
+				$iCNAMERecords = 0;
+				$oCNAMERecordSet = DBObjectSet::FromScratch('CNAMERecord');
+				$oIPSet->Rewind();
+				while ($oIP = $oIPSet->Fetch()) {
+					$sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
 		            $oIPCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oIP->Get('fqdn')));
-	              $oCNAMERecordSet->Append($oIPCNAMERecordSet);
-	              $iCNAMERecords += $oIPCNAMERecordSet->Count();
-	          }
-	          $iRRecords += $iCNAMERecords;
+					$oCNAMERecordSet->Append($oIPCNAMERecordSet);
+					$iCNAMERecords += $oIPCNAMERecordSet->Count();
+				}
+				$iRRecords += $iCNAMERecords;
 
-				    $sName = Dict::Format('Class:IPSubnet/Tab:rrecords_list');
-				    $sTitle = Dict::Format('Class:IPSubnet/Tab:rrecords_list+');
-	          if ($iRRecords > 0) {
-			      $oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
-				    $oPage->p($sTitle);
-	          if ($iPTRRecords > 0) {
-						    if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                $oPage->p(MetaModel::GetClassIcon('PTRRecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', $iPTRRecords));
-						    } else {
-							      $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
-							      $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
-							      $oPage->AddUiBlock($oClassIcon);
-						    }
-	              $oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
-	              $oBlock->Display($oPage, 'ptr_records', array('menu' => false));
-	          }
-	          if ($iAAAARecords > 0) {
-						    if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                $oPage->p(MetaModel::GetClassIcon('AAAARecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:aaaarecords_list', $iARecords));
-						    } else {
-							      $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
-							      $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:aaaarecords_list', MetaModel::GetName('AAAARecord')))->AddCSSClass('ibo-block-list--medallion');
-							      $oPage->AddUiBlock($oClassIcon);
-						    }
-	              $oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
-	              $oBlock->Display($oPage, 'aaaa_records', array('menu' => false));
-	          }
-	          if ($iCNAMERecords > 0) {
-						    if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0', '<')) {
-		                $oPage->p(MetaModel::GetClassIcon('CNAMERecord').'&nbsp;'.Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', $iCNAMERecords));
-						    } else {
-							      $oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
-							      $oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
-							      $oPage->AddUiBlock($oClassIcon);
-						    }
-	              $oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
-	              $oBlock->Display($oPage, 'cname_records', array('menu' => false));
-	          }
-	      } else {
-			      $oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-				    TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
-	      }
-	  }
-	  }
-
+				$sName = Dict::Format('Class:IPSubnet/Tab:rrecords_list');
+				$sTitle = Dict::Format('Class:IPSubnet/Tab:rrecords_list+');
+				if ($iRRecords > 0) {
+					$oPage->SetCurrentTab($sName.' ('.$iRRecords.')');
+					$oPage->p($sTitle);
+					if ($iPTRRecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('PTRRecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:ptrrecords_list', MetaModel::GetName('PTRRecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+						$oBlock = new DisplayBlock($oPTRRecordSet->GetFilter(), 'list', false);
+						$oBlock->Display($oPage, 'ptr_records', array('menu' => false));
+					}
+					if ($iAAAARecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('ARecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:aaaarecords_list', MetaModel::GetName('AAAARecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+						$oBlock = new DisplayBlock($oAAAARecordSet->GetFilter(), 'list', false);
+						$oBlock->Display($oPage, 'aaaa_records', array('menu' => false));
+					}
+					if ($iCNAMERecords > 0) {
+						$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon('CNAMERecord', false));
+						$oClassIcon->SetDescription(Dict::Format('Class:IPSubnet/Tab:cnamerecords_list', MetaModel::GetName('CNAMERecord')))->AddCSSClass('ibo-block-list--medallion');
+						$oPage->AddUiBlock($oClassIcon);
+						$oBlock = new DisplayBlock($oCNAMERecordSet->GetFilter(), 'list', false);
+						$oBlock->Display($oPage, 'cname_records', array('menu' => false));
+					}
+				} else {
+					$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
+					TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+				}
+			}
+		}
 	}
 
 	/**
@@ -5289,7 +5242,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	 * @inheritdoc
 	 */
 	public function GetHilightClass($oObject) {
-		return 0;
+		return HILIGHT_CLASS_NONE;
 	}
 
 	/**
@@ -5384,26 +5337,25 @@ class ZoneMgmtExtraMenus implements iPopupMenuExtension {
 	public static function EnumItems($iMenuId, $param) {
 		$aResult = array();
 		switch($iMenuId) {
-			  case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:	// $param is a DBObjectSet
-			  case iPopupMenuExtension::MENU_OBJLIST_TOOLKIT: // $param is a DBObjectSet
-			  break;
+			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:	// $param is a DBObjectSet
+			case iPopupMenuExtension::MENU_OBJLIST_TOOLKIT: // $param is a DBObjectSet
+			    break;
 
-			  case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS: // $param is a DBObject
-			      $oObj = $param;
+			case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS: // $param is a DBObject
+				$oObj = $param;
 
-			      // Additional actions for IPAddress and IPSubnet
-		        if (($oObj instanceof IPAddress) || ($oObj instanceof IPSubnet))
-				    {
-				        $aResult[] = new SeparatorPopupMenuItem();
-				        $oAppContext = new ApplicationContext();
+				// Additional actions for IPAddress and IPSubnet
+				if (($oObj instanceof IPAddress) || ($oObj instanceof IPSubnet)) {
+					$aResult[] = new SeparatorPopupMenuItem();
+					$oAppContext = new ApplicationContext();
 
-				        /** @var \IPObject $oObj */
-				        $id = $oObj->GetKey();
-				        $sClass = get_class($oObj);
+					/** @var \IPObject $oObj */
+					$id = $oObj->GetKey();
+					$sClass = get_class($oObj);
 
-				        $aParams = $oAppContext->GetAsHash();
-				        $aParams['class'] = $sClass;
-				        $aParams['id'] = $id;
+					$aParams = $oAppContext->GetAsHash();
+					$aParams['class'] = $sClass;
+					$aParams['id'] = $id;
 
 				        $operation = utils::ReadParam('operation', '');
 				        switch ($operation)
@@ -5422,49 +5374,49 @@ class ZoneMgmtExtraMenus implements iPopupMenuExtension {
 						            $aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
 						        break;
 
-						        default:
-							      break;
-					      }
-				    } elseif ($oObj instanceof Zone) {
-    				    // Additional actions for Zone
-        				$aResult[] = new SeparatorPopupMenuItem();
-				        $oAppContext = new ApplicationContext();
-				        $sContext = $oAppContext->GetForLink();
+						default:
+						    break;
+					}
+				} elseif ($oObj instanceof Zone) {
+					// Additional actions for Zone
+					$aResult[] = new SeparatorPopupMenuItem();
+			  	    $oAppContext = new ApplicationContext();
+					$sContext = $oAppContext->GetForLink();
 
-				        /** @var \Zone $oObj */
-				        $id = $oObj->GetKey();
-				        $sClass = get_class($oObj);
+					/** @var \Zone $oObj */
+			  	    $id = $oObj->GetKey();
+					$sClass = get_class($oObj);
 
-				        $aParams = $oAppContext->GetAsHash();
-				        $aParams['class'] = $sClass;
-				        $aParams['id'] = $id;
+					$aParams = $oAppContext->GetAsHash();
+			  	    $aParams['class'] = $sClass;
+					$aParams['id'] = $id;
 
-				        $operation = utils::ReadParam('operation', '');
-				        switch ($operation) {
-						        case 'apply_new':
-						        case 'apply_modify':
-						        case 'details':
-							          $aParams['operation'] = 'datafiledisplay';
-							          $aParams['sort_order'] = 'sort_by_record';
-						            $sMenu = 'UI:ZoneManagement:Action:DataFileDisplay:Zone:Menu';
-						            $aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
-						        break;
+					$operation = utils::ReadParam('operation', '');
+					switch ($operation) {
+						case 'apply_new':
+						case 'apply_modify':
+						case 'details':
+							$aParams['operation'] = 'datafiledisplay';
+							$aParams['sort_order'] = 'sort_by_record';
+							$sMenu = 'UI:ZoneManagement:Action:DataFileDisplay:Zone:Menu';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', $aParams));
+				            break;
 
-						        case 'datafiledisplay':
-						            $sMenu = 'UI:ZoneManagement:Action:Details:Zone:Menu';
-						            $aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$id&$sContext");
-						        break;
+						case 'datafiledisplay':
+							$sMenu = 'UI:ZoneManagement:Action:Details:Zone:Menu';
+							$aResult[] = new URLPopupMenuItem($sMenu, Dict::S($sMenu), utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$id&$sContext");
+						    break;
 
-						        default:
-						        break;
-					      }
+						default:
+						    break;
 				    }
+			    }
 				break;
 
-			  case iPopupMenuExtension::MENU_DASHBOARD_ACTIONS: // $param is a Dashboard
+            case iPopupMenuExtension::MENU_DASHBOARD_ACTIONS: // $param is a Dashboard
 				break;
 
-			  default: // Unknown type of menu, do nothing
+			default: // Unknown type of menu, do nothing
 				break;
 		}
 		return $aResult;
