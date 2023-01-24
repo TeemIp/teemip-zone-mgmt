@@ -131,7 +131,7 @@ class ReleaseRRsFromObsoleteIPs implements iScheduledProcess
 		$aRecordToCheck = [
 			'A' => "SELECT ARecord AS rr JOIN IPv4Address AS ip ON rr.ip_id = ip.id WHERE ip.status IN $sStatusList AND ip.org_id IN $sOrgToCleanList",
 			'AAAA' => "SELECT AAAARecord AS rr JOIN IPv6Address AS ip ON rr.ip_id = ip.id WHERE ip.status IN $sStatusList AND ip.org_id IN $sOrgToCleanList",
-			'CNAME' => "SELECT CNAMERecord AS rr JOIN IPAddress AS ip ON rr.cname = ip.fqdn WHERE ip.status IN $sStatusList AND ip.org_id IN $sOrgToCleanList",
+			'CNAME' => "SELECT CNAMERecord AS rr JOIN Organization AS o ON rr.org_id = o.id JOIN IPAddress AS ip ON ip.org_id = o.id WHERE rr.cname = ip.fqdn AND ip.status IN $sStatusList AND ip.org_id IN $sOrgToCleanList",
 			'PTR' => "SELECT PTRRecord AS rr JOIN Organization AS o ON rr.org_id = o.id JOIN IPAddress AS ip ON ip.org_id = o.id WHERE rr.hostname = ip.fqdn AND ip.status IN $sStatusList AND o.id IN $sOrgToCleanList",
 		];
 		foreach ($aRecordToCheck as $sRecordName => $sOQL) {
@@ -155,7 +155,7 @@ class ReleaseRRsFromObsoleteIPs implements iScheduledProcess
 		}
 
 		// Report
-		$sReport = ($aReport['rr_released'] === 0) ? "\nNo RR have been released\n" : "\n".$aReport['rr_released']." Resource Records have been released.\n";
+		$sReport = ($aReport['rr-released'] === 0) ? "\nNo RR have been released\n" : "\n".$aReport['rr-released']." Resource Records have been released.\n";
 
 		return $sReport;
 	}
