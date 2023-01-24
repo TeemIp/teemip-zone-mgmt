@@ -10,9 +10,13 @@
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:IPConfig/Attribute:ip_update_dns_records' => 'Automatically update DNS records',
-	'Class:IPConfig/Attribute:ip_update_dns_records+' => 'Automatically create, modify or delete DNS records linked to an IP address',
+	'Class:IPConfig/Attribute:ip_update_dns_records+' => 'Automatically create, modify or delete Resource Records linked to an IP address',
 	'Class:IPConfig/Attribute:ip_update_dns_records/Value:yes' => 'Yes',
 	'Class:IPConfig/Attribute:ip_update_dns_records/Value:no' => 'No',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete' => 'Remove DNS records from obsolete IPs',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete+' => 'Remove Resource Records associated to IP addresses that become obsolete',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:yes' => 'Yes',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:no' => 'No',
 ));
 
 //
@@ -21,7 +25,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:IPAddress/Attribute:view_id' => 'DNS View',
-	'Class:IPAddress/Attribute:view_id+' => '',
+	'Class:IPAddress/Attribute:view_id+' => 'DNS view that the IP is resolved from',
 	'Class:IPAddress/Attribute:view_name' => 'View name',
 	'Class:IPAddress/Attribute:view_name+' => '',
 	'Class:IPAddress/Tab:rrecords_list' => 'DNS Records',
@@ -154,7 +158,7 @@ Dict::Add('EN US', 'English', 'English', array(
 ;',
 	'Class:Zone/DataFile:DSRecord' => '
 ;
-; Delegation signers
+; Delegation Signers
 ;',
 	'Class:Zone/DataFile:GenericRecord' => '
 ;
@@ -201,9 +205,9 @@ Dict::Add('EN US', 'English', 'English', array(
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:lnkFunctionalCIToZone' => 'Link FunctionalCI / Zone',
 	'Class:lnkFunctionalCIToZone+' => '',
-	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'Server',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'DNS Server',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id+' => '',
-	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'Server name',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'DNS Server name',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name+' => '',
 	'Class:lnkFunctionalCIToZone/Attribute:zone_id' => 'Zone',
 	'Class:lnkFunctionalCIToZone/Attribute:zone_id+' => '',
@@ -466,9 +470,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:TLSARecord/Attribute:certificate_usage' => 'Certificate Usage',
 	'Class:TLSARecord/Attribute:certificate_usage+' => 'Integer',
 	'Class:TLSARecord/Attribute:selector' => 'Selector',
-	'Class:TLSARecord/Attribute:selector+' => 'Interger',
+	'Class:TLSARecord/Attribute:selector+' => 'Integer',
 	'Class:TLSARecord/Attribute:matching_type' => 'Matching Type',
-	'Class:TLSARecord/Attribute:matching_type+' => 'Interger',
+	'Class:TLSARecord/Attribute:matching_type+' => 'Integer',
 	'Class:TLSARecord/Attribute:data' => 'Certificate Association Data',
 	'Class:TLSARecord/Attribute:data+' => 'The actual data to be matched given the settings of the other fields',
 ));
@@ -490,7 +494,7 @@ Dict::Add('EN US', 'English', 'English', array(
 Dict::Add('EN US', 'English', 'English', array(
 	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Wrong format: IPv4 reverse zone format is x.[y.][z.]in-addr.arpa. or u-v.x.y.z.in-addr.arpa. !',
 	'UI:ZoneManagement:Action:New:Zone:V6:WrongFormat' => 'Wrong format: IPv6 reverse zone format is x1.[x2.]...[xi.]ip6.arpa. !',
-	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'An authoritative server can only be of Server or Virtual Machine class !',
+	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'An authoritative server can only be of Server, Virtual Machine, Network Device, Cluster Network or Application Solution class !',
 ));
 
 //
@@ -546,7 +550,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:DNSManagement' => 'DNS Management',
 	'Menu:DNSManagement+' => '',
 	'Menu:NameSpace' => 'Name Space',
-	'Menu:NameSpace+' => '',
+	'Menu:NameSpace+' => 'Summary of all DNS objects',
 	'Menu:DNSSpace:MainObjects' => 'Structural Objects',
 	'Title:Zones:DirectMapping' => 'Forward Zones',
 	'Title:Zones:V4ReverseMapping' => 'IPv4 reverse Zones',
@@ -555,11 +559,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:DNSSpace:SecurityResourceRecords' => 'Security Resource Records',
 	'Menu:DNSSpace:GenericResourceRecords' => 'Generic Resource Records',
 	'Menu:View' => 'Views',
-	'Menu:View+' => 'DNS Views',
+	'Menu:View+' => 'List of all DNS Views',
 	'Menu:Domain' => 'Domains',
-	'Menu:Domain+' => 'DNS Domains',
+	'Menu:Domain+' => 'List of all DNS Domains',
 	'Menu:Zone' => 'Zones',
-	'Menu:Zone+' => 'DNS Zones',
+	'Menu:Zone+' => 'List of all DNS Zones',
 	'Menu:ZoneManagement:ResourceRecords' => 'Resource Records',
 	'Menu:ZoneManagement:ResourceRecords+' => 'DNS Resource Records',
 	'Menu:NewResourceRecord' => 'New RR',
@@ -567,33 +571,33 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Menu:SearchResourceRecord' => 'Search for RRs',
 	'Menu:SearchResourceRecord+' => 'Search for DNS Resource Records',
 	'Menu:ARecord' => 'A',
-	'Menu:ARecord+' => 'A Records',
+	'Menu:ARecord+' => 'List of all A Records',
 	'Menu:AAAARecord' => 'AAAA',
-	'Menu:AAAARecord+' => 'AAAA Records',
+	'Menu:AAAARecord+' => 'List of all AAAA Records',
 	'Menu:CAARecord' => 'CAA',
-	'Menu:CAARecord+' => 'CAA Records',
+	'Menu:CAARecord+' => 'List of all CAA Records',
 	'Menu:CNAMERecord' => 'CNAME',
-	'Menu:CNAMERecord+' => 'CNAME Records',
+	'Menu:CNAMERecord+' => 'List of all CNAME Records',
 	'Menu:DSRecord' => 'DS',
-	'Menu:DSRecord+' => 'DS Records',
+	'Menu:DSRecord+' => 'List of all DS Records',
 	'Menu:MXRecord' => 'MX',
-	'Menu:MXRecord+' => 'MX Records',
+	'Menu:MXRecord+' => 'List of all MX Records',
 	'Menu:NSRecord' => 'NS',
-	'Menu:NSRecord+' => 'NS Records',
+	'Menu:NSRecord+' => 'List of all NS Records',
 	'Menu:OPENPGPKEYRecord' => 'OPENPGPKEY',
-	'Menu:OPENPGPKEYRecord+' => 'OPENPGPKEY Records',
+	'Menu:OPENPGPKEYRecord+' => 'List of all OPENPGPKEY Records',
 	'Menu:PTRRecord' => 'PTR',
-	'Menu:PTRRecord+' => 'PTR Records',
+	'Menu:PTRRecord+' => 'List of all PTR Records',
 	'Menu:SOARecord' => 'SOA',
-	'Menu:SOARecord+' => 'SOA Records',
+	'Menu:SOARecord+' => 'List of all SOA Records',
 	'Menu:SRVRecord' => 'SRV',
-	'Menu:SRVRecord+' => 'SRV Records',
+	'Menu:SRVRecord+' => 'List of all SRV Records',
 	'Menu:SSHFPRecord' => 'SSHFP',
-	'Menu:SSHFPRecord+' => 'SSHFP Records',
+	'Menu:SSHFPRecord+' => 'List of all SSHFP Records',
 	'Menu:TLSARecord' => 'TLSA',
-	'Menu:TLSARecord+' => 'TLSA Records',
+	'Menu:TLSARecord+' => 'List of all TLSA Records',
 	'Menu:TXTRecord' => 'TXT',
-	'Menu:TXTRecord+' => 'TXT Records',
+	'Menu:TXTRecord+' => 'List of all TXT Records',
 	'Menu:GenericRecord' => 'GENERIC',
-	'Menu:GenericRecord+' => 'GENERIC Records',
+	'Menu:GenericRecord+' => 'List of all generic or custom Records',
 ));

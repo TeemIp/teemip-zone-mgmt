@@ -13,6 +13,10 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:IPConfig/Attribute:ip_update_dns_records+' => 'Crée, modifie ou supprime automatiquement les enregistrements DNS liés à une adresse IP',
 	'Class:IPConfig/Attribute:ip_update_dns_records/Value:yes' => 'Oui',
 	'Class:IPConfig/Attribute:ip_update_dns_records/Value:no' => 'Non',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete' => 'Enlève les enregistrements DNS des IPs obsolètes',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete+' => 'Supprime automatiquement les enregistrements DNS liés à une adresse IP obsolète',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:yes' => 'Oui',
+	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:no' => 'Non',
 ));
 
 //
@@ -21,7 +25,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:IPAddress/Attribute:view_id' => 'Vue DNS',
-	'Class:IPAddress/Attribute:view_id+' => '',
+	'Class:IPAddress/Attribute:view_id+' => 'Vue DNS depuis laquelle l\'IP est résolue',
 	'Class:IPAddress/Attribute:view_name' => 'Nom de la Vue',
 	'Class:IPAddress/Attribute:view_name+' => '',
 	'Class:IPAddress/Tab:rrecords_list' => 'Enregistrements DNS',
@@ -130,41 +134,61 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone/Tab:ptrrecords_list+' => 'Liste de tous les enregistrements PTR de la zone',
 	'Class:Zone/Tab:otherrecords_list' => 'Autres enregistrements',
 	'Class:Zone/Tab:otherrecords_list+' => 'Liste de tous les autres enregistrements de la zone',
-	'Class:Zone/Tab:mxrecords_list' => 'Liste des %1$s enregistrements MX de la zone',
-	'Class:Zone/Tab:mxrecords_list_empty' => 'Il n\'y a pas d\enregistrement MX dans la zone',
-	'Class:Zone/Tab:srvrecords_list' => 'Liste des %1$s enregistrements SRV de la zone',
-	'Class:Zone/Tab:srvrecords_list_empty' => 'Il n\'y a pas d\enregistrement SRV dans la zone',
-	'Class:Zone/Tab:txtrecords_list' => 'Liste des %1$s enregistrements TXT de la zone',
-	'Class:Zone/Tab:txtrecords_list_empty' => 'Il n\'y a pas d\enregistrement TXT dans la zone',
-	'Class:Zone/DataFile:ns' => '
+	'Class:Zone/Tab:records_list' => 'Liste de tous les enregistrements %1$s de la zone',
+	'Class:Zone/Tab:records_list_empty' => 'Il n\'y a pas d\'enregistrement %1$s dans la zone',
+	'Class:Zone/DataFile:NSRecord' => '
 ;
 ; Serveurs de Noms
 ;',
-	'Class:Zone/DataFile:ipv4' => '
+	'Class:Zone/DataFile:ARecord' => '
 ;
 ; Adresses IPv4 pour les noms canoniques
 ;',
-	'Class:Zone/DataFile:ipv6' => '
+	'Class:Zone/DataFile:AAAARecord' => '
 ;
 ; Adresses IPv6 pour les noms canoniques
 ;',
-	'Class:Zone/DataFile:cnames' => '
+	'Class:Zone/DataFile:CAARecord' => '
 ;
-; Alias
+; Certification Authority Authorization
 ;',
-	'Class:Zone/DataFile:mx' => '
+	'Class:Zone/DataFile:CNAMERecord' => '
+;
+; Aliases
+;',
+	'Class:Zone/DataFile:DSRecord' => '
+;
+; Delegation Signers
+;',
+	'Class:Zone/DataFile:GenericRecord' => '
+;
+; Autres enregistrements
+;',
+	'Class:Zone/DataFile:MXRecord' => '
 ;
 ; Mail exchangers
 ;',
-	'Class:Zone/DataFile:ptr' => '
+	'Class:Zone/DataFile:OPENPGPKEYRecord' => '
+;
+; Clefs publiques OpenPGP
+;',
+	'Class:Zone/DataFile:PTRRecord' => '
 ;
 ; Adresses pointant vers des noms canoniques
 ;',
-'Class:Zone/DataFile:srv' => '
+	'Class:Zone/DataFile:SRVRecord' => '
 ;
 ; Localisation des services
 ;',
-	'Class:Zone/DataFile:txt' => '
+	'Class:Zone/DataFile:SSHFPRecord' => '
+;
+; Empruntes de clefs publiques SSH
+;',
+	'Class:Zone/DataFile:TLSARecord' => '
+;
+; TLSA certificate associations
+;',
+	'Class:Zone/DataFile:TXTRecord' => '
 ;
 ; Texte
 ;',
@@ -181,9 +205,9 @@ Dict::Add('FR FR', 'French', 'Français', array(
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:lnkFunctionalCIToZone' => 'Lien Serveur / Zone',
 	'Class:lnkFunctionalCIToZone+' => '',
-	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'Serveur',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'Serveur DNS',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id+' => '',
-	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'Nom du serveur',
+	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'Nom du serveur DNS',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name+' => '',
 	'Class:lnkFunctionalCIToZone/Attribute:zone_id' => 'Zone',
 	'Class:lnkFunctionalCIToZone/Attribute:zone_id+' => '',
@@ -235,6 +259,19 @@ Dict::Add('FR FR', 'French', 'Français', array(
 ));
 
 //
+// Class: ResourceRecordType
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:ResourceRecordType' => 'Type de Resource Record',
+	'Class:ResourceRecordType+' => 'Type de Resource Record qui n\'est pas couvert par une classe existante',
+	'Class:ResourceRecordType/Attribute:name' => 'Type',
+	'Class:ResourceRecordType/Attribute:name+' => 'Type tel qu\'il apparaît dans un fichier DB',
+	'Class:ResourceRecordType/Attribute:description' => 'Description',
+	'Class:ResourceRecordType/Attribute:description+' => '',
+));
+
+//
 // Class: ARecord
 //
 
@@ -245,7 +282,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:ARecord/Attribute:ip_id+' => '',
 	'Class:ARecord/Attribute:ip_fqdn' => 'FQDN de l\'adresse IPv4',
 	'Class:ARecord/Attribute:ip_fqdn+' => '',
-	));
+));
 
 //
 // Class: AAAARecord
@@ -261,6 +298,27 @@ Dict::Add('FR FR', 'French', 'Français', array(
 ));
 
 //
+// Class: CAARecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:CAARecord' => 'CAA',
+	'Class:CAARecord+' => 'Certification Authority Authorization',
+	'Class:CAARecord/Attribute:flag' => 'Flag',
+	'Class:CAARecord/Attribute:flag+' => 'Entier',
+	'Class:CAARecord/Attribute:tag' => 'Tag',
+	'Class:CAARecord/Attribute:tag+' => '',
+	'Class:CAARecord/Attribute:tag/Value:issue' => 'Issue',
+	'Class:CAARecord/Attribute:tag/Value:issue+' => '',
+	'Class:CAARecord/Attribute:tag/Value:issuewild' => 'Issue Wild',
+	'Class:CAARecord/Attribute:tag/Value:issuewild+' => '',
+	'Class:CAARecord/Attribute:tag/Value:iodef' => 'Iodef',
+	'Class:CAARecord/Attribute:tag/Value:iodef+' => '',
+	'Class:CAARecord/Attribute:value' => 'Valeur',
+	'Class:CAARecord/Attribute:value+' => 'Chaine de texte associée au Tag',
+));
+
+//
 // Class: CNAMERecord
 //
 
@@ -269,6 +327,36 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:CNAMERecord+' => '',
 	'Class:CNAMERecord/Attribute:cname' => 'CNAME',
 	'Class:CNAMERecord/Attribute:cname+' => 'Nom canonique',
+));
+
+//
+// Class: DSRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:DSRecord' => 'DS',
+	'Class:DSRecord+' => 'Delegation Signer Record',
+	'Class:DSRecord/Attribute:key_tag' => 'Key Tag',
+	'Class:DSRecord/Attribute:key_tag+' => 'Valeur numérique pouvant aider à identifier rapidement l\'enregistrement DNSKEY référencé',
+	'Class:DSRecord/Attribute:algorithm' => 'Algorithme',
+	'Class:DSRecord/Attribute:algorithm+' => 'Algorithme utilisé par l\'enregistrement DNSKEY référencé',
+	'Class:DSRecord/Attribute:digest_type' => 'Digest Type',
+	'Class:DSRecord/Attribute:digest_type+' => 'Algorithme de hachage cryptographique utilisé pour créer la valeur de Digest',
+	'Class:DSRecord/Attribute:digest' => 'Digest',
+	'Class:DSRecord/Attribute:digest+' => 'Valeur du hachage cryptographique de l\'enregistrement DNSKEY référencé',
+));
+
+//
+// Class: GenericRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:GenericRecord' => 'GENERIC',
+	'Class:GenericRecord+' => 'Enregistrement générique',
+	'Class:GenericRecord/Attribute:rrtype id' => 'Type',
+	'Class:GenericRecord/Attribute:rrtype id+' => 'Type d\'enregistrement',
+	'Class:GenericRecord/Attribute:payload' => 'Charge utile',
+	'Class:GenericRecord/Attribute:payload+' => 'Tout ce que le fichier db doit trouver derrière l\'enregistrement DNS',
 ));
 
 //
@@ -293,6 +381,17 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:NSRecord+' => '',
 	'Class:NSRecord/Attribute:nsname' => 'Serveur de nom',
 	'Class:NSRecord/Attribute:nsname+' => '',
+));
+
+//
+// Class: OPENPGPKEYRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:OPENPGPKEYRecord' => 'OPENPGPKEY',
+	'Class:OPENPGPKEYRecord+' => 'Clef publique OpenPGP',
+	'Class:OPENPGPKEYRecord/Attribute:key' => 'Clef publique OpenPGP',
+	'Class:OPENPGPKEYRecord/Attribute:key+' => 'Valeur de la clef publique OpenPGP transférable',
 ));
 
 //
@@ -330,17 +429,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 ));
 
 //
-// Class: TXTRecord
-//
-
-Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:TXTRecord' => 'TXT',
-	'Class:TXTRecord+' => '',
-	'Class:TXTRecord/Attribute:txt' => 'Text',
-	'Class:TXTRecord/Attribute:txt+' => '',
-));
-
-//
 // Class: SRVRecord
 //
 
@@ -358,12 +446,55 @@ Dict::Add('FR FR', 'French', 'Français', array(
 ));
 
 //
+// Class: SSHFPRecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:SSHFPRecord' => 'SSHFP',
+	'Class:SSHFPRecord+' => 'Enregistrement Secure SHell Fingerprint',
+	'Class:SSHFPRecord/Attribute:algorithm' => 'Algorithme',
+	'Class:SSHFPRecord/Attribute:algorithm+' => 'Algorithme utilisé par l\'enregistrement SSHFP',
+	'Class:SSHFPRecord/Attribute:type' => 'Digest Type',
+	'Class:SSHFPRecord/Attribute:type+' => 'Algorithme de hachage cryptographique utilisé pour créer la valeur de Digest',
+	'Class:SSHFPRecord/Attribute:fingerprint' => 'Emprunte',
+	'Class:SSHFPRecord/Attribute:fingerprint+' => 'Représentation hexadécimale de la valeur de hachage de la clé SSH',
+));
+
+//
+// Class: TLSARecord
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:TLSARecord' => 'TLSA',
+	'Class:TLSARecord+' => 'Enregistrement TLSA Certificate Association',
+	'Class:TLSARecord/Attribute:certificate_usage' => 'Utilisation du certificat',
+	'Class:TLSARecord/Attribute:certificate_usage+' => 'Entier',
+	'Class:TLSARecord/Attribute:selector' => 'Selecteur',
+	'Class:TLSARecord/Attribute:selector+' => 'Entier',
+	'Class:TLSARecord/Attribute:matching_type' => 'Matching Type',
+	'Class:TLSARecord/Attribute:matching_type+' => 'Entier',
+	'Class:TLSARecord/Attribute:data' => 'Certificate Association Data',
+	'Class:TLSARecord/Attribute:data+' => 'Données réelles à mettre en correspondance des autres champs',
+));
+
+//
+// Class: TXTRecord
+//
+
+Dict::Add('FR FR', 'French', 'Français', array(
+	'Class:TXTRecord' => 'TXT',
+	'Class:TXTRecord+' => '',
+	'Class:TXTRecord/Attribute:txt' => 'Text',
+	'Class:TXTRecord/Attribute:txt+' => '',
+));
+
+//
 // Management of zones
 //
 Dict::Add('FR FR', 'French', 'Français', array(
 	'UI:ZoneManagement:Action:New:Zone:V4:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv4 est x.[y.][z.]in-addr.arpa. ou u-v.x.y.z.in-addr.arpa. !',
 	'UI:ZoneManagement:Action:New:Zone:V6:WrongFormat' => 'Mauvais format: le format d\'une zone reverse IPv6 est x1.[x2.]...[x31.]ip6.arpa. !',
-	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'Un serveur authoritaire ne peut être que de classe Serveur ou Machine Virtuelle !',
+	'UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass' => 'Un serveur authoritaire ne peut être que de classe Serveur, Machine Virtuelle, Equipement réseau, Cluster réseau ou Solution Applicative !',
 ));
 
 //
@@ -419,18 +550,20 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:DNSManagement' => 'Gestion du DNS',
 	'Menu:DNSManagement+' => '',
 	'Menu:NameSpace' => 'Espace de Nomage',
-	'Menu:NameSpace+' => '',
+	'Menu:NameSpace+' => 'Résumé de tous les objets DNS ',
 	'Menu:DNSSpace:MainObjects' => 'Objets structurants',
 	'Title:Zones:DirectMapping' => 'Zones forward',
 	'Title:Zones:V4ReverseMapping' => 'Zones IPv4 inverse',
 	'Title:Zones:V6ReverseMapping' => 'Zones IPv6 inverse',
 	'Menu:DNSSpace:ResourceRecords' => 'Enregistrements',
+	'Menu:DNSSpace:SecurityResourceRecords' => 'Enregistrements de sécurité',
+	'Menu:DNSSpace:GenericResourceRecords' => 'Enregistrements génériques',
 	'Menu:View' => 'Vues',
-	'Menu:View+' => 'Vues DNS',
+	'Menu:View+' => 'Liste de toutes les vues DNS',
 	'Menu:Domain' => 'Domaines',
-	'Menu:Domain+' => 'Domaines DNS',
+	'Menu:Domain+' => 'Liste de tous les domaines DNS',
 	'Menu:Zone' => 'Zones',
-	'Menu:Zone+' => 'Zones DNS',
+	'Menu:Zone+' => 'Liste de toutes les zones DNS',
 	'Menu:DNSManagement:ResourceRecords' => 'Enregistrements',
 	'Menu:DNSManagement:ResourceRecords+' => 'Enregistrements DNS',
 	'Menu:NewResourceRecord' => 'Nouveau RR',
@@ -438,21 +571,33 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:SearchResourceRecord' => 'Recherche de RRs',
 	'Menu:SearchResourceRecord+' => 'Recherche d\'enregistrements DNS',
 	'Menu:ARecord' => 'A',
-	'Menu:ARecord+' => 'Enregistrements A',
+	'Menu:ARecord+' => 'Liste de tous les enregistrements A',
 	'Menu:AAAARecord' => 'AAAA',
-	'Menu:AAAARecord+' => 'Enregistrements AAAA',
+	'Menu:AAAARecord+' => 'Liste de tous les enregistrements AAAA',
+	'Menu:CAARecord' => 'CAA',
+	'Menu:CAARecord+' => 'Liste de tous les enregistrements CAA',
 	'Menu:CNAMERecord' => 'CNAME',
-	'Menu:CNAMERecord+' => 'Enregistrements CNAME',
+	'Menu:CNAMERecord+' => 'Liste de tous les enregistrements CNAME',
+	'Menu:DSRecord' => 'DS',
+	'Menu:DSRecord+' => 'Liste de tous les enregistrements DS',
 	'Menu:MXRecord' => 'MX',
-	'Menu:MXRecord+' => 'Enregistrements MX',
+	'Menu:MXRecord+' => 'Liste de tous les enregistrements MX',
 	'Menu:NSRecord' => 'NS',
-	'Menu:NSRecord+' => 'Enregistrements NS',
+	'Menu:NSRecord+' => 'Liste de tous les enregistrements NS',
+	'Menu:OPENPGPKEYRecord' => 'OPENPGPKEY',
+	'Menu:OPENPGPKEYRecord+' => 'Liste de tous les enregistrements OPENPGPKEY',
 	'Menu:PTRRecord' => 'PTR',
-	'Menu:PTRRecord+' => 'Enregistrements PTR',
+	'Menu:PTRRecord+' => 'Liste de tous les enregistrements PTR',
 	'Menu:SOARecord' => 'SOA',
-	'Menu:SOARecord+' => 'Enregistrements SOA',
-	'Menu:TXTRecord' => 'TXT',
-	'Menu:TXTRecord+' => 'Enregistrements TXT',
+	'Menu:SOARecord+' => 'Liste de tous les enregistrements SOA',
 	'Menu:SRVRecord' => 'SRV',
-	'Menu:SRVRecord+' => 'Enregistrements SRV',
+	'Menu:SRVRecord+' => 'Liste de tous les enregistrements SRV',
+	'Menu:SSHFPRecord' => 'SSHFP',
+	'Menu:SSHFPRecord+' => 'Liste de tous les enregistrements SSHFP',
+	'Menu:TLSARecord' => 'TLSA',
+	'Menu:TLSARecord+' => 'Liste de tous les enregistrements TLSA',
+	'Menu:TXTRecord' => 'TXT',
+	'Menu:TXTRecord+' => 'Liste de tous les enregistrements TXT',
+	'Menu:GenericRecord' => 'GENERIC',
+	'Menu:GenericRecord+' => 'Liste de tous les enregistrements génériques',
 ));
