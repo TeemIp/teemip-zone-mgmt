@@ -7,5 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'TeemIp\\TeemIp\\Extension\\ZoneManagement\\Hook\\ReleaseRRsFromObsoleteIPs' => $baseDir . '/src/Hook/ReleaseRRsFromObsoleteIPs.php',
     'TeemIp\\TeemIp\\Extension\\ZoneManagement\\Model\\_Zone' => $baseDir . '/src/Model/_Zone.php',
 );
