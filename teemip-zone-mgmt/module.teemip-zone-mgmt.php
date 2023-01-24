@@ -29,6 +29,7 @@ SetupWebPage::AddModule(
 		//
 		'datamodel' => array(
 			'vendor/autoload.php',
+			'src/Hook/ReleaseRRsFromObsoleteIPs.php',
 			'model.teemip-zone-mgmt.php',
 		),
 		'webservice' => array(),
@@ -44,14 +45,22 @@ SetupWebPage::AddModule(
 
 		// Default settings
 		//
-		'settings' => array(),
+		'settings' => array(
+			'rr_release_on_ip_status' => array(
+				'enabled' => false,
+				'debug' => false,
+				'periodicity' => 3600,
+				'status_list' => array('released', 'unassigned'),
+			),
+		),
 	)
 );
 
 if (!class_exists('ZoneManagementInstaller')) {
 	// Module installation handler
 	//
-	class ZoneManagementInstaller extends ModuleInstallerAPI {
+	class ZoneManagementInstaller extends ModuleInstallerAPI
+	{
 		public static function BeforeWritingConfig(Config $oConfiguration)
 		{
 			// If you want to override/force some configuration values, do it here
@@ -83,7 +92,7 @@ if (!class_exists('ZoneManagementInstaller')) {
 			// Migrate allocation_date and release_date from IPAddress to IPObject
 			// Delete allocation_date and release_date from IPAddress
 
-			if (($sPreviousVersion=='1.0.0') || ($sPreviousVersion=='1.1.0')) {
+			if (($sPreviousVersion == '1.0.0') || ($sPreviousVersion == '1.1.0')) {
 				SetupLog::Info("Module teemip-zone-mgmt: remove ResourceRecord class from the DNSObject tree and move it directly under cmdbAbstractObject class");
 
 				$sDNSObjectTable = MetaModel::DBGetTable('DNSObject');
@@ -125,7 +134,7 @@ if (!class_exists('ZoneManagementInstaller')) {
 				}
 
 				// If still no language, get the default one
-				if (null===$sLang) {
+				if (null === $sLang) {
 					$sLang = str_replace(' ', '_', strtolower($oConfiguration->GetDefaultLanguage()));
 				}
 
