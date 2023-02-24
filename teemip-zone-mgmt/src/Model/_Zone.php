@@ -415,11 +415,21 @@ class _Zone extends DNSObject
 						foreach ($this->aSecondaryRecordClasses as $sClass) {
 							$oRecordSet = $aRecordSets[$sClass];
 							if ($oRecordSet->Count() > 0) {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
-								$oClassIcon->SetDescription(Dict::Format('Class:Zone/Tab:records_list', MetaModel::GetName($sClass)))->AddCSSClass('ibo-block-list--medallion');
-								$oP->AddUiBlock($oClassIcon);
 								$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
-								$oBlock->Display($oP, strtolower($sClass), array('menu' => false));
+								$sSubTitle = Dict::Format('Class:Zone/Tab:records_list', MetaModel::GetName($sClass));
+								if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
+									$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
+									$oClassIcon->SetDescription($sSubTitle)->AddCSSClass('ibo-block-list--medallion');
+									$oP->AddUiBlock($oClassIcon);
+									$oBlock->Display($oP, strtolower($sClass), array('menu' => false));
+								} else {
+									$oBlock->Display($oP, strtolower($sClass), array(
+										'menu' => false,
+										'panel_title' => MetaModel::GetName($sClass),
+										'panel_title_tooltip' => $sSubTitle,
+										'panel_icon' => MetaModel::GetClassIcon($sClass, false)
+									));
+								}
 							}
 						}
 					} else {
