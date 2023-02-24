@@ -4522,17 +4522,30 @@
         <db_final_class_field/>
         <naming>
           <attributes>
-            <attribute id="functionalci_id"/>
-            <attribute id="zone_id"/>
+            <attribute id="functionalci_name"/>
+            <attribute id="zone_name"/>
           </attributes>
         </naming>
-        <icon/>
+        <style>
+          <icon/>
+        </style>
         <reconciliation>
           <attributes>
             <attribute id="functionalci_id"/>
             <attribute id="zone_id"/>
           </attributes>
         </reconciliation>
+        <uniqueness_rules>
+          <rule id="no_duplicate">
+            <attributes>
+              <attribute id="functionalci_id"/>
+              <attribute id="zone_id"/>
+            </attributes>
+            <filter><![CDATA[]]></filter>
+            <disabled>false</disabled>
+            <is_blocking>true</is_blocking>
+          </rule>
+        </uniqueness_rules>
       </properties>
       <fields>
         <field id="functionalci_id" xsi:type="AttributeExternalKey">

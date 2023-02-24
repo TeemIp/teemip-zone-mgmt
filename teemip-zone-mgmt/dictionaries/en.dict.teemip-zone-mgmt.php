@@ -205,6 +205,7 @@ Dict::Add('EN US', 'English', 'English', array(
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:lnkFunctionalCIToZone' => 'Link FunctionalCI / Zone',
 	'Class:lnkFunctionalCIToZone+' => '',
+	'Class:lnkFunctionalCIToZone/Name' => '%1$s / %2$s',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id' => 'DNS Server',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_id+' => '',
 	'Class:lnkFunctionalCIToZone/Attribute:functionalci_name' => 'DNS Server name',
