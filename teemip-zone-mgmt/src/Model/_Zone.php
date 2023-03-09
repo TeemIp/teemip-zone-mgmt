@@ -410,8 +410,7 @@ class _Zone extends DNSObject
 					$sName = Dict::Format('Class:Zone/Tab:otherrecords_list');
 					$sTitle = Dict::Format('Class:Zone/Tab:otherrecords_list+');
 					if ($iOtherRecords > 0) {
-						$oP->SetCurrentTab($sName.' ('.$iOtherRecords.')');
-						$oP->p($sTitle);
+						$oP->SetCurrentTab('otherrecords_list', $sName.' ('.$iOtherRecords.')', $sTitle);
 						foreach ($this->aSecondaryRecordClasses as $sClass) {
 							$oRecordSet = $aRecordSets[$sClass];
 							if ($oRecordSet->Count() > 0) {
@@ -421,9 +420,9 @@ class _Zone extends DNSObject
 									$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
 									$oClassIcon->SetDescription($sSubTitle)->AddCSSClass('ibo-block-list--medallion');
 									$oP->AddUiBlock($oClassIcon);
-									$oBlock->Display($oP, strtolower($sClass), array('menu' => false));
+									$oBlock->Display($oP, 'blk-'.strtolower($sClass), array('menu' => false));
 								} else {
-									$oBlock->Display($oP, strtolower($sClass), array(
+									$oBlock->Display($oP, 'blk-'.strtolower($sClass), array(
 										'menu' => false,
 										'panel_title' => MetaModel::GetName($sClass),
 										'panel_title_tooltip' => $sSubTitle,
