@@ -45,11 +45,10 @@ try {
 	$oP->add_linked_script("../js/linkswidget.js");
 	$oP->add_linked_script("../js/extkeywidget.js");
 
-	switch($operation)
-	{
+	switch ($operation) {
 		///////////////////////////////////////////////////////////////////////////////////////////
-		
-		case 'datafiledisplay':	// Display zone in BIND format
+
+		case 'datafiledisplay':    // Display zone in BIND format
 			$sClass = utils::ReadParam('class', '');
 			$id = utils::ReadParam('id', '');
 			$sSortOrder = utils::ReadParam('sort_order', '');
@@ -61,7 +60,7 @@ try {
 			if ($sClass != 'Zone') {
 				throw new ApplicationException(Dict::Format('UI:Error:WrongActionForClass', $operation, $sClass));
 			}
-			
+
 			// Check if the object exists
 			$oObj = MetaModel::GetObject($sClass, $id, false /* MustBeFound */);
 			if (is_null($oObj)) {
@@ -71,11 +70,11 @@ try {
 				// Dump data file
 				$oObj->DisplayDataFile($oP, array('sort-order' => $sSortOrder));
 			}
-		break; // End case datafiledisplay
-		
+			break; // End case datafiledisplay
+
 		///////////////////////////////////////////////////////////////////////////////////////////
 
-		case 'updaterrs':	// Create or update Resource Records
+		case 'updaterrs':    // Create or update Resource Records
 			$sClass = utils::ReadParam('class', '');
 			$id = utils::ReadParam('id', '');
 			// Check if right parameters have been given
@@ -124,7 +123,7 @@ try {
 
 		///////////////////////////////////////////////////////////////////////////////////////////
 
-		case 'deleterrs':	// Create Resource Records
+		case 'deleterrs':    // Create Resource Records
 			$sClass = utils::ReadParam('class', '');
 			$id = utils::ReadParam('id', '');
 			// Check if right parameters have been given
@@ -221,7 +220,7 @@ try {
 				IssueLog::Error("Failed to log issue into the DB");
 			}
 		}
-		
+
 		IssueLog::Error($e->getMessage());
 	}
 }
