@@ -82,12 +82,12 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone' => 'Zone',
-	'Class:Zone+' => '',
+	'Class:Zone+' => 'Zone DNS',
 	'Class:Zone/Name' => '%1$s',
 	'Class:Zone:baseinfo' => 'Information Générale',
 	'Class:Zone:soainfo' => 'Start Of Authority',
 	'Class:Zone/Attribute:view_id' => 'Vue',
-	'Class:Zone/Attribute:view_id+' => '',
+	'Class:Zone/Attribute:view_id+' => 'Vue à laquelle appartient la zone',
 	'Class:Zone/Attribute:mapping' => 'Type de Mapping',
 	'Class:Zone/Attribute:mapping+' => 'Type de résolution fournie par la zone: forward, reverse pour adresses IPv4 ou reverse pour les adresses IPv6',
 	'Class:Zone/Attribute:mapping/Value:direct' => 'Forward',
@@ -101,11 +101,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone/Attribute:comment' => 'Commentaire',
 	'Class:Zone/Attribute:comment+' => '',
 	'Class:Zone/Attribute:requestor_id' => 'Demandeur',
-	'Class:Zone/Attribute:requestor_id+' => '',
+	'Class:Zone/Attribute:requestor_id+' => 'Personne ayant demandé la création ou la modification de la zone',
 	'Class:Zone/Attribute:requestor_name' => 'Nom du demandeur',
 	'Class:Zone/Attribute:requestor_name+' => '',
 	'Class:Zone/Attribute:ttl' => 'TTL',
-	'Class:Zone/Attribute:ttl+' => '',
+	'Class:Zone/Attribute:ttl+' => 'Time To Live',
 	'Class:Zone/Attribute:sourcedname' => 'Master server',
 	'Class:Zone/Attribute:sourcedname+' => '',
 	'Class:Zone/Attribute:mbox' => 'Hostmaster mailbox',
@@ -235,25 +235,25 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:ResourceRecord/Attribute:finalclass' => 'Type',
 	'Class:ResourceRecord/Attribute:finalclass+' => '',
 	'Class:ResourceRecord/Attribute:org_id' => 'Organisation',
-	'Class:ResourceRecord/Attribute:org_id+' => '',
+	'Class:ResourceRecord/Attribute:org_id+' => 'Organisation à laquelle appartient l\'enregistrement',
 	'Class:ResourceRecord/Attribute:org_name' => 'Nom de l\'organisation',
 	'Class:ResourceRecord/Attribute:org_name+' => '',
-	'Class:ResourceRecord/Attribute:zone_id' => 'Zone',
-	'Class:ResourceRecord/Attribute:zone_id+' => '',
-	'Class:ResourceRecord/Attribute:zone_name' => 'Nom de la zone',
-	'Class:ResourceRecord/Attribute:zone_name+' => '',
 	'Class:ResourceRecord/Attribute:name' => 'Nom du RR',
 	'Class:ResourceRecord/Attribute:name+' => '',
+	'Class:ResourceRecord/Attribute:comment' => 'Commentaire',
+	'Class:ResourceRecord/Attribute:comment+' => '',
+	'Class:ResourceRecord/Attribute:zone_id' => 'Zone',
+	'Class:ResourceRecord/Attribute:zone_id+' => 'Zone à laquelle appartient l\'enregistrement',
+	'Class:ResourceRecord/Attribute:zone_name' => 'Nom de la zone',
+	'Class:ResourceRecord/Attribute:zone_name+' => '',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl' => 'Surcharge du TTL de la zone',
-	'Class:ResourceRecord/Attribute:overwrite_zone_ttl+' => '',
+	'Class:ResourceRecord/Attribute:overwrite_zone_ttl+' => 'Surcharge, ou pas, le TTL défini au niveau de la zone',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:no' => 'Non',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:no+' => '',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:yes' => 'Oui',
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:yes+' => '',
 	'Class:ResourceRecord/Attribute:ttl' => 'TTL',
-	'Class:ResourceRecord/Attribute:ttl+' => '',
-	'Class:ResourceRecord/Attribute:comment' => 'Commentaire',
-	'Class:ResourceRecord/Attribute:comment+' => '',
+	'Class:ResourceRecord/Attribute:ttl+' => 'Time To Live',
 	'ResourceRecord:Zone' => 'Zone',
 	'ResourceRecord:Record' => 'Attributs de l\'enregistrement',
 ));
@@ -277,7 +277,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:ARecord' => 'A',
-	'Class:ARecord+' => '',
+	'Class:ARecord+' => 'Enregistrement des adresses de type IPv4',
 	'Class:ARecord/Attribute:ip_id' => 'Adresse IPv4',
 	'Class:ARecord/Attribute:ip_id+' => '',
 	'Class:ARecord/Attribute:ip_fqdn' => 'FQDN de l\'adresse IPv4',
@@ -290,7 +290,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:AAAARecord' => 'AAAA',
-	'Class:AAAARecord+' => '',
+	'Class:AAAARecord+' => 'Enregistrement des adresses de type IPv6',
 	'Class:AAAARecord/Attribute:ip_id' => 'Adresse IPv6',
 	'Class:AAAARecord/Attribute:ip_id+' => '',
 	'Class:AAAARecord/Attribute:ip_fqdn' => 'FQDN de l\'adresse IPv6',
@@ -324,7 +324,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:CNAMERecord' => 'CNAME',
-	'Class:CNAMERecord+' => '',
+	'Class:CNAMERecord+' => 'Enregistrement des noms canoniques',
 	'Class:CNAMERecord/Attribute:cname' => 'CNAME',
 	'Class:CNAMERecord/Attribute:cname+' => 'Nom canonique',
 ));
@@ -365,7 +365,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MXRecord' => 'MX',
-	'Class:MXRecord+' => '',
+	'Class:MXRecord+' => 'Enregistrement des serveurs de courrier',
 	'Class:MXRecord/Attribute:preference' => 'Préférence',
 	'Class:MXRecord/Attribute:preference+' => '',
 	'Class:MXRecord/Attribute:exchange' => 'Serveur de courrier',
@@ -378,7 +378,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:NSRecord' => 'NS',
-	'Class:NSRecord+' => '',
+	'Class:NSRecord+' => 'Enregistrement des serveurs de nom',
 	'Class:NSRecord/Attribute:nsname' => 'Serveur de nom',
 	'Class:NSRecord/Attribute:nsname+' => '',
 ));
@@ -400,7 +400,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:PTRRecord' => 'PTR',
-	'Class:PTRRecord+' => '',
+	'Class:PTRRecord+' => 'Enregistrement de type pointeur',
 	'Class:PTRRecord/Attribute:hostname' => 'Nom du host',
 	'Class:PTRRecord/Attribute:hostname+' => '',
 ));
@@ -411,7 +411,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:SOARecord' => 'SOA',
-	'Class:SOARecord+' => '',
+	'Class:SOARecord+' => 'Enregistrement des données de zone',
 	'Class:SOARecord/Attribute:sourcedname' => 'Serveur Maître',
 	'Class:SOARecord/Attribute:sourcedname+' => '',
 	'Class:SOARecord/Attribute:mbox' => 'Adresse mail',
@@ -434,7 +434,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:SRVRecord' => 'SRV',
-	'Class:SRVRecord+' => '',
+	'Class:SRVRecord+' => 'Enregistrement des services',
 	'Class:SRVRecord/Attribute:priority' => 'Priorité',
 	'Class:SRVRecord/Attribute:priority+' => '',
 	'Class:SRVRecord/Attribute:weight' => 'Poids',
@@ -483,7 +483,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:TXTRecord' => 'TXT',
-	'Class:TXTRecord+' => '',
+	'Class:TXTRecord+' => 'Enregistrement texte',
 	'Class:TXTRecord/Attribute:txt' => 'Text',
 	'Class:TXTRecord/Attribute:txt+' => '',
 ));
@@ -567,7 +567,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:DNSManagement:ResourceRecords' => 'Enregistrements',
 	'Menu:DNSManagement:ResourceRecords+' => 'Enregistrements DNS',
 	'Menu:NewResourceRecord' => 'Nouveau RR',
-	'Menu:NewResourceRecord+' => 'Nouvel Enregistrement DNS',
+	'Menu:NewResourceRecord+' => 'Créer un nouvel enregistrement DNS',
 	'Menu:SearchResourceRecord' => 'Recherche de RRs',
 	'Menu:SearchResourceRecord+' => 'Recherche d\'enregistrements DNS',
 	'Menu:ARecord' => 'A',
