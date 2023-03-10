@@ -353,10 +353,12 @@ Dict::Add('EN US', 'English', 'English', array(
 Dict::Add('EN US', 'English', 'English', array(
 	'Class:GenericRecord' => 'GENERIC',
 	'Class:GenericRecord+' => 'Enregistrement générique',
-	'Class:GenericRecord/Attribute:rrtype id' => 'Type',
-	'Class:GenericRecord/Attribute:rrtype id+' => 'Type d\'enregistrement',
-	'Class:GenericRecord/Attribute:payload' => 'Charge utile',
-	'Class:GenericRecord/Attribute:payload+' => 'Tout ce que le fichier db doit trouver derrière l\'enregistrement DNS',
+	'Class:GenericRecord/Attribute:payload' => 'Payload',
+	'Class:GenericRecord/Attribute:payload+' => 'All what the db file should see behind Resource Record statement',
+	'Class:GenericRecord/Attribute:rrtype_id' => 'Type',
+	'Class:GenericRecord/Attribute:rrtype_id+' => 'Type d\'enregistrement',
+	'Class:GenericRecord/Attribute:rrtype_name' => 'Nom du type',
+	'Class:GenericRecord/Attribute:rrtype_name+' => '',
 ));
 
 //
