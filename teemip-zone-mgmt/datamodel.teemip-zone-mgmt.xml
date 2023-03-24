@@ -284,21 +284,21 @@
         </field>
       </fields>
       <event_listeners>
-        <listener id="OnIPAddressCreateRequestedByZoneMgmt" _delta="define">
+        <event_listener id="OnIPAddressCreateRequestedByZoneMgmt" _delta="define">
           <event>EVENT_DB_CREATE_DONE</event>
           <callback>OnIPAddressCreateRequestedByZoneMgmt</callback>
           <rank>100</rank>
-        </listener>
-        <listener id="OnIPAddressUpdateRequestedByZoneMgmt" _delta="define">
+        </event_listener>
+        <event_listener id="OnIPAddressUpdateRequestedByZoneMgmt" _delta="define">
           <event>EVENT_DB_UPDATE_DONE</event>
           <callback>OnIPAddressUpdateRequestedByZoneMgmt</callback>
           <rank>100</rank>
-        </listener>
-        <listener id="OnIPAddressDeleteRequestedByZoneMgmt" _delta="define">
+        </event_listener>
+        <event_listener id="OnIPAddressDeleteRequestedByZoneMgmt" _delta="define">
           <event>EVENT_DB_DELETE_DONE</event>
           <callback>OnIPAddressDeleteRequestedByZoneMgmt</callback>
           <rank>100</rank>
-        </listener>
+        </event_listener>
       </event_listeners>
       <methods>
         <method id="DoCheckRemoveRRsOnStatus" _delta="define">
