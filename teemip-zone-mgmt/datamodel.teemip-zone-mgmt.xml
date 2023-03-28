@@ -668,8 +668,7 @@
         }
 
         // Update PTR Record
-        $sIp = $this->Get('ip');
-        $sRawPtr = $this->ConvertToPtr($sIp);
+        $sRawPtr = $this->ConvertToPtr($this->Get('ip'));
         list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $this->Get('view_id'), 'ipv4reverse', $this->Get('org_id'));
         if ($sErrorZone == '')
         {
@@ -715,8 +714,7 @@
         $this->CleanARecord();
 
         // Remove PTR record
-        $sIp = $this->Get('ip');
-        $sRawPtr = $this->ConvertToPtr($sIp);
+        $sRawPtr = $this->ConvertToPtr($this->Get('ip'));
         list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $this->Get('view_id'), 'ipv4reverse', $this->Get('org_id'));
         if ($sErrorZone == '') {
             // Zone has been found, compute final FQDN and check if records exists
@@ -836,8 +834,9 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <code><![CDATA[    public function ConvertToPtr($sIp)
+          <code><![CDATA[    public function ConvertToPtr($oIp)
     {
+        $sIp = $oIp->GetAsCannonical();
         $aPtr1 = array_reverse(explode(':', $sIp));
         $aPtr2 = array();
         for ($i = 0; $i < IPV6_NIBBLE_NUMBER; $i++) {
@@ -910,8 +909,7 @@
 
         // Update PTR Record
         // Look for appropriate reverse zone
-        $sIp = $this->Get('ip')->GetAsCannonical();
-        $sPtr = $this->ConvertToPtr($sIp);
+        $sPtr = $this->ConvertToPtr($this->Get('ip'));
         list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sPtr, $this->Get('view_id'), 'ipv6reverse', $this->Get('org_id'));
         if ($sErrorZone == '')
         {
@@ -948,8 +946,7 @@
         $this->CleanAAAARecord();
 
         // Remove PTR record
-        $sIp = $this->Get('ip')->GetAsCannonical();
-        $sPtr = $this->ConvertToPtr($sIp);
+        $sPtr = $this->ConvertToPtr($this->Get('ip'));
         $this->CleanPTRRecord($sPtr);
     }]]></code>
         </method>
@@ -5002,8 +4999,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 		        $iRRecords = 0;
 
 		        // Search for PTR records
-		        $sIp = $oObject->Get('ip');
-		        $sRawPtr = $oObject->ConvertToPtr($sIp);
+		        $sRawPtr = $oObject->ConvertToPtr($oObject->Get('ip'));
 		        list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $oObject->Get('view_id'), 'ipv4reverse', $oObject->Get('org_id'));
 		        if ($sErrorZone == '') {
 		            // Zone has been found, compute final FQDN and check if records exists
@@ -5066,8 +5062,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	        	$iRRecords = 0;
 
 	        	// Search for PTR records
-				$sIp = $oObject->Get('ip')->GetAsCannonical();
-				$sPtr = $oObject->ConvertToPtr($sIp);
+				$sPtr = $oObject->ConvertToPtr($oObject->Get('ip'));
 				$sOQL = "SELECT PTRRecord WHERE name = :ptr";
 				$oRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
 				$aRecordSets['PTRRecord'] = $oRecordSet;
@@ -5124,8 +5119,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	        	// Search for PTR records
 				$oRecordSet = DBObjectSet::FromScratch('PTRRecord');
 	        	while ($oIP = $oIPSet->Fetch()) {
-	            	$sIp = $oIP->Get('ip');
-	            	$sRawPtr = $oIP->ConvertToPtr($sIp);
+	            	$sRawPtr = $oIP->ConvertToPtr($oIP->Get('ip'));
 	            	list($sErrorZone, $iZoneId, $sZoneName) = Zone::GetZoneFromFqdn($sRawPtr, $oIP->Get('view_id'), 'ipv4reverse', $oIP->Get('org_id'));
 					if ($sErrorZone == '') {
 	                	// Zone has been found, compute final FQDN and check if records exists
@@ -5200,8 +5194,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
    	        	// Search for PTR records$iPTRRecords = 0;
 				$oRecordSet = DBObjectSet::FromScratch('PTRRecord');
 				while ($oIP = $oIPSet->Fetch()) {
-					$sIp = $oIP->Get('ip')->GetAsCannonical();
-					$sPtr = $oIP->ConvertToPtr($sIp);
+					$sPtr = $oIP->ConvertToPtr($oIP->Get('ip'));
 					$sOQL = "SELECT PTRRecord WHERE name = :ptr";
 					$oPTRRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ptr' => $sPtr));
 					$oRecordSet->Append($oPTRRecordSet);
