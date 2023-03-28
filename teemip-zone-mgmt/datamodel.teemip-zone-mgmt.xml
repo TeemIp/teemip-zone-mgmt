@@ -5070,13 +5070,13 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 
 				// Search for AAAA records
 				$sOQL = "SELECT AAAARecord WHERE ip_id = :ip_id";
-				$oAAAARecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $oObject->GetKey()));
+				$oRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_id' => $oObject->GetKey()));
 				$aRecordSets['AAAARecord'] = $oRecordSet;
 				$iRRecords += $oRecordSet->Count();
 
 				// Searh for CNAME records
 				$sOQL = "SELECT CNAMERecord WHERE cname = :ip_fqdn";
-				$oCNAMERecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oObject->Get('fqdn')));
+				$oRecordSet =  new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('ip_fqdn' => $oObject->Get('fqdn')));
 		        $aRecordSets['CNAMERecord'] = $oRecordSet;
 		        $iRRecords += $oRecordSet->Count();
 
