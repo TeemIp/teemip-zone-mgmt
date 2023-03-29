@@ -489,12 +489,16 @@
           <type>Custom</type>
           <code><![CDATA[    public function CreatePTRRecord($sPtr, $iZoneId)
     {
-        $oPTRRecord = MetaModel::NewObject('PTRRecord');
-        $oPTRRecord->Set('org_id', $this->Get('org_id'));
-        $oPTRRecord->Set('zone_id', $iZoneId);
-        $oPTRRecord->Set('name', $sPtr);
-        $oPTRRecord->Set('hostname', $this->Get('fqdn'));
-        $oPTRRecord->DBInsert();
+        $sHostname = $this->Get('fqdn');
+        if ($sHostname != '') {
+        	// null is not allowed for 'hostname' attribute
+			$oPTRRecord = MetaModel::NewObject('PTRRecord');
+			$oPTRRecord->Set('org_id', $this->Get('org_id'));
+			$oPTRRecord->Set('zone_id', $iZoneId);
+			$oPTRRecord->Set('name', $sPtr);
+			$oPTRRecord->Set('hostname', $sHostname);
+			$oPTRRecord->DBInsert();
+        }
     }]]></code>
         </method>
         <method id="CleanPTRRecord" _delta="define">
@@ -919,7 +923,7 @@
                 // Clean existing wrong PTR record, if any
                 $this->CleanPTRRecord($sPtr);
 
-                // Create correct A record now
+                // Create correct PTR record now
                 $this->CreatePTRRecord($sPtr, $iZoneId);
             }
         }
