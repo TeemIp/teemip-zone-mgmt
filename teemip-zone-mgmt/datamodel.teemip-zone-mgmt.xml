@@ -1356,6 +1356,19 @@
             </item>
           </items>
         </list>
+        <summary>
+          <items>
+            <item id="view_id">
+              <rank>10</rank>
+            </item>
+            <item id="ttl">
+              <rank>20</rank>
+            </item>
+            <item id="sourcedname">
+              <rank>30</rank>
+            </item>
+          </items>
+        </summary>
       </presentation>
     </class>
     <class id="ResourceRecord" _delta="define">
