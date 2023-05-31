@@ -284,20 +284,15 @@
         </field>
       </fields>
       <event_listeners>
-        <event_listener id="OnIPAddressCreateRequestedByZoneMgmt" _delta="define">
-          <event>EVENT_DB_CREATE_DONE</event>
-          <callback>OnIPAddressCreateRequestedByZoneMgmt</callback>
-          <rank>100</rank>
+        <event_listener id="OnIPAddressAfterWriteRequestedByZoneMgmt" _delta="define">
+          <event>EVENT_DB_AFTER_WRITE</event>
+          <callback>OnIPAddressAfterWriteRequestedByZoneMgmt</callback>
+          <rank>110</rank>
         </event_listener>
-        <event_listener id="OnIPAddressUpdateRequestedByZoneMgmt" _delta="define">
-          <event>EVENT_DB_UPDATE_DONE</event>
-          <callback>OnIPAddressUpdateRequestedByZoneMgmt</callback>
-          <rank>100</rank>
-        </event_listener>
-        <event_listener id="OnIPAddressDeleteRequestedByZoneMgmt" _delta="define">
-          <event>EVENT_DB_DELETE_DONE</event>
-          <callback>OnIPAddressDeleteRequestedByZoneMgmt</callback>
-          <rank>100</rank>
+        <event_listener id="OnIPAddressAfterDeleteRequestedByZoneMgmt" _delta="define">
+          <event>EVENT_DB_AFTER_DELETE</event>
+          <callback>OnIPAddressAfterDeleteRequestedByZoneMgmt</callback>
+          <rank>110</rank>
         </event_listener>
       </event_listeners>
       <methods>
@@ -517,41 +512,23 @@
         }
     }]]></code>
         </method>
-        <method id="OnIPAddressCreateRequestedByZoneMgmt" _delta="define">
+        <method id="OnIPAddressAfterWriteRequestedByZoneMgmt" _delta="define">
           <comment/>
           <static>false</static>
           <access>public</access>
           <type>EventListener</type>
-          <code><![CDATA[    public function OnIPAddressCreateRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
+          <code><![CDATA[    public function OnIPAddressAfterWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
     {
 		// Create DNS records associated to IP if config requires it
 		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
 		if ($sIpUpdateDNSRecords == 'yes') {
-		    // Don't create records if these should not exist when IP is obsolete
-		    if (!$this->DoCheckRemoveRRsOnStatus()) {
-				list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
-				if (($sError != '') && ($sSeverity == 'error')) {
+			if ($this->DoCheckRemoveRRsOnStatus()) {
+                $aEventData = $oEventData->GetEventData();
+				if (!$aEventData['is_new']) {
+					// For AfterUpdate only
 					$this->CleanRRs();
-				} else {
-					$this->UpdateRRs();
 				}
-			}
-	    }
-    }]]></code>
-        </method>
-        <method id="OnIPAddressUpdateRequestedByZoneMgmt" _delta="define">
-          <comment/>
-          <static>false</static>
-          <access>public</access>
-          <type>EventListener</type>
-          <code><![CDATA[    public function OnIPAddressUpdateRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
-    {
-    	// Update DNS records associated to IP if config requires it
-		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
-		if ($sIpUpdateDNSRecords == 'yes') {
-		    if ($this->DoCheckRemoveRRsOnStatus()) {
-		        $this->CleanRRs();
-		    } else {
+			} else {
 				list($sError, $sSeverity) = $this->DoCheckUpdateRRs();
 				if (($sError != '') && ($sSeverity == 'error')) {
 					$this->CleanRRs();
@@ -562,12 +539,12 @@
 		}
     }]]></code>
         </method>
-        <method id="OnIPAddressDeleteRequestedByZoneMgmt" _delta="define">
+        <method id="OnIPAddressAfterDeleteRequestedByZoneMgmt" _delta="define">
           <comment/>
           <static>false</static>
           <access>public</access>
           <type>EventListener</type>
-          <code><![CDATA[    public function OnIPAddressDeleteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
+          <code><![CDATA[    public function OnIPAddressAfterDeleteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData)
     {
     	// Cleanup DNS records associated to IP if config requires it
 		$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $this->Get('org_id'));
