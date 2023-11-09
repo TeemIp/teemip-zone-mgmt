@@ -4973,7 +4973,7 @@
 use Combodo\iTop\Application\UI\Base\Component\MedallionIcon\MedallionIcon;
 use TeemIp\TeemIp\Extension\Framework\Helper\IPUtils;
 
-class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExtension
+class TeemIpZoneMgmt implements iApplicationUIExtension
 {
 	/**
 	 * @inheritdoc
@@ -5283,87 +5283,6 @@ class TeemIpZoneMgmt implements iApplicationUIExtension, iApplicationObjectExten
 	 */
 	public function EnumAllowedActions(DBObjectSet $oSet) {
 		return array();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function OnIsModified($oObject) {
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function OnCheckToWrite($oObject) {
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function OnCheckToDelete($oObject) {
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function OnDBUpdate($oObject, $oChange = null) {
-		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-			if ($oObject instanceof IPAddress) {
-			    // Update DNS records associated to IP if config requires it
-			    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
-		    	if ($sIpUpdateDNSRecords == 'yes') {
-		    		// Don't update records if these should not exist when IP is obsolete
-		    		if ($oObject->DoCheckRemoveRRsOnStatus()) {
-						$oObject->CleanRRs();
-		    		} else {
-						list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
-						if (($sError != '') && ($sSeverity == 'error')) {
-							$oObject->CleanRRs();
-						} else {
-						  $oObject->UpdateRRs();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function OnDBInsert($oObject, $oChange = null) {
-		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-			if ($oObject instanceof IPAddress) {
-			    // Create DNS records associated to IP if config requires it
-			    $sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
-		    	if ($sIpUpdateDNSRecords == 'yes') {
-		    		// Don't create records if these should not exist when IP is obsolete
-		    		if (!$oObject->DoCheckRemoveRRsOnStatus()) {
-						list($sError, $sSeverity) = $oObject->DoCheckUpdateRRs();
-				    	if (($sError != '') && ($sSeverity == 'error')) {
-					        $oObject->CleanRRs();
-				    	} else {
-					    	$oObject->UpdateRRs();
-					    }
-	    			}
-	    		}
-			}
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function OnDBDelete($oObject, $oChange = null) {
-		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-			if ($oObject instanceof IPAddress) {
-				// Cleanup DNS records associated to IP if config requires it
-				$sIpUpdateDNSRecords = IPConfig::GetFromGlobalIPConfig('ip_update_dns_records', $oObject->Get('org_id'));
-				if ($sIpUpdateDNSRecords == 'yes') {
-						$oObject->CleanRRs();
-				}
-			}
-		}
 	}
 
 }
