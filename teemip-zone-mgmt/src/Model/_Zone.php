@@ -525,7 +525,7 @@ class _Zone extends DNSObject
 		// Display text area
 		$sHtml = $this->GetDataFile($aParams['sort-order']);
 		$sUITitle = Dict::Format('UI:ZoneManagement:Action:DataFileDisplay:Zone:PageTitle_Object_Class', 'Zone', $this->GetName());
-		$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fa fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
+		$oP->SetBreadCrumbEntry($sUITitle, $sUITitle, '', '', 'fas fa-file', iTopWebPage::ENUM_BREADCRUMB_ENTRY_ICON_TYPE_CSS_CLASSES);
 		$oP->add(<<<HTML
 				<div id="zonedatafile" class="ibo-is-code">
 				<pre>$sHtml</pre>
