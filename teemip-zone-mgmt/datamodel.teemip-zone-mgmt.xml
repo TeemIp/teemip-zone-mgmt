@@ -5030,19 +5030,12 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 						if ($oRecordSet->Count() > 0) {
 							$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
 							$sSubTitle = Dict::Format('Class:IPAddress/Tab:'.strtolower($sClass).'s_list', MetaModel::GetName($sClass));
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
-								$oClassIcon->SetDescription($sSubTitle)->AddCSSClass('ibo-block-list--medallion');
-								$oPage->AddUiBlock($oClassIcon);
-								$oBlock->Display($oPage, strtolower($sClass), array('menu' => false));
-							} else {
-								$oBlock->Display($oPage, strtolower($sClass), array(
-									'menu' => false,
-									'panel_title' => MetaModel::GetName($sClass),
-									'panel_title_tooltip' => $sSubTitle,
-									'panel_icon' => MetaModel::GetClassIcon($sClass, false)
-								));
-							}
+							$oBlock->Display($oPage, strtolower($sClass), array(
+								'menu' => false,
+								'panel_title' => MetaModel::GetName($sClass),
+								'panel_title_tooltip' => $sSubTitle,
+								'panel_icon' => MetaModel::GetClassIcon($sClass, false)
+							));
 						}
 					}
 	        	} else {
@@ -5082,19 +5075,12 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 						if ($oRecordSet->Count() > 0) {
 							$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
 							$sSubTitle = Dict::Format('Class:IPAddress/Tab:'.strtolower($sClass).'s_list', MetaModel::GetName($sClass));
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
-								$oClassIcon->SetDescription($sSubTitle)->AddCSSClass('ibo-block-list--medallion');
-								$oPage->AddUiBlock($oClassIcon);
-								$oBlock->Display($oPage, strtolower($sClass), array('menu' => false));
-							} else {
-								$oBlock->Display($oPage, strtolower($sClass), array(
-									'menu' => false,
-									'panel_title' => MetaModel::GetName($sClass),
-									'panel_title_tooltip' => $sSubTitle,
-									'panel_icon' => MetaModel::GetClassIcon($sClass, false)
-								));
-							}
+							$oBlock->Display($oPage, strtolower($sClass), array(
+								'menu' => false,
+								'panel_title' => MetaModel::GetName($sClass),
+								'panel_title_tooltip' => $sSubTitle,
+								'panel_icon' => MetaModel::GetClassIcon($sClass, false)
+							));
 						}
 					}
 	        	} else {
@@ -5157,19 +5143,12 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 						if ($oRecordSet->Count() > 0) {
 							$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
 							$sSubTitle = Dict::Format('Class:IPSubnet/Tab:'.strtolower($sClass).'s_list', MetaModel::GetName($sClass));
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
-								$oClassIcon->SetDescription($sSubTitle)->AddCSSClass('ibo-block-list--medallion');
-								$oPage->AddUiBlock($oClassIcon);
-								$oBlock->Display($oPage, strtolower($sClass), array('menu' => false));
-							} else {
-								$oBlock->Display($oPage, strtolower($sClass), array(
-									'menu' => false,
-									'panel_title' => MetaModel::GetName($sClass),
-									'panel_title_tooltip' => $sSubTitle,
-									'panel_icon' => MetaModel::GetClassIcon($sClass, false)
-								));
-							}
+							$oBlock->Display($oPage, strtolower($sClass), array(
+								'menu' => false,
+								'panel_title' => MetaModel::GetName($sClass),
+								'panel_title_tooltip' => $sSubTitle,
+								'panel_icon' => MetaModel::GetClassIcon($sClass, false)
+							));
 						}
 					}
             	} else {
@@ -5222,19 +5201,12 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 						if ($oRecordSet->Count() > 0) {
 							$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
 							$sSubTitle = Dict::Format('Class:IPSubnet/Tab:'.strtolower($sClass).'s_list', MetaModel::GetName($sClass));
-							if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1', '<')) {
-								$oClassIcon = new MedallionIcon(MetaModel::GetClassIcon($sClass, false));
-								$oClassIcon->SetDescription($sSubTitle)->AddCSSClass('ibo-block-list--medallion');
-								$oPage->AddUiBlock($oClassIcon);
-								$oBlock->Display($oPage, strtolower($sClass), array('menu' => false));
-							} else {
-								$oBlock->Display($oPage, strtolower($sClass), array(
-									'menu' => false,
-									'panel_title' => MetaModel::GetName($sClass),
-									'panel_title_tooltip' => $sSubTitle,
-									'panel_icon' => MetaModel::GetClassIcon($sClass, false)
-								));
-							}
+							$oBlock->Display($oPage, strtolower($sClass), array(
+								'menu' => false,
+								'panel_title' => MetaModel::GetName($sClass),
+								'panel_title_tooltip' => $sSubTitle,
+								'panel_icon' => MetaModel::GetClassIcon($sClass, false)
+							));
 						}
 					}
 				} else {
