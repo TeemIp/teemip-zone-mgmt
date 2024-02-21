@@ -384,7 +384,7 @@ class _Zone extends DNSObject
 			$oNSRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 			$sName = Dict::Format('Class:Zone/Tab:nsrecords_list');
 			$sTitle = Dict::Format('Class:Zone/Tab:nsrecords_list+');
-			IPUtils::DisplayTabContent($oP, $sName, 'ns_records', 'NSRecord', $sTitle, '', $oNSRecordSet);
+			IPUtils::DisplayTabContent($oP, $sName, 'ns_records', 'NSRecord', $sTitle, '', $oNSRecordSet, false);
 
 			switch ($this->Get('mapping')) {
 				case 'direct':
@@ -394,7 +394,7 @@ class _Zone extends DNSObject
 						$oRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 						$sName = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list');
 						$sTitle = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list+');
-						IPUtils::DisplayTabContent($oP, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet);
+						IPUtils::DisplayTabContent($oP, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet, false);
 					}
 
 					// Tab for Other records
@@ -426,7 +426,7 @@ class _Zone extends DNSObject
 						}
 					} else {
 						$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-						IPUtils::DisplayTabContent($oP, $sName, 'otherrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+						IPUtils::DisplayTabContent($oP, $sName, 'otherrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
 					}
 					break;
 
@@ -437,7 +437,7 @@ class _Zone extends DNSObject
 						$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 						$sName = Dict::Format('Class:Zone/Tab:cnamerecords_list');
 						$sTitle = Dict::Format('Class:Zone/Tab:cnamerecords_list+');
-						IPUtils::DisplayTabContent($oP, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet);
+						IPUtils::DisplayTabContent($oP, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet, false);
 					}
 
 				case 'ipv6reverse':
@@ -446,7 +446,7 @@ class _Zone extends DNSObject
 					$oPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 					$sName = Dict::Format('Class:Zone/Tab:ptrrecords_list');
 					$sTitle = Dict::Format('Class:Zone/Tab:ptrrecords_list+');
-					IPUtils::DisplayTabContent($oP, $sName, 'ptr_records', 'PTRRecord', $sTitle, '', $oPTRRecordSet);
+					IPUtils::DisplayTabContent($oP, $sName, 'ptr_records', 'PTRRecord', $sTitle, '', $oPTRRecordSet, false);
 					break;
 
 				default:

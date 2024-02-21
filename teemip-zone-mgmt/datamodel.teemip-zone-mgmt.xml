@@ -5040,7 +5040,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 					}
 	        	} else {
 					$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-			        TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+			        TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
 	          	}
 	    	}
 		} elseif ($oObject instanceof IPv6Address) {
@@ -5085,7 +5085,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 					}
 	        	} else {
 					$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-				    TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+				    TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
 	        	}
 	    	}
 		} elseif ($oObject instanceof IPv4Subnet) {
@@ -5153,7 +5153,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 					}
             	} else {
                 	$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-                	TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+                	TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
             	}
 	    	}
 		} elseif ($oObject instanceof IPv6Subnet) {
@@ -5211,7 +5211,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 					}
 				} else {
 					$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-					TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
+					TeemIp\TeemIp\Extension\Framework\Helper\IPUtils::DisplayTabContent($oPage, $sName, 'rrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
 				}
 			}
 		}
