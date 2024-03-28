@@ -774,7 +774,6 @@
             <item id="col:col2" _delta="must_exist">
               <items>
                 <item id="fieldset:Class:IPAddress:dnsinfo" _delta="must_exist">
-                  <rank>10</rank>
                   <items>
                     <item id="view_id" _delta="define">
                       <rank>25</rank>
@@ -989,7 +988,6 @@
             <item id="col:col2" _delta="must_exist">
               <items>
                 <item id="fieldset:Class:IPAddress:dnsinfo" _delta="must_exist">
-                  <rank>10</rank>
                   <items>
                     <item id="view_id" _delta="define">
                       <rank>25</rank>
