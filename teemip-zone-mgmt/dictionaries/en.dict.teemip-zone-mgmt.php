@@ -489,6 +489,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:TXTRecord+' => 'Text Record',
 	'Class:TXTRecord/Attribute:txt' => 'Text',
 	'Class:TXTRecord/Attribute:txt+' => 'Free form text of any type',
+	'Class:TXTRecord/Attribute:previous_segment_id' => 'Previous segment',
+	'Class:TXTRecord/Attribute:previous_segment_id+' => 'Text Record that contains the previous chunk of the long string (> 255 bytes) that is segmented between this text record and other ones.',
+	'Class:TXTRecord/Attribute:next_segment_id' => 'Next segment',
+	'Class:TXTRecord/Attribute:next_segment_id+' => 'Text Record that contains the next chunk of the long string (> 255 bytes) that is segmented between this text record and other ones.',
+	'TXTRecord:Chaining' => 'Chaining',
 ));
 
 //

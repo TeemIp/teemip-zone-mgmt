@@ -488,6 +488,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:TXTRecord+' => 'Enregistrement texte',
 	'Class:TXTRecord/Attribute:txt' => 'Text',
 	'Class:TXTRecord/Attribute:txt+' => '',
+	'Class:TXTRecord/Attribute:previous_segment_id' => 'Segment précédent',
+	'Class:TXTRecord/Attribute:previous_segment_id+' => 'Enregistrement texte qui contient la partie précédente de la longue châine de texte (> 255 octets) qui est segmentée dans cet enregistrement texte et d\'autres.',
+	'Class:TXTRecord/Attribute:next_segment_id' => 'Segment suivant',
+	'Class:TXTRecord/Attribute:next_segment_id+' => 'Enregistrement texte qui contient la partie suivante de la longue châine de texte (> 255 octets) qui est segmentée dans cet enregistrement texte et d\'autres.',
+	'TXTRecord:Chaining' => 'Chainâge',
 ));
 
 //

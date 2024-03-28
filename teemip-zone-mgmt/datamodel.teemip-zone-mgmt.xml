@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0">
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0" load="strict">
   <classes>
     <class id="IPConfig" _delta="must_exist">
       <fields>
@@ -4324,6 +4324,36 @@
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
         </field>
+        <field id="previous_segment_id" xsi:type="AttributeExternalKey" _delta="define">
+          <filter><![CDATA[SELECT TXTRecord AS r WHERE r.zone_id = :this->zone_id AND r.id != :this->id]]></filter>
+          <dependencies>
+            <attribute id="zone_id"/>
+          </dependencies>
+          <sql>previous_segment_id</sql>
+          <filter/>
+          <is_null_allowed>true</is_null_allowed>
+          <target_class>TXTRecord</target_class>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="previous_segment_name" xsi:type="AttributeExternalField" _delta="define">
+          <extkey_attcode>previous_segment_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+        <field id="next_segment_id" xsi:type="AttributeExternalKey" _delta="define">
+          <filter><![CDATA[SELECT TXTRecord AS r WHERE r.zone_id = :this->zone_id AND r.id != :this->id]]></filter>
+          <dependencies>
+            <attribute id="zone_id"/>
+          </dependencies>
+          <sql>next_segment_id</sql>
+          <filter/>
+          <is_null_allowed>true</is_null_allowed>
+          <target_class>TXTRecord</target_class>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="next_segment_name" xsi:type="AttributeExternalField" _delta="define">
+          <extkey_attcode>next_segment_id</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
       </fields>
       <methods>
         <method id="OnInsert">
@@ -4348,6 +4378,33 @@
       }
     }]]></code>
         </method>
+        <method id="AfterInsert">
+          <comment/>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-cmdbAbstractObject</type>
+          <code><![CDATA[    protected function AfterInsert()
+    {
+    	parent::AfterInsert();
+
+    	// Set reflexive relation on previous and next records
+    	if ($this->Get('previous_segment_id') > 0) {
+    		$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
+    		if ($oPreviousTXTRecord) {
+				$oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
+				$oPreviousTXTRecord->DBUpdate();
+			}
+		}
+		if ($this->Get('next_segment_id') > 0) {
+    		$oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
+    		if ($oNextTXTRecord) {
+				$oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
+				$oNextTXTRecord->DBUpdate();
+			}
+		}
+
+    }]]></code>
+        </method>
         <method id="OnUpdate">
           <comment/>
           <static>false</static>
@@ -4370,6 +4427,80 @@
       }
     }]]></code>
         </method>
+        <method id="AfterUpdate">
+          <comment/>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-cmdbAbstractObject</type>
+          <code><![CDATA[    protected function AfterUpdate()
+    {
+    	parent::AfterUpdate();
+
+		$aChanges = $this->ListPreviousValuesForUpdatedAttributes();
+
+    	// Update reflexive relation on previous and next records
+		if (array_key_exists('previous_segment_id', $aChanges)) {
+			if ($this->Get('previous_segment_id') > 0) {
+				$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
+				if ($oPreviousTXTRecord) {
+					$oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
+					$oPreviousTXTRecord->DBUpdate();
+				}
+			}
+			if ($aChanges['previous_segment_id'] > 0) {
+				$oOldPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['previous_segment_id'], false);
+				if ($oOldPreviousTXTRecord) {
+					$oOldPreviousTXTRecord->Set('next_segment_id', 0);
+					$oOldPreviousTXTRecord->DBUpdate();
+				}
+			}
+		}
+
+		if (array_key_exists('next_segment_id', $aChanges)) {
+			if ($this->Get('next_segment_id') > 0) {
+				$oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
+				if ($oNextTXTRecord) {
+					$oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
+					$oNextTXTRecord->DBUpdate();
+				}
+			}
+			if ($aChanges['next_segment_id'] > 0) {
+				$oOldNextTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['next_segment_id'], false);
+				if ($oOldNextTXTRecord) {
+					$oOldNextTXTRecord->Set('previous_segment_id', 0);
+					$oOldNextTXTRecord->DBUpdate();
+				}
+			}
+		}
+    }]]></code>
+        </method>
+        <method id="AfterDelete">
+          <comment/>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-cmdbAbstractObject</type>
+          <code><![CDATA[    protected function AfterDelete()
+    {
+    	parent::AfterDelete();
+
+    	// Set reflexive relation on previous and next records
+    	if ($this->Get('previous_segment_id') > 0) {
+    		$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
+    		if ($oPreviousTXTRecord) {
+				$oPreviousTXTRecord->Set('next_segment_id', 0);
+				$oPreviousTXTRecord->DBUpdate();
+			}
+		}
+		if ($this->Get('next_segment_id') > 0) {
+    		$oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
+    		if ($oNextTXTRecord) {
+				$oNextTXTRecord->Set('previous_segment_id', 0);
+				$oNextTXTRecord->DBUpdate();
+			}
+		}
+
+    }]]></code>
+        </method>
         <method id="GetDataString">
           <comment/>
           <static>false</static>
@@ -4377,25 +4508,57 @@
           <type>Custom</type>
           <code><![CDATA[    public function GetDataString()
     {
-    	$sDataName = $this->GetDataNameForDataString();
-     	if ($this->Get('overwrite_zone_ttl') == 'yes')
-     	{
-     		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TXT        ".$this->Get('txt');
-     	}
-     	else
-     	{
-    		$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TXT        ".$this->Get('txt');
-      	}
-     	$sComment = $this->Get('comment');
-     	if ($sComment == '')
-     	{
-     		$sHtml .= "\n";
-     	}
-     	else
-     	{
-     		$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
-     	}
+   		// Records that are internal segments of long (> 255 bytes) strings are not processed through the first segment
+    	if ($this->Get('previous_segment_id') != 0)  return '';
+
+	    // Handle records that host short (<= 255 bytes) strings or records that are a start for long strings
+	    $iNextSegment = $this->Get('next_segment_id');
+    	if ($iNextSegment == 0) {
+    		$stext = $this->Get('txt');
+    	} else {
+    		$stext = '('.$this->Get('txt');
+    	}
+		$sDataName = $this->GetDataNameForDataString();
+		if ($this->Get('overwrite_zone_ttl') == 'yes') {
+			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TXT        ".$stext;
+		} else {
+			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TXT        ".$stext;
+		}
+		$sComment = $this->Get('comment');
+		if ($sComment == '') {
+			$sHtml .= "\n";
+		} else {
+			$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
+		}
+
+		if ($iNextSegment > 0) {
+			$sHtml .= $this->GetEndOfDataSegment($iNextSegment);
+		}
+
      	return $sHtml;
+    }]]></code>
+        </method>
+        <method id="GetEndOfDataSegment">
+          <comment/>
+          <static>false</static>
+          <access>private</access>
+          <type>Custom</type>
+          <code><![CDATA[    private function GetEndOfDataSegment($iNextSegment)
+    {
+        if ($iNextSegment == 0) return '';
+
+        $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $iNextSegment, false);
+        if (is_null($oNextTXTRecord)) return '';
+
+        $sHtml = str_repeat(' ', SPACE_TO_TEXT).$oNextTXTRecord->Get('txt');
+	    $iNextSegment = $oNextTXTRecord->Get('next_segment_id');
+	    if ($iNextSegment > 0) {
+	        $sHtml .= "\n".$oNextTXTRecord->GetEndOfDataSegment($iNextSegment);
+	    } else {
+	        $sHtml .= ")\n";
+	    }
+
+        return $sHtml;
     }]]></code>
         </method>
       </methods>
@@ -4434,6 +4597,17 @@
                     </item>
                   </items>
                   <rank>20</rank>
+                </item>
+                <item id="fieldset:TXTRecord:Chaining">
+                  <items>
+                    <item id="previous_segment_id">
+                      <rank>10</rank>
+                    </item>
+                    <item id="next_segment_id">
+                      <rank>20</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
                 </item>
               </items>
             </item>
@@ -4488,14 +4662,20 @@
             <item id="txt">
               <rank>30</rank>
             </item>
-            <item id="zone_id">
+            <item id="previous_segment_id">
               <rank>40</rank>
             </item>
-            <item id="comment">
+            <item id="next_segment_id">
               <rank>50</rank>
             </item>
-            <item id="org_id">
+            <item id="zone_id">
               <rank>60</rank>
+            </item>
+            <item id="comment">
+              <rank>70</rank>
+            </item>
+            <item id="org_id">
+              <rank>80</rank>
             </item>
           </items>
         </list>
@@ -4959,6 +5139,7 @@
     <constant id="SPACE_PTR_OWNER_TO_TTL" xsi:type="integer" _delta="define">4</constant>
     <constant id="SPACE_TTL_TO_CLASS" xsi:type="integer" _delta="define">7</constant>
     <constant id="SPACE_RRTYPE_TO_PAYLOAD" xsi:type="integer" _delta="define">11</constant>
+    <constant id="SPACE_TO_TEXT" xsi:type="integer" _delta="define">64</constant>
     <constant id="SPACE_TO_COMMENT" xsi:type="integer" _delta="define">120</constant>
   </constants>
   <snippets>
