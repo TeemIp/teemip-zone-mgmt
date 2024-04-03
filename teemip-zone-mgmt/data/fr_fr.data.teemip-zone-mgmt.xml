@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Set>
+	<AuditDomain alias="AuditDomain" id="1">
+		<name>Gestion du DNS</name>
+		<description>Audit de l'information DNS enregistrée dans la CMDB</description>
+	</AuditDomain>
 	<AuditCategory alias="AuditCategory" id="1">
 		<name>Gestion des zones DNS</name>
 		<description>Ensemble de règles liée aux zones DNS</description>
 		<definition_set>SELECT Zone</definition_set>
 	</AuditCategory>
+	<lnkAuditCategoryToAuditDomain alias="lnkAuditCategoryToAuditDomain" id="1">
+		<domain_id>1</domain_id>
+		<category_id>1</category_id>
+	</lnkAuditCategoryToAuditDomain>
 	<AuditRule alias="AuditRule" id="1">
 		<name>Le serveur maître n'est pas autoritaire</name>
 		<description>Le serveur maître défini dans le SOA de la Zone n'apparait pas dans la liste de ses serveurs autoritaires</description>
-		<query>SELECT Zone AS z JOIN lnkFunctionalCIToZone AS l ON l.zone_id = z.id WHERE (z.sourcedname = l.functionalci_name OR z.sourcedname = CONCAT(l.functionalci_name, '.')) AND l.authority = 'master'</query>
+		<query><![CDATA[SELECT Zone AS z JOIN lnkFunctionalCIToZone AS l ON l.zone_id = z.id WHERE (z.sourcedname = l.functionalci_name OR z.sourcedname = CONCAT(l.functionalci_name, '.')) AND l.authority = 'master']]></query>
 		<valid_flag>true</valid_flag>
 		<category_id>1</category_id>
 	</AuditRule>
 	<AuditRule alias="AuditRule" id="2">
 		<name>Un serveur des enregistrements NS de la zone n'est pas autoritaire</name>
 		<description>Au moins un serveur défini dans l'un des enregistrements NS de la zone n'apparait pas dans la liste de ses serveurs autoritaires</description>
-		<query>SELECT Zone AS z JOIN NSRecord AS nsr ON nsr.zone_id = z.id WHERE z.id NOT IN (SELECT Zone AS z1 JOIN NSRecord AS nsr1 ON nsr1.zone_id = z1.id JOIN lnkFunctionalCIToZone AS l1 ON l1.zone_id = z1.id WHERE nsr1.nsname = l1.functionalci_name OR nsr1.nsname = CONCAT(l1.functionalci_name, '.'))</query>
+		<query><![CDATA[SELECT Zone AS z JOIN NSRecord AS nsr ON nsr.zone_id = z.id WHERE z.id NOT IN (SELECT Zone AS z1 JOIN NSRecord AS nsr1 ON nsr1.zone_id = z1.id JOIN lnkFunctionalCIToZone AS l1 ON l1.zone_id = z1.id WHERE nsr1.nsname = l1.functionalci_name OR nsr1.nsname = CONCAT(l1.functionalci_name, '.'))]]></query>
 		<valid_flag>false</valid_flag>
 		<category_id>1</category_id>
 	</AuditRule>
