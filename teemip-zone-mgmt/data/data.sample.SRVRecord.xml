@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<SRVRecord alias="SRVRecord" id="1">
+		<org_id>2</org_id>
+		<name>_http._tcp.www.demo.com.</name>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>no</overwrite_zone_ttl>
+		<priority>3</priority>
+		<weight>10</weight>
+		<port>25</port>
+		<target>www.demo.com.</target>
+	</SRVRecord>
+	<SRVRecord alias="SRVRecord" id="2">
+		<org_id>2</org_id>
+		<name>demo.com.</name>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>yes</overwrite_zone_ttl>
+		<ttl>1200</ttl>
+		<priority>25</priority>
+		<weight>6</weight>
+		<port>63</port>
+		<target>target.com.</target>
+	</SRVRecord>
+</Set>

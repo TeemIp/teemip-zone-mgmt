@@ -35,7 +35,22 @@ SetupWebPage::AddModule(
 		'webservice' => array(),
 		'data.struct' => array(// add your 'structure' definition XML files here,
 		),
-		'data.sample' => array(// add your sample data XML files here,
+		'data.sample' => array(
+			'data/data.sample.Zone.xml',
+			'data/data.sample.ResourceRecordType.xml',
+			'data/data.sample.ARecord.xml',
+			'data/data.sample.AAAARecord.xml',
+			'data/data.sample.CNAMERecord.xml',
+			'data/data.sample.DSRecord.xml',
+			'data/data.sample.GenericRecord.xml',
+			'data/data.sample.MXRecord.xml',
+			'data/data.sample.NSRecord.xml',
+			'data/data.sample.OPENPGPKEYRecord.xml',
+			'data/data.sample.PTRRecord.xml',
+			'data/data.sample.SRVRecord.xml',
+			'data/data.sample.SSHFPRecord.xml',
+			'data/data.sample.TLSARecord.xml',
+			'data/data.sample.TXTRecord.xml',
 		),
 
 		// Documentation

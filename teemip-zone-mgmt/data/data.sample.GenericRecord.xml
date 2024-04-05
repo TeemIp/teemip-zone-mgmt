@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<GenericRecord alias="GenericRecord" id="1">
+		<org_id>2</org_id>
+		<name>_ftp._tcp.demo.com.</name>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>no</overwrite_zone_ttl>
+		<rrtype_id>2</rrtype_id>
+		<payload>10 1 &quot;ftp://ftp.demo.com/public&quot;</payload>
+	</GenericRecord>
+</Set>

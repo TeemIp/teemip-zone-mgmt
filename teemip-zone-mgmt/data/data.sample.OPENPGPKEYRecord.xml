@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+		~ @copyright   Copyright (C) 2010-2024 TeemIp
+		~ @license     http://opensource.org/licenses/AGPL-3.0
+		-->
+<Set>
+	<OPENPGPKEYRecord alias="OPENPGPKEYRecord" id="1">
+		<org_id>2</org_id>
+		<name>myopenpgpkey.demo.com.</name>
+		<comment>See example in ietf.org</comment>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>yes</overwrite_zone_ttl>
+		<ttl>864000</ttl>
+		<key>This_is_where_my_public_key_should_be_registered</key>
+	</OPENPGPKEYRecord>
+</Set>

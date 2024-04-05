@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<SSHFPRecord alias="SSHFPRecord" id="1">
+		<org_id>2</org_id>
+		<name>my-ssh-server.demo.com.</name>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>no</overwrite_zone_ttl>
+		<algorithm>3</algorithm>
+		<type>2</type>
+		<fingerprint>123456789abcdef67890123456789abcdef67890</fingerprint>
+	</SSHFPRecord>
+</Set>

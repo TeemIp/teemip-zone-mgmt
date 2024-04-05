@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<MXRecord alias="MXRecord" id="1">
+		<org_id>2</org_id>
+		<name>*.test.demo.com.</name>
+		<comment>Example for '*' usage</comment>
+		<zone_id>1</zone_id>
+		<preference>5</preference>
+		<exchange>mail.ovh.com.</exchange>
+	</MXRecord>
+	<MXRecord alias="MXRecord" id="2">
+		<org_id>2</org_id>
+		<name>demo.com.</name>
+		<comment>Main mail exchange for the domain</comment>
+		<zone_id>1</zone_id>
+		<preference>10</preference>
+		<exchange>mx1.isp.net.</exchange>
+	</MXRecord>
+	<MXRecord alias="MXRecord" id="3">
+		<org_id>2</org_id>
+		<name>nonfqdn.demo.com.</name>
+		<zone_id>1</zone_id>
+		<preference>15</preference>
+		<exchange>smtp.teemip.de.</exchange>
+	</MXRecord>
+</Set>

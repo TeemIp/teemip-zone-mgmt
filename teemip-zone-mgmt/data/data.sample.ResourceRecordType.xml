@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+    <ResourceRecordType alias="ResourceRecordType" id="1">
+        <name>HINFO</name>
+        <description>HINFO records allow you to define the hardware type and Operating System (OS) in use at a host</description>
+    </ResourceRecordType>
+    <ResourceRecordType alias="ResourceRecordType" id="2">
+        <name>URI</name>
+        <description>Uniform Resource Identifier (URI) record (RFC 7553) is a means for publishing mappings from hostnames to URIs.</description>
+    </ResourceRecordType>
+</Set>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<TLSARecord alias="TLSARecord" id="1">
+		<org_id>2</org_id>
+		<name>_443._tcp.www.demo.com.</name>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>yes</overwrite_zone_ttl>
+		<ttl>7200</ttl>
+		<certificate_usage>3</certificate_usage>
+		<selector>1</selector>
+		<matching_type>1</matching_type>
+		<data>0D6FCE13243AA7</data>
+	</TLSARecord>
+</Set>

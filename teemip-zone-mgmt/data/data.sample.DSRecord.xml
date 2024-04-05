@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<DSRecord alias="DSRecord" id="1">
+		<org_id>2</org_id>
+		<name>demo.com.</name>
+		<zone_id>1</zone_id>
+		<overwrite_zone_ttl>no</overwrite_zone_ttl>
+		<key_tag>2371</key_tag>
+		<algorithm>13</algorithm>
+		<digest_type>2</digest_type>
+		<digest>1F987CC6583E92DF0890718C42</digest>
+	</DSRecord>
+</Set>

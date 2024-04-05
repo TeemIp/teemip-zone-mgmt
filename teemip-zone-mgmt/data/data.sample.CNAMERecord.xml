@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<CNAMERecord alias="CNAMERecord" id="1">
+		<org_id>2</org_id>
+		<name>anotheralias.demo.com.</name>
+		<zone_id>1</zone_id>
+		<cname>server.demo.de.</cname>
+	</CNAMERecord>
+	<CNAMERecord alias="CNAMERecord" id="2">
+			<org_id>2</org_id>
+			<name>myaliasformyserver.demo.com.</name>
+			<zone_id>1</zone_id>
+			<cname>myserver.demo.co.uk.</cname>
+	</CNAMERecord>
+</Set>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @copyright   Copyright (C) 2010-2024 TeemIp
+  ~ @license     http://opensource.org/licenses/AGPL-3.0
+  -->
+<Set>
+	<TXTRecord alias="TXTRecord" id="1">
+		<org_id>2</org_id>
+		<name>alien.demo.com.</name>
+		<zone_id>1</zone_id>
+		<txt>&quot;All your base are belong to us!&quot;</txt>
+	</TXTRecord>
+	<TXTRecord alias="TXTRecord" id="2">
+		<org_id>2</org_id>
+		<name>mail.demo.com.</name>
+		<comment>Head of the chain</comment>
+		<zone_id>1</zone_id>
+		<txt>&quot;v=DKIM1;t=s;p= MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA77VDAIfyhjtoF0DIE5V7&quot;</txt>
+	</TXTRecord>
+	<TXTRecord alias="TXTRecord" id="3">
+		<org_id>2</org_id>
+		<name>mail2.demo.com.</name>
+		<comment>Second chunk of the chain</comment>
+		<zone_id>1</zone_id>
+		<txt>&quot;rev1EKk4L0nxdBpD5O/jPrM4KP0kukeuB6IMpVplkkq52MSDeRcjoO50h0DmwZOr&quot;</txt>
+		<previous_segment_id>2</previous_segment_id>
+	</TXTRecord>
+	<TXTRecord alias="TXTRecord" id="4">
+		<org_id>2</org_id>
+		<name>mail3.demo.com.</name>
+		<comment>Last chunk of the chain</comment>
+		<zone_id>2</zone_id>
+		<txt>&quot;UI6K6PaW2WvtbJG2v+gHLY5M4tB0+/FNJU9emZfkPOk3DmRhZ8ENi7+oZa2ivUDj OQIDAQAB&quot;</txt>
+		<previous_segment_id>3</previous_segment_id>
+	</TXTRecord>
+</Set>
