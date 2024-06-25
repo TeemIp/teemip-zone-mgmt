@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2023 TeemIp
+ * @copyright   Copyright (C) 2010-2024 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -391,10 +391,10 @@ class _Zone extends DNSObject
     /**
 	 * @inheritdoc
 	 */
-	public function DisplayBareRelations(WebPage $oP, $bEditMode = false)
+	public function DisplayBareRelations($oPage, $bEditMode = false)
 	{
 		// Execute parent function first
-		parent::DisplayBareRelations($oP, $bEditMode);
+		parent::DisplayBareRelations($oPage, $bEditMode);
 
 		if (!$bEditMode) {
 			// Tab for NS records
@@ -402,7 +402,7 @@ class _Zone extends DNSObject
 			$oNSRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 			$sName = Dict::Format('Class:Zone/Tab:nsrecords_list');
 			$sTitle = Dict::Format('Class:Zone/Tab:nsrecords_list+');
-			IPUtils::DisplayTabContent($oP, $sName, 'ns_records', 'NSRecord', $sTitle, '', $oNSRecordSet, false);
+			IPUtils::DisplayTabContent($oPage, $sName, 'ns_records', 'NSRecord', $sTitle, '', $oNSRecordSet, false);
 
 			switch ($this->Get('mapping')) {
 				case 'direct':
@@ -412,7 +412,7 @@ class _Zone extends DNSObject
 						$oRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 						$sName = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list');
 						$sTitle = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list+');
-						IPUtils::DisplayTabContent($oP, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet, false);
+						IPUtils::DisplayTabContent($oPage, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet, false);
 					}
 
 					// Tab for Other records
@@ -428,13 +428,13 @@ class _Zone extends DNSObject
 					$sName = Dict::Format('Class:Zone/Tab:otherrecords_list');
 					$sTitle = Dict::Format('Class:Zone/Tab:otherrecords_list+');
 					if ($iOtherRecords > 0) {
-						$oP->SetCurrentTab('otherrecords_list', $sName.' ('.$iOtherRecords.')', $sTitle);
+						$oPage->SetCurrentTab('otherrecords_list', $sName.' ('.$iOtherRecords.')', $sTitle);
 						foreach ($this->aSecondaryRecordClasses as $sClass) {
 							$oRecordSet = $aRecordSets[$sClass];
 							if ($oRecordSet->Count() > 0) {
 								$oBlock = new DisplayBlock($oRecordSet->GetFilter(), 'list', false);
 								$sSubTitle = Dict::Format('Class:Zone/Tab:records_list', MetaModel::GetName($sClass));
-								$oBlock->Display($oP, 'blk-'.strtolower($sClass), array(
+								$oBlock->Display($oPage, 'blk-'.strtolower($sClass), array(
 									'menu' => false,
 									'panel_title' => MetaModel::GetName($sClass),
 									'panel_title_tooltip' => $sSubTitle,
@@ -444,7 +444,7 @@ class _Zone extends DNSObject
 						}
 					} else {
 						$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-						IPUtils::DisplayTabContent($oP, $sName, 'otherrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
+						IPUtils::DisplayTabContent($oPage, $sName, 'otherrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
 					}
 					break;
 
@@ -455,7 +455,7 @@ class _Zone extends DNSObject
 						$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 						$sName = Dict::Format('Class:Zone/Tab:cnamerecords_list');
 						$sTitle = Dict::Format('Class:Zone/Tab:cnamerecords_list+');
-						IPUtils::DisplayTabContent($oP, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet, false);
+						IPUtils::DisplayTabContent($oPage, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet, false);
 					}
 
 				case 'ipv6reverse':
@@ -464,7 +464,7 @@ class _Zone extends DNSObject
 					$oPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 					$sName = Dict::Format('Class:Zone/Tab:ptrrecords_list');
 					$sTitle = Dict::Format('Class:Zone/Tab:ptrrecords_list+');
-					IPUtils::DisplayTabContent($oP, $sName, 'ptr_records', 'PTRRecord', $sTitle, '', $oPTRRecordSet, false);
+					IPUtils::DisplayTabContent($oPage, $sName, 'ptr_records', 'PTRRecord', $sTitle, '', $oPTRRecordSet, false);
 					break;
 
 				default:
