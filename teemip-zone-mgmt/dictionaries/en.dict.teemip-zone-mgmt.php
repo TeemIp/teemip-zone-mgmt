@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2023 TeemIp
+ * @copyright   Copyright (C) 2010-2024 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -17,6 +17,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete+' => 'Remove Resource Records associated to IP addresses that become obsolete',
 	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:yes' => 'Yes',
 	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:no' => 'No',
+    'Class:IPConfig/Attribute:serial_update_method' => 'Serial update method',
+    'Class:IPConfig/Attribute:serial_update_method+' => 'Method used to update the serial number of a zone',
+    'Class:IPConfig/Attribute:serial_update_method/Value:increment_by_one' => 'Increment by one',
+    'Class:IPConfig/Attribute:serial_update_method/Value:set_date' => 'Date, in ISO 8601 basic format, followed by a two-digit counter',
+    'Class:IPConfig/Attribute:serial_update_method/Value:set_ux_time' => 'Date expressed as the number of seconds since the UNIX epoch',
 ));
 
 //

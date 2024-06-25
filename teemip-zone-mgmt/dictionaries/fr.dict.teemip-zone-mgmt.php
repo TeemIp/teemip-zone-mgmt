@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2023 TeemIp
+ * @copyright   Copyright (C) 2010-2024 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -17,6 +17,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete+' => 'Supprime automatiquement les enregistrements DNS liés à une adresse IP obsolète',
 	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:yes' => 'Oui',
 	'Class:IPConfig/Attribute:remove_rr_on_ip_obsolete/Value:no' => 'Non',
+    'Class:IPConfig/Attribute:serial_update_method' => 'Méthode de mise à jour du serial',
+    'Class:IPConfig/Attribute:serial_update_method+' => 'Méthode utilisée pour mettre à jour le numéro de série de la zone',
+    'Class:IPConfig/Attribute:serial_update_method/Value:increment_by_one' => 'Increment de un',
+    'Class:IPConfig/Attribute:serial_update_method/Value:set_date' => 'Date, au format ISO 8601 basic, suivi par un compteur sur 2 chiffres',
+    'Class:IPConfig/Attribute:serial_update_method/Value:set_ux_time' => 'Date exprimée en nombre de secondes depuis l\'époque UNIX',
 ));
 
 //

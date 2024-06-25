@@ -31,6 +31,22 @@
           <is_null_allowed>false</is_null_allowed>
           <display_style>radio_horizontal</display_style>
         </field>
+        <field id="serial_update_method" xsi:type="AttributeEnum" _delta="define">
+          <sql>serial_update_method</sql>
+          <values>
+            <value id="increment_by_one">
+              <code>increment_by_one</code>
+            </value>
+            <value id="set_date">
+              <code>set_date</code>
+            </value>
+            <value id="set_ux_time">
+              <code>set_ux_time</code>
+            </value>
+          </values>
+          <default_value>increment_by_one</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
       </fields>
       <presentation>
         <details>
@@ -44,6 +60,9 @@
                     </item>
                     <item id="remove_rr_on_ip_obsolete" _delta="define">
                       <rank>60</rank>
+                    </item>
+                    <item id="serial_update_method" _delta="define">
+                      <rank>70</rank>
                     </item>
                   </items>
                 </item>

@@ -13,6 +13,7 @@ use DBObjectSearch;
 use Dict;
 use DisplayBlock;
 use DNSObject;
+use IPConfig;
 use iTopWebPage;
 use MetaModel;
 use TeemIp\TeemIp\Extension\Framework\Helper\IPUtils;
@@ -352,25 +353,42 @@ class _Zone extends DNSObject
 	 * @inheritdoc
 	 */
 	protected function OnUpdate()
-	{
-		parent::OnUpdate();
+    {
+        parent::OnUpdate();
 
-		// Add '.' at the end of name and sourcedname fields if not already set
-		$sName = $this->Get('name');
-		if (substr($sName, -1) != '.') {
-			$this->Set('name', $sName.'.');
-		}
-		$sSourceDName = $this->Get('sourcedname');
-		if (substr($sSourceDName, -1) != '.') {
-			$this->Set('sourcedname', $sSourceDName.'.');
-		}
+        // Add '.' at the end of name and sourcedname fields if not already set
+        $sName = $this->Get('name');
+        if (substr($sName, -1) != '.') {
+            $this->Set('name', $sName . '.');
+        }
+        $sSourceDName = $this->Get('sourcedname');
+        if (substr($sSourceDName, -1) != '.') {
+            $this->Set('sourcedname', $sSourceDName . '.');
+        }
 
-		// Check if reverse zone ends up with right arpa domain.
-		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
-		$this->Set('name', $sName);
-	}
+        // Check if reverse zone ends up with right arpa domain.
+        $sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
+        $this->Set('name', $sName);
+    }
 
-	/**
+    /**
+     * @inheritdoc
+     */
+    protected function AfterUpdate()
+    {
+        parent::AfterUpdate();
+
+        // Recompute serial #, if relevant attribute of the zone have changed
+        $aChanges = $this->ListPreviousValuesForUpdatedAttributes();
+        if (array_key_exists('ttl', $aChanges) || array_key_exists('sourcedname', $aChanges) ||
+            array_key_exists('mbox', $aChanges) || array_key_exists('refresh', $aChanges) ||
+            array_key_exists('retry', $aChanges) || array_key_exists('expire', $aChanges) ||
+            array_key_exists('minimum', $aChanges)) {
+            $this->IncreaseSerial();
+        }
+    }
+
+    /**
 	 * @inheritdoc
 	 */
 	public function DisplayBareRelations(WebPage $oP, $bEditMode = false)
@@ -650,8 +668,30 @@ HTML
 	 */
 	public function IncreaseSerial(): void
 	{
-		$iSerial = $this->Get('serial');
-		$this->Set('serial', $iSerial + 1);
+        $sSerialUpdateMethod = IPConfig::GetFromGlobalIPConfig('serial_update_method', $this->Get('org_id'));
+        switch ($sSerialUpdateMethod) {
+            case 'set_date':
+                $sSerial = $this->Get('serial');
+                $sDateSerial = substr($sSerial, 0, 8);
+                $sDate = date('Ymd');
+                if ($sDateSerial != $sDate) {
+                    $sSerial = $sDate.'01';
+                } else {
+                    $sNb = substr($sSerial, 8, 2) + 1;
+                    $sSerial = $sDateSerial.$sNb;
+                }
+                break;
+
+            case 'set_ux_time':
+                $sSerial = time();
+                break;
+
+            case 'increment_by_one':
+            default:
+                $sSerial = $this->Get('serial') + 1;
+                break;
+        }
+		$this->Set('serial', $sSerial);
 	}
 
 }
