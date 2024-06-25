@@ -677,7 +677,7 @@ HTML
                 if ($sDateSerial != $sDate) {
                     $sSerial = $sDate.'01';
                 } else {
-                    $sNb = substr($sSerial, 8, 2) + 1;
+                    $sNb = (int) substr($sSerial, 8, 2) + 1;
                     $sSerial = $sDateSerial.$sNb;
                 }
                 break;
