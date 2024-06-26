@@ -8,7 +8,6 @@ namespace TeemIp\TeemIp\Extension\ZoneManagement\Model;
 
 use ApplicationContext;
 use CMDBObjectSet;
-use Combodo\iTop\Application\UI\Base\Component\MedallionIcon\MedallionIcon;
 use DBObjectSearch;
 use Dict;
 use DisplayBlock;
@@ -18,7 +17,6 @@ use iTopWebPage;
 use MetaModel;
 use TeemIp\TeemIp\Extension\Framework\Helper\IPUtils;
 use utils;
-use WebPage;
 
 class _Zone extends DNSObject
 {
@@ -251,7 +249,7 @@ class _Zone extends DNSObject
 		if (!self::IsIPv4SubClassCReverseZone($sZoneName)) {
 			return false;
 		}
-		$sClassCZoneFromZone = substr(strstr($sZoneName, '.', false), 1);
+		$sClassCZoneFromZone = substr(strstr($sZoneName, '.'), 1);
 		$sUserSeparator = MetaModel::GetModuleSetting(self::MODULE_CODE, self::IPV4_SUB_CLASS_C_SEPARATOR, '');
 		$sSeparator = ($sUserSeparator !== '') ? $sUserSeparator : self::DEFAULT_IPV4_SUB_CLASS_C_SEPARATOR;
 		$aZoneLabels = explode('.', $sZoneName);
@@ -259,14 +257,14 @@ class _Zone extends DNSObject
 
 		if (self::IsIPv4PTR($sFqdn)) {
 			// Handle simple PTR first
-			$sClassCZoneFromFQDN = substr(strstr($sFqdn, '.', false), 1);
+			$sClassCZoneFromFQDN = substr(strstr($sFqdn, '.'), 1);
 			if ($sClassCZoneFromFQDN != $sClassCZoneFromZone) {
 				return false;
 			}
 		} elseif (self::IsIPv4SubClassCPTR($sFqdn)) {
 			// Handle sub class C PTR next
-			$sSubClassCZoneFromFQDN = substr(strstr($sFqdn, '.', false), 1);
-			$sClassCZoneFromFQDN = substr(strstr($sSubClassCZoneFromFQDN, '.', false), 1);
+			$sSubClassCZoneFromFQDN = substr(strstr($sFqdn, '.'), 1);
+			$sClassCZoneFromFQDN = substr(strstr($sSubClassCZoneFromFQDN, '.'), 1);
 			if (($sClassCZoneFromFQDN != $sClassCZoneFromZone) || ($sSubClassCZoneFromFQDN != $sZoneName)) {
 				return false;
 			}
@@ -402,7 +400,7 @@ class _Zone extends DNSObject
 			$oNSRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 			$sName = Dict::Format('Class:Zone/Tab:nsrecords_list');
 			$sTitle = Dict::Format('Class:Zone/Tab:nsrecords_list+');
-			IPUtils::DisplayTabContent($oPage, $sName, 'ns_records', 'NSRecord', $sTitle, '', $oNSRecordSet, false);
+			IPUtils::DisplayTabContent($oPage, $sName, 'ns_records', 'NSRecord', $sTitle, '', $oNSRecordSet);
 
 			switch ($this->Get('mapping')) {
 				case 'direct':
@@ -412,7 +410,7 @@ class _Zone extends DNSObject
 						$oRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 						$sName = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list');
 						$sTitle = Dict::Format('Class:Zone/Tab:'.strtolower($sClass).'s_list+');
-						IPUtils::DisplayTabContent($oPage, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet, false);
+						IPUtils::DisplayTabContent($oPage, $sName, strtolower($sClass), $sClass, $sTitle, '', $oRecordSet);
 					}
 
 					// Tab for Other records
@@ -444,18 +442,19 @@ class _Zone extends DNSObject
 						}
 					} else {
 						$oSet = CMDBObjectSet::FromScratch('ResourceRecord');
-						IPUtils::DisplayTabContent($oPage, $sName, 'otherrecords_list', 'ResourceRecord', $sTitle, '', $oSet, false);
+						IPUtils::DisplayTabContent($oPage, $sName, 'otherrecords_list', 'ResourceRecord', $sTitle, '', $oSet);
 					}
 					break;
 
-				case 'ipv4reverse':
-					// Tab for CNAME records for non sub class C reverse zones
+                /** @noinspection PhpMissingBreakStatementInspection */
+                case 'ipv4reverse':
+                     // Tab for CNAME records for non sub class C reverse zones
 					if (!$this->IsIPv4SubClassCReverseZone($this->GetName())) {
 						$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
 						$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 						$sName = Dict::Format('Class:Zone/Tab:cnamerecords_list');
 						$sTitle = Dict::Format('Class:Zone/Tab:cnamerecords_list+');
-						IPUtils::DisplayTabContent($oPage, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet, false);
+						IPUtils::DisplayTabContent($oPage, $sName, 'cname_records', 'CNAMERecord', $sTitle, '', $oCNAMERecordSet);
 					}
 
 				case 'ipv6reverse':
@@ -464,7 +463,7 @@ class _Zone extends DNSObject
 					$oPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 					$sName = Dict::Format('Class:Zone/Tab:ptrrecords_list');
 					$sTitle = Dict::Format('Class:Zone/Tab:ptrrecords_list+');
-					IPUtils::DisplayTabContent($oPage, $sName, 'ptr_records', 'PTRRecord', $sTitle, '', $oPTRRecordSet, false);
+					IPUtils::DisplayTabContent($oPage, $sName, 'ptr_records', 'PTRRecord', $sTitle, '', $oPTRRecordSet);
 					break;
 
 				default:
@@ -516,7 +515,7 @@ class _Zone extends DNSObject
 			$id = $this->GetKey();
 
 			// Prepare context to switch display order and display button
-			$sUrl = utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php', array());
+			$sUrl = utils::GetAbsoluteUrlModulePage('teemip-zone-mgmt', 'ui.teemip-zone-mgmt.php');
 			$sHtml = "<form method=\"post\" action=\"".$sUrl."\">";
 			$sHtml .= "<input type=\"hidden\" name=\"class\" value=\"Zone\">";
 			$sHtml .= "<input type=\"hidden\" name=\"id\" value=\"$id\">";
@@ -626,7 +625,8 @@ HTML
 				}
 				break;
 
-			case 'ipv4reverse':
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'ipv4reverse':
 				if (!$this->IsIPv4SubClassCReverseZone($this->GetName())) {
 					$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
 					$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
@@ -640,7 +640,7 @@ HTML
 					}
 				}
 
-			case 'ipv6reverse':
+            case 'ipv6reverse':
 				$sOQL = "SELECT PTRRecord WHERE zone_id = :zone_id";
 				$oPTRRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
 

@@ -4,8 +4,6 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-use const ITOP_DESIGN_LATEST_VERSION;
-
 /*********************************************************************
  *
  * Main user interface pages for Zone Management extension starts here
@@ -96,6 +94,7 @@ try {
 			} else {
 				$sParentClass = 'IP'.substr($sClass, 4);
 				list($sError, $sSeverity) = $oObj->DoCheckUpdateRRs();
+                $sMessage = '';
 				if ($sError != '') {
 					// Report issue
 					$sMessage = Dict::Format('UI:ZoneManagement:Action:'.$sParentClass.':UpdateRRs:HasNotRun', $sError);
@@ -103,18 +102,19 @@ try {
 				if ($sSeverity == 'error') {
 					$oObj->CleanRRs();
 					$sCleanMessage = '';
-					$sCleanSeverity = 'info';
+					$sCleanSeverity = WebPage::ENUM_SESSION_MESSAGE_SEVERITY_INFO;
 				} else {
 					$sError = $oObj->UpdateRRs();
 					if ($sError != '') {
 						// Report issue
 						$sMessage = Dict::Format('UI:ZoneManagement:Action:'.$sParentClass.':UpdateRRs:HasErrors', $sError);
-						$sSeverity = 'info';
+						$sSeverity = WebPage::ENUM_SESSION_MESSAGE_SEVERITY_INFO;
 					} else {
 						$sMessage = Dict::Format('UI:ZoneManagement:Action:'.$sParentClass.':UpdateRRs:HasRun');
 						$sSeverity = 'ok';
 					}
 					$sCleanMessage = '';
+                    $sCleanSeverity = WebPage::ENUM_SESSION_MESSAGE_SEVERITY_OK;
 				}
 				cmdbAbstractObject::SetSessionMessage($sClass, $id, 'updaterrs', $sMessage, $sSeverity, 0, true /* must not exist */);
 				if ($sCleanMessage != '') {
