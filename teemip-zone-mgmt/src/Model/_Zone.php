@@ -678,7 +678,7 @@ HTML
                     $sSerial = $sDate.'01';
                 } else {
                     $sNb = (int) substr($sSerial, 8, 2) + 1;
-                    $sSerial = $sDateSerial.$sNb;
+                    $sSerial = $sDateSerial.sprintf("%'.02d", $sNb);
                 }
                 break;
 
