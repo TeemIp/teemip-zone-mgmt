@@ -5186,7 +5186,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	public function OnDisplayRelations($oObject, WebPage $oPage, $bEditMode = false)
 	{
 		if ($oObject instanceof IPv4Address) {
-		    if (!$bEditMode) {
+			if ($oObject->GetDisplayMode() == cmdbAbstractObject::ENUM_DISPLAY_MODE_VIEW) {
 				$aRecordSets = [];
 		        $iRRecords = 0;
 
@@ -5242,7 +5242,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	          	}
 	    	}
 		} elseif ($oObject instanceof IPv6Address) {
-	    	if (!$bEditMode) {
+			if ($oObject->GetDisplayMode() == cmdbAbstractObject::ENUM_DISPLAY_MODE_VIEW) {
 				$aRecordSets = [];
 	        	$iRRecords = 0;
 
@@ -5287,7 +5287,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
 	        	}
 	    	}
 		} elseif ($oObject instanceof IPv4Subnet) {
-		    if (!$bEditMode) {
+			if ($oObject->GetDisplayMode() == cmdbAbstractObject::ENUM_DISPLAY_MODE_VIEW) {
 				$aRecordSets = [];
 	        	$iRRecords = 0;
 
@@ -5355,7 +5355,7 @@ class TeemIpZoneMgmt implements iApplicationUIExtension
             	}
 	    	}
 		} elseif ($oObject instanceof IPv6Subnet) {
-	    	if (!$bEditMode) {
+			if ($oObject->GetDisplayMode() == cmdbAbstractObject::ENUM_DISPLAY_MODE_VIEW) {
 				$aRecordSets = [];
 	        	$iRRecords = 0;
 

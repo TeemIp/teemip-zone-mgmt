@@ -8,6 +8,7 @@ namespace TeemIp\TeemIp\Extension\ZoneManagement\Model;
 
 use ApplicationContext;
 use CMDBObjectSet;
+use Combodo\iTop\Application\WebPage\WebPage;
 use DBObjectSearch;
 use Dict;
 use DisplayBlock;
@@ -69,7 +70,7 @@ class _Zone extends DNSObject
 		if ((strlen($sFqdn) == 0) || ($iOrgId == 0)) {
 			return array(Dict::Format('UI:ZoneManagement:Action:IPAddress:UpdateRRs:Error:CannotFindZone:'.$sMapping), 0, '');
 		}
-		// Look for sub class C IPv4 reverse zone
+		// Look for subclass C IPv4 reverse zone
 		if ($sMapping == 'ipv4reverse') {
 			list ($iZoneId, $sZoneName) = self::GetIPv4SubClassCReverseZoneFromFqdn($sFqdn, $iView, $iOrgId);
 			if ($iZoneId > 0) {
@@ -92,7 +93,7 @@ class _Zone extends DNSObject
 	}
 
 	/**
-	 * Get the IPv4 sub class C reverse zone that correspond to the given FQDN
+	 * Get the IPv4 subclass C reverse zone that correspond to the given FQDN
 	 *
 	 * @param $sFqdn
 	 * @param $iView
@@ -141,7 +142,7 @@ class _Zone extends DNSObject
 	}
 
 	/**
-	 * Check is FQDN has IPv4 sub class C PTR format
+	 * Check is FQDN has IPv4 subclass C PTR format
 	 *
 	 * @param $sFqdn
 	 *
@@ -179,7 +180,7 @@ class _Zone extends DNSObject
 	}
 
 	/**
-	 * Check if the given zone is an IPv4 sub class C reverse zone
+	 * Check if the given zone is an IPv4 subclass C reverse zone
 	 *
 	 * @param $sZoneName
 	 *
@@ -234,7 +235,7 @@ class _Zone extends DNSObject
 	}
 
 	/**
-	 * Check if the FQDN belongs to the sub class C IPv4 reverse zone
+	 * Check if the FQDN belongs to the subclass C IPv4 reverse zone
 	 *
 	 * @param $sFqdn
 	 *   . format is w1.[u1-v1].x1.y1.z1.in-addr.arpa.
@@ -262,7 +263,7 @@ class _Zone extends DNSObject
 				return false;
 			}
 		} elseif (self::IsIPv4SubClassCPTR($sFqdn)) {
-			// Handle sub class C PTR next
+			// Handle subclass C PTR next
 			$sSubClassCZoneFromFQDN = substr(strstr($sFqdn, '.'), 1);
 			$sClassCZoneFromFQDN = substr(strstr($sSubClassCZoneFromFQDN, '.'), 1);
 			if (($sClassCZoneFromFQDN != $sClassCZoneFromZone) || ($sSubClassCZoneFromFQDN != $sZoneName)) {
@@ -272,7 +273,7 @@ class _Zone extends DNSObject
 			return false;
 		}
 
-		// Check last digit of FQDN is in sub class C range
+		// Check last digit of FQDN is in subclass C range
 		$aFqdnLabels = explode('.', $sFqdn);
 		$sLastDigit = $aFqdnLabels[0];
 		if (($sLastDigit < $aRange[0]) || ($aRange[1] < $sLastDigit)) {
@@ -389,12 +390,12 @@ class _Zone extends DNSObject
     /**
 	 * @inheritdoc
 	 */
-	public function DisplayBareRelations($oPage, $bEditMode = false)
+	public function DisplayBareRelations(WebPage $oPage, $bEditMode = false)
 	{
 		// Execute parent function first
 		parent::DisplayBareRelations($oPage, $bEditMode);
 
-		if (!$bEditMode) {
+        if ($this->GetDisplayMode() == static::ENUM_DISPLAY_MODE_VIEW) {
 			// Tab for NS records
 			$sOQL = "SELECT NSRecord WHERE zone_id = :zone_id";
 			$oNSRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
@@ -448,7 +449,7 @@ class _Zone extends DNSObject
 
                 /** @noinspection PhpMissingBreakStatementInspection */
                 case 'ipv4reverse':
-                     // Tab for CNAME records for non sub class C reverse zones
+                     // Tab for CNAME records for non subclass C reverse zones
 					if (!$this->IsIPv4SubClassCReverseZone($this->GetName())) {
 						$sOQL = "SELECT CNAMERecord WHERE zone_id = :zone_id";
 						$oCNAMERecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
