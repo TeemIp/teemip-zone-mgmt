@@ -7,6 +7,7 @@
 namespace TeemIp\TeemIp\Extension\ZoneManagement\Model;
 
 use ApplicationContext;
+use cmdbAbstractObject;
 use CMDBObjectSet;
 use Combodo\iTop\Application\WebPage\WebPage;
 use DBObjectSearch;
@@ -395,7 +396,7 @@ class _Zone extends DNSObject
 		// Execute parent function first
 		parent::DisplayBareRelations($oPage, $bEditMode);
 
-        if ($this->GetDisplayMode() == static::ENUM_DISPLAY_MODE_VIEW) {
+        if ($this->GetDisplayMode() == cmdbAbstractObject::ENUM_DISPLAY_MODE_VIEW) {
 			// Tab for NS records
 			$sOQL = "SELECT NSRecord WHERE zone_id = :zone_id";
 			$oNSRecordSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), array('zone_id' => $this->GetKey()));
