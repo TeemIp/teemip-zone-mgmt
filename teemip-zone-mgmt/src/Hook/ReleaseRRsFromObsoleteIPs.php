@@ -89,7 +89,7 @@ class ReleaseRRsFromObsoleteIPs implements iScheduledProcess
 		if (!$bEnabled) {
 			$sPeriodicity = '86400';
 		}
-		$oRet->modify('+'.$sPeriodicity.' seconds');
+		$oRet->modify($sPeriodicity.' seconds');
 
 		return $oRet;
 	}
