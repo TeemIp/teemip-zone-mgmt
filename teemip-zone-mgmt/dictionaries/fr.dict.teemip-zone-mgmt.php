@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2010-2024 TeemIp
+ * @copyright   Copyright (C) 2010-2025 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -267,7 +267,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Class: ResourceRecordType
 //
 
-Dict::Add('EN US', 'English', 'English', array(
+Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:ResourceRecordType' => 'Type de Resource Record',
 	'Class:ResourceRecordType+' => 'Type de Resource Record qui n\'est pas couvert par une classe existante',
 	'Class:ResourceRecordType/Attribute:name' => 'Type',
@@ -306,7 +306,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Class: CAARecord
 //
 
-Dict::Add('EN US', 'English', 'English', array(
+Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:CAARecord' => 'CAA',
 	'Class:CAARecord+' => 'Certification Authority Authorization',
 	'Class:CAARecord/Attribute:flag' => 'Flag',
@@ -338,7 +338,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Class: DSRecord
 //
 
-Dict::Add('EN US', 'English', 'English', array(
+Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:DSRecord' => 'DS',
 	'Class:DSRecord+' => 'Delegation Signer Record',
 	'Class:DSRecord/Attribute:key_tag' => 'Key Tag',
@@ -355,8 +355,8 @@ Dict::Add('EN US', 'English', 'English', array(
 // Class: GenericRecord
 //
 
-Dict::Add('EN US', 'English', 'English', array(
-	'Class:GenericRecord' => 'GENERIC',
+DDict::Add('FR FR', 'French', 'Français', array(
+    'Class:GenericRecord' => 'GENERIC',
 	'Class:GenericRecord+' => 'Enregistrement générique',
 	'Class:GenericRecord/Attribute:payload' => 'Payload',
 	'Class:GenericRecord/Attribute:payload+' => 'All what the db file should see behind Resource Record statement',
@@ -394,7 +394,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Class: OPENPGPKEYRecord
 //
 
-Dict::Add('EN US', 'English', 'English', array(
+Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:OPENPGPKEYRecord' => 'OPENPGPKEY',
 	'Class:OPENPGPKEYRecord+' => 'Clef publique OpenPGP',
 	'Class:OPENPGPKEYRecord/Attribute:key' => 'Clef publique OpenPGP',
@@ -456,7 +456,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Class: SSHFPRecord
 //
 
-Dict::Add('EN US', 'English', 'English', array(
+Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:SSHFPRecord' => 'SSHFP',
 	'Class:SSHFPRecord+' => 'Enregistrement Secure SHell Fingerprint',
 	'Class:SSHFPRecord/Attribute:algorithm' => 'Algorithme',
@@ -471,7 +471,7 @@ Dict::Add('EN US', 'English', 'English', array(
 // Class: TLSARecord
 //
 
-Dict::Add('EN US', 'English', 'English', array(
+Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:TLSARecord' => 'TLSA',
 	'Class:TLSARecord+' => 'Enregistrement TLSA Certificate Association',
 	'Class:TLSARecord/Attribute:certificate_usage' => 'Utilisation du certificat',
