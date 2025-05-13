@@ -355,7 +355,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 // Class: GenericRecord
 //
 
-DDict::Add('FR FR', 'French', 'Français', array(
+Dict::Add('FR FR', 'French', 'Français', array(
     'Class:GenericRecord' => 'GENERIC',
 	'Class:GenericRecord+' => 'Enregistrement générique',
 	'Class:GenericRecord/Attribute:payload' => 'Payload',
