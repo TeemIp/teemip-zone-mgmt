@@ -23,6 +23,7 @@ class ComposerStaticInit8287cab5f6268c0891a3635490df7bdd
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'TeemIp\\TeemIp\\Extension\\ZoneManagement\\Hook\\ReleaseRRsFromObsoleteIPs' => __DIR__ . '/../..' . '/src/Hook/ReleaseRRsFromObsoleteIPs.php',
+        'TeemIp\\TeemIp\\Extension\\ZoneManagement\\Hook\\TeemIpZoneMgmtServices' => __DIR__ . '/../..' . '/src/Hook/TeemIpZoneMgmtServices.php',
         'TeemIp\\TeemIp\\Extension\\ZoneManagement\\Model\\_Zone' => __DIR__ . '/../..' . '/src/Model/_Zone.php',
     );
 
