@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2010-2024 TeemIp
+ * @copyright   Copyright (C) 2010-2025 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -30,6 +30,7 @@ SetupWebPage::AddModule(
 		'datamodel' => array(
 			'vendor/autoload.php',
 			'src/Hook/ReleaseRRsFromObsoleteIPs.php',
+            'src/Hook/TeemIpZoneMgmtServices.php',
 			'model.teemip-zone-mgmt.php',
 		),
 		'webservice' => array(),
