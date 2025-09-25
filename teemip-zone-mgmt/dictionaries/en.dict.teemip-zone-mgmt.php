@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2010-2024 TeemIp
+ * @copyright   Copyright (C) 2010-2025 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -22,6 +22,7 @@ Dict::Add('EN US', 'English', 'English', array(
     'Class:IPConfig/Attribute:serial_update_method/Value:increment_by_one' => 'Increment by one',
     'Class:IPConfig/Attribute:serial_update_method/Value:set_date' => 'Date, in ISO 8601 basic format, followed by a two-digit counter',
     'Class:IPConfig/Attribute:serial_update_method/Value:set_ux_time' => 'Date expressed as the number of seconds since the UNIX epoch',
+    'Class:IPConfig/Attribute:serial_update_method/Value:managed_remotely' => 'The serial number is managed remotely, outside of the application',
 ));
 
 //
@@ -115,6 +116,13 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:Zone/Attribute:sourcedname+' => '',
 	'Class:Zone/Attribute:mbox' => 'Hostmaster mailbox',
 	'Class:Zone/Attribute:mbox+' => '',
+    'Class:Zone/Attribute:serial_update_method' => 'Serial update method',
+    'Class:Zone/Attribute:serial_update_method+' => 'Method used to update the serial number of the zone',
+    'Class:Zone/Attribute:serial_update_method/Value:increment_by_one' => 'Increment by one',
+    'Class:Zone/Attribute:serial_update_method/Value:set_date' => 'Date, in ISO 8601 basic format, followed by a two-digit counter',
+    'Class:Zone/Attribute:serial_update_method/Value:set_ux_time' => 'Date expressed as the number of seconds since the UNIX epoch',
+    'Class:Zone/Attribute:serial_update_method/Value:managed_remotely' => 'The serial number is managed remotely, outside of the application',
+    'Class:Zone/Attribute:serial_update_method/Value:use_global_config' => 'Follow what is defined in the global IP settings of the organization',
 	'Class:Zone/Attribute:serial' => 'Serial',
 	'Class:Zone/Attribute:serial+' => '',
 	'Class:Zone/Attribute:refresh' => 'Refresh',

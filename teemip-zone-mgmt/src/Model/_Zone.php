@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2010-2024 TeemIp
+ * @copyright   Copyright (C) 2010-2025 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -670,7 +670,10 @@ HTML
 	 */
 	public function IncreaseSerial(): void
 	{
-        $sSerialUpdateMethod = IPConfig::GetFromGlobalIPConfig('serial_update_method', $this->Get('org_id'));
+        $sSerialUpdateMethod = $this->Get('serial_update_method');
+        if ($sSerialUpdateMethod == 'use_global_config') {
+            $sSerialUpdateMethod = IPConfig::GetFromGlobalIPConfig('serial_update_method', $this->Get('org_id'));
+        }
         switch ($sSerialUpdateMethod) {
             case 'set_date':
                 $sSerial = $this->Get('serial');
@@ -689,11 +692,14 @@ HTML
                 break;
 
             case 'increment_by_one':
-            default:
                 $sSerial = $this->Get('serial') + 1;
                 break;
+
+            case 'managed_remotely':
+            default:
+                return;
         }
-		$this->Set('serial', $sSerial);
+        $this->Set('serial', $sSerial);
 	}
 
 }

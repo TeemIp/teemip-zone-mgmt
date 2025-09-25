@@ -22,6 +22,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
     'Class:IPConfig/Attribute:serial_update_method/Value:increment_by_one' => 'Increment de un',
     'Class:IPConfig/Attribute:serial_update_method/Value:set_date' => 'Date, au format ISO 8601 basic, suivi par un compteur sur 2 chiffres',
     'Class:IPConfig/Attribute:serial_update_method/Value:set_ux_time' => 'Date exprimée en nombre de secondes depuis l\'époque UNIX',
+    'Class:IPConfig/Attribute:serial_update_method/Value:managed_remotely' => 'Le serial n\'est pas géré localement mais en dehors de cette application',
 ));
 
 //
@@ -115,6 +116,13 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone/Attribute:sourcedname+' => '',
 	'Class:Zone/Attribute:mbox' => 'Hostmaster mailbox',
 	'Class:Zone/Attribute:mbox+' => '',
+    'Class:Zone/Attribute:serial_update_method' => 'Méthode de mise à jour du serial',
+    'Class:Zone/Attribute:serial_update_method+' => 'Méthode utilisée pour mettre à jour le numéro de série de la zone',
+    'Class:Zone/Attribute:serial_update_method/Value:increment_by_one' => 'Increment de un',
+    'Class:Zone/Attribute:serial_update_method/Value:set_date' => 'Date, au format ISO 8601 basic, suivi par un compteur sur 2 chiffres',
+    'Class:Zone/Attribute:serial_update_method/Value:set_ux_time' => 'Date exprimée en nombre de secondes depuis l\'époque UNIX',
+    'Class:Zone/Attribute:serial_update_method/Value:managed_remotely' => 'Le serial n\'est pas géré localement mais en dehors de cette application',
+    'Class:Zone/Attribute:serial_update_method/Value:use_global_config' => 'Suit ce qui esst défini par les paramètres globaux de l\'organisation',
 	'Class:Zone/Attribute:serial' => 'Serial',
 	'Class:Zone/Attribute:serial+' => '',
 	'Class:Zone/Attribute:refresh' => 'Refresh',

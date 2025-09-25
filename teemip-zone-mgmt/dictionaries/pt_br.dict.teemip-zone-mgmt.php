@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (C) 2010-2024 TeemIp
+ * @copyright   Copyright (C) 2010-2025 TeemIp
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -22,6 +22,7 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
     'Class:IPConfig/Attribute:serial_update_method/Value:increment_by_one' => 'Incrementar em um',
     'Class:IPConfig/Attribute:serial_update_method/Value:set_date' => 'Data, no formato básico ISO 8601, seguida por um contador de dois dígitos',
     'Class:IPConfig/Attribute:serial_update_method/Value:set_ux_time' => 'Data expressa como o número de segundos desde a época UNIX',
+    'Class:IPConfig/Attribute:serial_update_method/Value:managed_remotely' => 'O número de série é gerenciado remotamente, fora do aplicativo',
 ));
 
 //
@@ -115,6 +116,13 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
 	'Class:Zone/Attribute:sourcedname+' => '',
 	'Class:Zone/Attribute:mbox' => 'Caixa de correio do Hostmaster',
 	'Class:Zone/Attribute:mbox+' => '',
+    'Class:Zone/Attribute:serial_update_method' => 'Método de atualização do serial',
+    'Class:Zone/Attribute:serial_update_method+' => 'Método usado para atualizar o número de série da zona',
+    'Class:Zone/Attribute:serial_update_method/Value:increment_by_one' => 'Incrementar em um',
+    'Class:Zone/Attribute:serial_update_method/Value:set_date' => 'Data, no formato básico ISO 8601, seguida por um contador de dois dígitos',
+    'Class:Zone/Attribute:serial_update_method/Value:set_ux_time' => 'Data expressa como o número de segundos desde a época UNIX',
+    'Class:Zone/Attribute:serial_update_method/Value:managed_remotely' => 'O número de série é gerenciado remotamente, fora do aplicativo',
+    'Class:Zone/Attribute:serial_update_method/Value:use_global_config' => 'Siga o que está definido nas configurações globais de IP da organização',
 	'Class:Zone/Attribute:serial' => 'Serial',
 	'Class:Zone/Attribute:serial+' => '',
 	'Class:Zone/Attribute:refresh' => 'Atualização (Refresh)',
