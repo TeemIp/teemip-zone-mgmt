@@ -569,7 +569,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:DNSManagement' => 'Gestion du DNS',
 	'Menu:DNSManagement+' => '',
-	'Menu:NameSpace' => 'Espace de Nomage',
+	'Menu:NameSpace' => 'Espace de Nommage',
 	'Menu:NameSpace+' => 'Résumé de tous les objets DNS ',
 	'Menu:DNSSpace:MainObjects' => 'Objets structurants',
 	'Title:Zones:DirectMapping' => 'Zones forward',
