@@ -1084,7 +1084,7 @@
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
         </field>
-        <field id="view_id" xsi:type="AttributeExternalKey" _delta="define">
+        <field id="view_id" xsi:type="AttributeExternalKey">
           <filter><![CDATA[SELECT View AS v WHERE v.org_id = :this->org_id]]></filter>
           <dependencies>
             <attribute id="org_id"/>
@@ -1095,7 +1095,7 @@
           <target_class>View</target_class>
           <on_target_delete>DEL_MANUAL</on_target_delete>
         </field>
-        <field id="view_name" xsi:type="AttributeExternalField" _delta="define">
+        <field id="view_name" xsi:type="AttributeExternalField">
           <extkey_attcode>view_id</extkey_attcode>
           <target_attcode>name</target_attcode>
         </field>
@@ -1179,7 +1179,7 @@
           <ext_key_to_remote>functionalci_id</ext_key_to_remote>
           <duplicates/>
         </field>
-        <field id="serial_update_method" xsi:type="AttributeEnum" _delta="define">
+        <field id="serial_update_method" xsi:type="AttributeEnum">
           <sql>serial_update_method</sql>
           <sort_type>rank</sort_type>
           <values>
@@ -1208,52 +1208,97 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnZoneCheckToWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_CHECK_TO_WRITE</event>
+          <callback>OnZoneCheckToWriteRequestedByZoneMgmt</callback>
+          <rank>100</rank>
+        </event_listener>
+        <event_listener id="OnZoneAfterWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_AFTER_WRITE</event>
+          <callback>OnZoneAfterWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+        <event_listener id="OnZoneBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnZoneBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="OnInsert">
+        <method id="OnZoneCheckToWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
-   {
-      parent::OnInsert();
-
-      $sName = $this->Get('name');
-      $sViewName = $this->Get('view_name');
-      if ($sViewName == '')
-      {
-            $this->Set('full_name', $sName);
-      }
-      else
-      {
-            $this->Set('full_name', $sName." [".$sViewName."]");
-      }
-      return;
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnZoneCheckToWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
+    {
+		$sMapping = $this->Get('mapping');
+		$sName = $this->Get('name');
+		if ($sMapping == 'ipv4reverse') {
+			if (!$this->IsIPv4ReverseZone($sName) && !$this->IsIPv4SubClassCReverseZone($sName)) {
+				$this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:Zone:V4:WrongFormat'));
+			}
+		} elseif ($sMapping == 'ipv6reverse') {
+			if (!$this->IsIPv6ReverseZone($sName)) {
+				$this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:Zone:V6:WrongFormat'));
+			}
+		}
     }]]></code>
         </method>
-        <method id="OnUpdate">
+        <method id="OnZoneBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-   {
-      parent::OnUpdate();
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnZoneBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
+    {
+        // Compute full name
+        $sName = $this->Get('name');
+        $sViewName = $this->Get('view_name');
+        $aEventData = $oEventData->GetEventData();
+        if ($aEventData['is_new'] || ($sName != $this->GetOriginal('name')) || ($sViewName != $this->GetOriginal('view_name'))) {
+            if ($sViewName == '') {
+                $this->Set('full_name', $sName);
+            } else {
+                $this->Set('full_name', $sName." [".$sViewName."]");
+            }
+        }
 
-      $sName = $this->Get('name');
-      $sViewName = $this->Get('view_name');
-      if (($sName != $this->GetOriginal('name')) || ($sViewName != $this->GetOriginal('view_name')))
-      {
-            if ($sViewName == '')
-            {
-                  $this->Set('full_name', $sName);
+        // Add '.' at the end of name and sourcedname fields if not already set
+		$sName = strtolower($this->Get('name'));
+		if (substr($sName, -1) != '.') {
+			$this->Set('name', $sName.'.');
+		}
+		$sSourceDName = strtolower($this->Get('sourcedname'));
+		if (substr($sSourceDName, -1) != '.') {
+			$this->Set('sourcedname', $sSourceDName.'.');
+		}
+
+		// Check if reverse zone ends up with right arpa domain.
+		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
+		$this->Set('name', $sName);
+    }]]></code>
+        </method>
+        <method id="OnZoneAfterWriteRequestedByZoneMgmt">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnZoneAfterWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
+    {
+        $aEventData = $oEventData->GetEventData();
+        if (!$aEventData['is_new']) {
+            // We are in an AfterUpdate situation
+            // Recompute serial #, if relevant attribute of the zone have changed
+            $aChanges = $this->ListPreviousValuesForUpdatedAttributes();
+            if (array_key_exists('ttl', $aChanges) || array_key_exists('sourcedname', $aChanges) ||
+                array_key_exists('mbox', $aChanges) || array_key_exists('refresh', $aChanges) ||
+                array_key_exists('retry', $aChanges) || array_key_exists('expire', $aChanges) ||
+                array_key_exists('minimum', $aChanges)) {
+                $this->IncreaseSerial();
             }
-            else
-            {
-                  $this->Set('full_name', $sName." [".$sViewName."]");
-            }
-      }
-      return;
+        }
     }]]></code>
         </method>
       </methods>
@@ -1486,6 +1531,23 @@
           <is_null_allowed>true</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnResourceRecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnResourceRecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+        <event_listener id="OnResourceRecordAfterWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_AFTER_WRITE</event>
+          <callback>OnResourceRecordAfterWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+        <event_listener id="OnResourceRecordAfterDeleteRequestedByZoneMgmt">
+          <event>EVENT_DB_AFTER_DELETE</event>
+          <callback>OnResourceRecordAfterDeleteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
         <method id="ComputeFqdn">
           <static>true</static>
@@ -1518,100 +1580,55 @@
 
 	}]]></code>
         </method>
-        <method id="OnInsert">
+        <method id="OnResourceRecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
-   {
-      parent::OnInsert();
-
-      $sName = $this->Get('name');
-      if ($sName != '@')
-      {
-          $sZoneName = $this->Get('zone_name');
-          $sFqdn = $this->ComputeFqdn($sName, $sZoneName);
-          if ($sName != $sFqdn)
-          {
-              $this->Set('name', $sFqdn);
-          }
-      }
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnResourceRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
+    {
+        $sName = $this->Get('name');
+        if ($sName != '@')
+        {
+            $sZoneName = $this->Get('zone_name');
+            $sFqdn = $this->ComputeFqdn($sName, $sZoneName);
+            if ($sName != $sFqdn)
+            {
+                $this->Set('name', $sFqdn);
+            }
+        }
     }]]></code>
         </method>
-        <method id="OnUpdate">
+        <method id="OnResourceRecordAfterWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-   {
-      parent::OnUpdate();
-
-      $sName = $this->Get('name');
-      if ($sName != '@')
-      {
-          $sZoneName = $this->Get('zone_name');
-          $sFqdn = $this->ComputeFqdn($sName, $sZoneName);
-          if ($sName != $sFqdn)
-          {
-              $this->Set('name', $sFqdn);
-          }
-      }
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnResourceRecordAfterWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
+    {
+        $iZoneId = $this->Get('zone_id');
+        $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
+        if (!is_null($oZone))
+        {
+          $oZone->IncreaseSerial();
+          $oZone->DBUpdate();
+        }
     }]]></code>
         </method>
-        <method id="AfterInsert">
+        <method id="OnResourceRecordAfterDeleteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function AfterInsert()
-   {
-      parent::AfterInsert();
-
-      $iZoneId = $this->Get('zone_id');
-      $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
-      if (!is_null($oZone))
-      {
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnResourceRecordAfterDeleteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
+    {
+        $iZoneId = $this->Get('zone_id');
+        $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
+        if (!is_null($oZone))
+        {
             $oZone->IncreaseSerial();
             $oZone->DBUpdate();
-      }
-    }]]></code>
-        </method>
-        <method id="AfterUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function AfterUpdate()
-   {
-      parent::AfterUpdate();
-
-      $iZoneId = $this->Get('zone_id');
-      $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
-      if (!is_null($oZone))
-      {
-            $oZone->IncreaseSerial();
-            $oZone->DBUpdate();
-      }
-    }]]></code>
-        </method>
-        <method id="AfterDelete">
-        <comment/>
-        <static>false</static>
-        <access>protected</access>
-        <type>Overload-cmdbAbstractObject</type>
-        <code><![CDATA[    protected function AfterDelete()
-   {
-      parent::AfterDelete();
-
-      $iZoneId = $this->Get('zone_id');
-      $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
-      if (!is_null($oZone))
-      {
-            $oZone->IncreaseSerial();
-            $oZone->DBUpdate();
-      }
+        }
     }]]></code>
         </method>
         <method id="GetDataNameForDataString">
@@ -2348,39 +2365,27 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnCNAMERecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnCNAMERecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="OnInsert">
+        <method id="OnCNAMERecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnCNAMERecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-	  	parent::OnInsert();
-
 		// Add '.' at the end of cname field if not already set
 		$sCName = $this->Get('cname');
 		if (substr($sCName, - 1) != '.')
 		{
 			$this->Set('cname', $sCName.'.');
     	}
-    }]]></code>
-        </method>
-        <method id="OnUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-    {
-        parent::OnUpdate();
-
-		// Add '.' at the end of cname field if not already set
-		$sCName = $this->Get('cname');
-		if (substr($sCName, - 1) != '.')
-		{
-			$this->Set('cname', $sCName.'.');
-		}
     }]]></code>
         </method>
         <method id="GetDataString">
@@ -2936,33 +2941,21 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnMXRecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnMXRecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="OnInsert">
+        <method id="OnMXRecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnMXRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-	  	parent::OnInsert();
-
-		// Add '.' at the end of exchange field if not already set
-		$sExchange = $this->Get('exchange');
-		if (substr($sExchange, - 1) != '.')
-		{
-			$this->Set('exchange', $sExchange.'.');
-		}
-    }]]></code>
-        </method>
-        <method id="OnUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-    {
-        parent::OnUpdate();
-
 		// Add '.' at the end of exchange field if not already set
 		$sExchange = $this->Get('exchange');
 		if (substr($sExchange, - 1) != '.')
@@ -3140,33 +3133,21 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnNSRecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnNSRecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="OnInsert">
+        <method id="OnNSRecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnNSRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-	  	parent::OnInsert();
-
-		// Add '.' at the end of nsname field if not already set
-		$sNSName = $this->Get('nsname');
-		if (substr($sNSName, - 1) != '.')
-		{
-			$this->Set('nsname', $sNSName.'.');
-		}
-    }]]></code>
-        </method>
-        <method id="OnUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-    {
-        parent::OnUpdate();
-
 		// Add '.' at the end of nsname field if not already set
 		$sNSName = $this->Get('nsname');
 		if (substr($sNSName, - 1) != '.')
@@ -3506,16 +3487,26 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnPTRRecordCheckToWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_CHECK_TO_WRITE</event>
+          <callback>OnPTRRecordCheckToWriteRequestedByZoneMgmt</callback>
+          <rank>100</rank>
+        </event_listener>
+        <event_listener id="OnPTRRecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnPTRRecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="DoCheckToWrite">
+        <method id="OnPTRRecordCheckToWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
           <access>public</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    public function DoCheckToWrite()
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnPTRRecordCheckToWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-        parent::DoCheckToWrite();
-
         $iZoneId = $this->Get('zone_id');
         $oZone = MetaModel::GetObject('Zone', $iZoneId, false /* MustBeFound */);
         if (!is_null($oZone)) {
@@ -3530,26 +3521,26 @@
                 $bSubClassC = Zone::IsIPv4SubClassCReverseZone($sZoneName);
                 if ($bSubClassC) {
                     if ($iNbDigit != 5) {
-                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit');
+                        $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit'));
                         return;
                     }
                     if (!Zone::IsInSubClassCReverseZone($sFqdn, $sZoneName)) {
-                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone');
+                        $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IPNotInZone'));
                         return;
                     }
                 } else {
                     if ($iNbDigit != 4) {
-                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit');
+                        $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongNumberOfDigit'));
                         return;
                     }
                     for ($i = 0; $i < $iNbDigit; $i++) {
                         if (!((0 <= $aDigit[$i]) && ($aDigit[$i] <= 255))) {
-                            $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange');
+                            $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:IpNotInRange'));
                             return;
                         }
                     }
                     if (!Zone::IsIPv4PTR($sFqdn)) {
-                        $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat');
+                        $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V4:WrongFormat'));
                         return;
                     }
                 }
@@ -3557,49 +3548,30 @@
                 $aDigit = explode('.', strstr($sFqdn, '.ip6.arpa.', true));
                 $iNbDigit = sizeof($aDigit);
                 if ($iNbDigit != 32) {
-                    $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit');
+                    $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:WrongNumberOfDigit'));
                     return;
                 }
                 if (!Zone::IsIPv6PTR($sFqdn)) {
-                    $this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:IpNotInRange');
+                    $this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:PTRRecord:V6:IpNotInRange'));
                     return;
                 }
             }
         }
     }]]></code>
         </method>
-        <method id="OnInsert">
+        <method id="OnPTRRecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnPTRRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-      parent::OnInsert();
-
-      // Add '.' at the end of hostname field if not already set
-      $sNSName = $this->Get('hostname');
-      if (substr($sNSName, - 1) != '.')
-      {
-         $this->Set('hostname', $sNSName.'.');
-      }
-    }]]></code>
-        </method>
-        <method id="OnUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-    {
-        parent::OnUpdate();
-
-      // Add '.' at the end of hostname field if not already set
-      $sNSName = $this->Get('hostname');
-      if (substr($sNSName, - 1) != '.')
-      {
-         $this->Set('hostname', $sNSName.'.');
-      }
+        // Add '.' at the end of hostname field if not already set
+        $sNSName = $this->Get('hostname');
+        if (substr($sNSName, - 1) != '.')
+        {
+            $this->Set('hostname', $sNSName.'.');
+        }
     }]]></code>
         </method>
         <method id="GetDataString">
@@ -3781,33 +3753,21 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnSRVRecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnSRVRecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="OnInsert">
+        <method id="OnSRVRecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnSRVRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-	  	parent::OnInsert();
-
-		// Add '.' at the end of target field if not already set
-		$sTarget = $this->Get('target');
-		if (substr($sTarget, - 1) != '.')
-		{
-			$this->Set('target', $sTarget.'.');
-		}
-    }]]></code>
-        </method>
-        <method id="OnUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
-    {
-        parent::OnUpdate();
-
 		// Add '.' at the end of target field if not already set
 		$sTarget = $this->Get('target');
 		if (substr($sTarget, - 1) != '.')
@@ -4379,7 +4339,7 @@
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
         </field>
-        <field id="previous_segment_id" xsi:type="AttributeExternalKey" _delta="define">
+        <field id="previous_segment_id" xsi:type="AttributeExternalKey">
           <filter><![CDATA[SELECT TXTRecord AS r WHERE r.zone_id = :this->zone_id AND r.id != :this->id]]></filter>
           <dependencies>
             <attribute id="zone_id"/>
@@ -4390,11 +4350,11 @@
           <target_class>TXTRecord</target_class>
           <on_target_delete>DEL_MANUAL</on_target_delete>
         </field>
-        <field id="previous_segment_name" xsi:type="AttributeExternalField" _delta="define">
+        <field id="previous_segment_name" xsi:type="AttributeExternalField">
           <extkey_attcode>previous_segment_id</extkey_attcode>
           <target_attcode>name</target_attcode>
         </field>
-        <field id="next_segment_id" xsi:type="AttributeExternalKey" _delta="define">
+        <field id="next_segment_id" xsi:type="AttributeExternalKey">
           <filter><![CDATA[SELECT TXTRecord AS r WHERE r.zone_id = :this->zone_id AND r.id != :this->id]]></filter>
           <dependencies>
             <attribute id="zone_id"/>
@@ -4405,21 +4365,36 @@
           <target_class>TXTRecord</target_class>
           <on_target_delete>DEL_MANUAL</on_target_delete>
         </field>
-        <field id="next_segment_name" xsi:type="AttributeExternalField" _delta="define">
+        <field id="next_segment_name" xsi:type="AttributeExternalField">
           <extkey_attcode>next_segment_id</extkey_attcode>
           <target_attcode>name</target_attcode>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnTXTRecordBeforeWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_BEFORE_WRITE</event>
+          <callback>OnTXTRecordBeforeWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+        <event_listener id="OnTXTRecordAfterWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_AFTER_WRITE</event>
+          <callback>OnTXTRecordAfterWriteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+        <event_listener id="OnTXTRecordAfterDeleteRequestedByZoneMgmt">
+          <event>EVENT_DB_AFTER_DELETE</event>
+          <callback>OnTXTRecordAfterDeleteRequestedByZoneMgmt</callback>
+          <rank>10</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="OnInsert">
+        <method id="OnTXTRecordBeforeWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnTXTRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-      parent::OnInsert();
-
       // Add '"' at the front and the end of txt field if not already set
       $sTxt = $this->Get('txt');
       if (substr($sTxt, - 1) != '"')
@@ -4433,111 +4408,78 @@
       }
     }]]></code>
         </method>
-        <method id="AfterInsert">
+        <method id="OnTXTRecordAfterWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function AfterInsert()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnTXTRecordAfterWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-    	parent::AfterInsert();
+        $aEventData = $oEventData->GetEventData();
+        if ($aEventData['is_new']) {
+        	// We are in the AfterInsert situation
+        	// Set reflexive relation on previous and next records
+            if ($this->Get('previous_segment_id') > 0) {
+                $oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
+                if ($oPreviousTXTRecord) {
+                    $oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
+                    $oPreviousTXTRecord->DBUpdate();
+                }
+            }
+            if ($this->Get('next_segment_id') > 0) {
+                $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
+                if ($oNextTXTRecord) {
+                    $oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
+                    $oNextTXTRecord->DBUpdate();
+                }
+            }
+        } else {
+            $aChanges = $this->ListPreviousValuesForUpdatedAttributes();
 
-    	// Set reflexive relation on previous and next records
-    	if ($this->Get('previous_segment_id') > 0) {
-    		$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
-    		if ($oPreviousTXTRecord) {
-				$oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
-				$oPreviousTXTRecord->DBUpdate();
-			}
-		}
-		if ($this->Get('next_segment_id') > 0) {
-    		$oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
-    		if ($oNextTXTRecord) {
-				$oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
-				$oNextTXTRecord->DBUpdate();
-			}
-		}
+            // Update reflexive relation on previous and next records
+            if (array_key_exists('previous_segment_id', $aChanges)) {
+                if ($this->Get('previous_segment_id') > 0) {
+                    $oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
+                    if ($oPreviousTXTRecord) {
+                        $oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
+                        $oPreviousTXTRecord->DBUpdate();
+                    }
+                }
+                if ($aChanges['previous_segment_id'] > 0) {
+                    $oOldPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['previous_segment_id'], false);
+                    if ($oOldPreviousTXTRecord) {
+                        $oOldPreviousTXTRecord->Set('next_segment_id', 0);
+                        $oOldPreviousTXTRecord->DBUpdate();
+                    }
+                }
+            }
 
+            if (array_key_exists('next_segment_id', $aChanges)) {
+                if ($this->Get('next_segment_id') > 0) {
+                    $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
+                    if ($oNextTXTRecord) {
+                        $oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
+                        $oNextTXTRecord->DBUpdate();
+                    }
+                }
+                if ($aChanges['next_segment_id'] > 0) {
+                    $oOldNextTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['next_segment_id'], false);
+                    if ($oOldNextTXTRecord) {
+                        $oOldNextTXTRecord->Set('previous_segment_id', 0);
+                        $oOldNextTXTRecord->DBUpdate();
+                    }
+                }
+            }
+        }
     }]]></code>
         </method>
-        <method id="OnUpdate">
+        <method id="OnTXTRecordAfterDeleteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function OnUpdate()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnTXTRecordAfterDeleteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-        parent::OnUpdate();
-
-      // Add '"' at the front and the end of txt field if not already set
-      $sTxt = $this->Get('txt');
-      if (substr($sTxt, - 1) != '"')
-      {
-         $sTxt = $sTxt.'"';
-         if ($sTxt[0] != '"')
-         {
-            $sTxt = '"'.$sTxt;
-         }
-         $this->Set('txt', $sTxt);
-      }
-    }]]></code>
-        </method>
-        <method id="AfterUpdate">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function AfterUpdate()
-    {
-    	parent::AfterUpdate();
-
-		$aChanges = $this->ListPreviousValuesForUpdatedAttributes();
-
-    	// Update reflexive relation on previous and next records
-		if (array_key_exists('previous_segment_id', $aChanges)) {
-			if ($this->Get('previous_segment_id') > 0) {
-				$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
-				if ($oPreviousTXTRecord) {
-					$oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
-					$oPreviousTXTRecord->DBUpdate();
-				}
-			}
-			if ($aChanges['previous_segment_id'] > 0) {
-				$oOldPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['previous_segment_id'], false);
-				if ($oOldPreviousTXTRecord) {
-					$oOldPreviousTXTRecord->Set('next_segment_id', 0);
-					$oOldPreviousTXTRecord->DBUpdate();
-				}
-			}
-		}
-
-		if (array_key_exists('next_segment_id', $aChanges)) {
-			if ($this->Get('next_segment_id') > 0) {
-				$oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
-				if ($oNextTXTRecord) {
-					$oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
-					$oNextTXTRecord->DBUpdate();
-				}
-			}
-			if ($aChanges['next_segment_id'] > 0) {
-				$oOldNextTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['next_segment_id'], false);
-				if ($oOldNextTXTRecord) {
-					$oOldNextTXTRecord->Set('previous_segment_id', 0);
-					$oOldNextTXTRecord->DBUpdate();
-				}
-			}
-		}
-    }]]></code>
-        </method>
-        <method id="AfterDelete">
-          <comment/>
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    protected function AfterDelete()
-    {
-    	parent::AfterDelete();
-
     	// Set reflexive relation on previous and next records
     	if ($this->Get('previous_segment_id') > 0) {
     		$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
@@ -4553,7 +4495,6 @@
 				$oNextTXTRecord->DBUpdate();
 			}
 		}
-
     }]]></code>
         </method>
         <method id="GetDataString">
@@ -4816,23 +4757,28 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
+      <event_listeners>
+        <event_listener id="OnlnkFunctionalCIToZoneCheckToWriteRequestedByZoneMgmt">
+          <event>EVENT_DB_CHECK_TO_WRITE</event>
+          <callback>OnlnkFunctionalCIToZoneCheckToWriteRequestedByZoneMgmt</callback>
+          <rank>100</rank>
+        </event_listener>
+      </event_listeners>
       <methods>
-        <method id="DoCheckToWrite">
+        <method id="OnlnkFunctionalCIToZoneCheckToWriteRequestedByZoneMgmt">
           <comment/>
           <static>false</static>
-          <access>protected</access>
-          <type>Overload-cmdbAbstractObject</type>
-          <code><![CDATA[    public function DoCheckToWrite()
+          <access>public</access>
+          <type>EventListener</type>
+          <code><![CDATA[    public function OnlnkFunctionalCIToZoneCheckToWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
     {
-    	parent::DoCheckToWrite();
-
     	$iCI = $this->Get('functionalci_id');
     	$oCI = MetaModel::GetObject('FunctionalCI', $iCI, false);
     	if (!is_null($oCI))
     	{
 			if (!in_array($oCI->Get('finalclass'), array('Server', 'VirtualMachine', 'NetworkDevice', 'ClusterNetwork' , 'ApplicationSolution')))
 			{
-				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass');
+				$this->AddCheckIssue(Dict::Format('UI:ZoneManagement:Action:New:lnkFunctionalCIToZone:WrongCIClass'));
 			}
 		}
     	return;

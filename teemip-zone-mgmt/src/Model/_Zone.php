@@ -292,7 +292,7 @@ class _Zone extends DNSObject
 	 *
 	 * @return string
 	 */
-	private function StraightenReverse($sMapping, $sName): string
+	protected function StraightenReverse($sMapping, $sName): string
 	{
 		if ($sMapping == 'ipv4reverse') {
 			if (substr($sName, -13) != 'in-addr.arpa.') {
@@ -326,67 +326,6 @@ class _Zone extends DNSObject
 
 		return ($sName);
 	}
-
-	/**
-	 * @inheritdoc
-	 */
-	protected function OnInsert()
-	{
-		parent::OnInsert();
-
-		// Add '.' at the end of name and sourcedname fields if not already set
-		$sName = strtolower($this->Get('name'));
-		if (substr($sName, -1) != '.') {
-			$this->Set('name', $sName.'.');
-		}
-		$sSourceDName = strtolower($this->Get('sourcedname'));
-		if (substr($sSourceDName, -1) != '.') {
-			$this->Set('sourcedname', $sSourceDName.'.');
-		}
-
-		// Check if reverse zone ends up with right arpa domain.
-		$sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
-		$this->Set('name', $sName);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	protected function OnUpdate()
-    {
-        parent::OnUpdate();
-
-        // Add '.' at the end of name and sourcedname fields if not already set
-        $sName = $this->Get('name');
-        if (substr($sName, -1) != '.') {
-            $this->Set('name', $sName . '.');
-        }
-        $sSourceDName = $this->Get('sourcedname');
-        if (substr($sSourceDName, -1) != '.') {
-            $this->Set('sourcedname', $sSourceDName . '.');
-        }
-
-        // Check if reverse zone ends up with right arpa domain.
-        $sName = $this->StraightenReverse($this->Get('mapping'), $this->Get('name'));
-        $this->Set('name', $sName);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function AfterUpdate()
-    {
-        parent::AfterUpdate();
-
-        // Recompute serial #, if relevant attribute of the zone have changed
-        $aChanges = $this->ListPreviousValuesForUpdatedAttributes();
-        if (array_key_exists('ttl', $aChanges) || array_key_exists('sourcedname', $aChanges) ||
-            array_key_exists('mbox', $aChanges) || array_key_exists('refresh', $aChanges) ||
-            array_key_exists('retry', $aChanges) || array_key_exists('expire', $aChanges) ||
-            array_key_exists('minimum', $aChanges)) {
-            $this->IncreaseSerial();
-        }
-    }
 
     /**
 	 * @inheritdoc
@@ -470,26 +409,6 @@ class _Zone extends DNSObject
 
 				default:
 					break;
-			}
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function DoCheckToWrite()
-	{
-		parent::DoCheckToWrite();
-
-		$sMapping = $this->Get('mapping');
-		$sName = $this->Get('name');
-		if ($sMapping == 'ipv4reverse') {
-			if (!$this->IsIPv4ReverseZone($sName) && !$this->IsIPv4SubClassCReverseZone($sName)) {
-				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V4:WrongFormat');
-			}
-		} elseif ($sMapping == 'ipv6reverse') {
-			if (!$this->IsIPv6ReverseZone($sName)) {
-				$this->m_aCheckIssues[] = Dict::Format('UI:ZoneManagement:Action:New:Zone:V6:WrongFormat');
 			}
 		}
 	}
