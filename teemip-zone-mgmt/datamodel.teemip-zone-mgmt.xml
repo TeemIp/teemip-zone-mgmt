@@ -193,9 +193,6 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <arguments>
-            <argument>string</argument>
-          </arguments>
           <code><![CDATA[    public function DoCheckUpdateRRs()
     {
         return array('', 'ok');
@@ -210,9 +207,6 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <arguments>
-            <argument>string</argument>
-          </arguments>
           <code><![CDATA[    public function UpdateRRs()
     {
         $sOQL = "SELECT IPv4Address WHERE subnet_id = :id";
@@ -255,9 +249,6 @@
           <static>false</static>
           <access>public</access>
           <type>Custom</type>
-          <arguments>
-            <argument>string</argument>
-          </arguments>
           <code><![CDATA[    public function UpdateRRs()
     {
         $sOQL = "SELECT IPv6Address WHERE subnet_id = :id";
