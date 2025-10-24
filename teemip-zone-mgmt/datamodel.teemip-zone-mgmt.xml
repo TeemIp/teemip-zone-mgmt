@@ -4325,7 +4325,7 @@
         </reconciliation>
       </properties>
       <fields>
-        <field id="txt" xsi:type="AttributeString">
+        <field id="txt" xsi:type="AttributeText">
           <sql>txt</sql>
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
