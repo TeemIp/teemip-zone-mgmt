@@ -133,6 +133,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:Zone/Attribute:expire+' => '',
 	'Class:Zone/Attribute:minimum' => 'Minimum',
 	'Class:Zone/Attribute:minimum+' => '',
+    'Class:Zone/Attribute:file_format' => 'File format',
+    'Class:Zone/Attribute:file_format+' => 'Format of the data file that defines the whole zone',
+    'Class:Zone/Attribute:file_format/Value:bind' => 'BIND',
 	'Class:Zone/Attribute:functionalcis_list' => 'Authoritative servers',
 	'Class:Zone/Attribute:functionalcis_list+' => 'Authoritative servers looking after the zone',
 	'Class:Zone/Tab:nsrecords_list' => 'NS records',
@@ -268,8 +271,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:yes+' => '',
 	'Class:ResourceRecord/Attribute:ttl' => 'TTL',
 	'Class:ResourceRecord/Attribute:ttl+' => 'Time To Live',
+    'Class:ResourceRecord/Attribute:zone_file_format' => 'Zone file format',
+    'Class:ResourceRecord/Attribute:zone_file_format+' => 'Format of the data file that defines the zone',
 	'ResourceRecord:Zone' => 'Zone',
 	'ResourceRecord:Record' => 'RRs attributes',
+    'ResourceRecord:RenderedInFile' => 'Representation in data file',
 ));
 
 //

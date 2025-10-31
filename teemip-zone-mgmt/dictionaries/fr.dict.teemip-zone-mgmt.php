@@ -133,6 +133,9 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:Zone/Attribute:expire+' => '',
 	'Class:Zone/Attribute:minimum' => 'Minimum',
 	'Class:Zone/Attribute:minimum+' => '',
+    'Class:Zone/Attribute:file_format' => 'Format du fichier de données',
+    'Class:Zone/Attribute:file_format+' => 'Format du fichier de données qui définit la zone complète',
+    'Class:Zone/Attribute:file_format/Value:bind' => 'BIND',
 	'Class:Zone/Attribute:functionalcis_list' => 'Serveurs autoritaires',
 	'Class:Zone/Attribute:functionalcis_list+' => 'Serveurs autoritaires en charge de la zone',
 	'Class:Zone/Tab:nsrecords_list' => 'Enregistrements NS',
@@ -267,8 +270,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:ResourceRecord/Attribute:overwrite_zone_ttl/Value:yes+' => '',
 	'Class:ResourceRecord/Attribute:ttl' => 'TTL',
 	'Class:ResourceRecord/Attribute:ttl+' => 'Time To Live',
+    'Class:ResourceRecord/Attribute:zone_file_format' => 'Format du fichier',
+    'Class:ResourceRecord/Attribute:zone_file_format+' => 'Format du fichier de données qui définit la zone',
 	'ResourceRecord:Zone' => 'Zone',
 	'ResourceRecord:Record' => 'Attributs de l\'enregistrement',
+    'ResourceRecord:RenderedInFile' => 'Représentation dans le fichier de données',
 ));
 
 //
