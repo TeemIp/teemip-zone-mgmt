@@ -1198,6 +1198,16 @@
           <default_value>use_global_config</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
+        <field id="file_format" xsi:type="AttributeEnum">
+          <sql>file_format</sql>
+          <values>
+            <value id="bind">
+              <code>bind</code>
+            </value>
+          </values>
+          <default_value>bind</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
       </fields>
       <event_listeners>
         <event_listener id="OnZoneCheckToWriteRequestedByZoneMgmt">
@@ -1317,11 +1327,14 @@
                     <item id="ttl">
                       <rank>50</rank>
                     </item>
-                    <item id="comment">
+                    <item id="file_format">
                       <rank>60</rank>
                     </item>
-                    <item id="requestor_id">
+                    <item id="comment">
                       <rank>70</rank>
+                    </item>
+                    <item id="requestor_id">
+                      <rank>80</rank>
                     </item>
                   </items>
                 </item>
@@ -1503,6 +1516,10 @@
           <extkey_attcode>zone_id</extkey_attcode>
           <target_attcode>name</target_attcode>
         </field>
+        <field id="zone_file_format" xsi:type="AttributeExternalField">
+          <extkey_attcode>zone_id</extkey_attcode>
+          <target_attcode>file_format</target_attcode>
+        </field>
         <field id="overwrite_zone_ttl" xsi:type="AttributeEnum">
           <sql>overwrite_zone_ttl</sql>
           <values>
@@ -1639,6 +1656,50 @@
    	    $sDataName = str_replace($sPrependedDomainName, "", $sOwner);
     	return $sDataName;
     }]]></code>
+        </method>
+        <method id="GetDataString">
+          <comment/>
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code><![CDATA[    public function GetDataString()
+    {
+     	return '';
+    }]]></code>
+        </method>
+        <method id="DisplayBareRelations">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[
+            public function DisplayBareRelations(WebPage $oPage, $bEditMode = false)
+            {
+            	parent::DisplayBareRelations($oPage, $bEditMode);
+
+	            if(!$bEditMode) {
+		            // Display RR data string in appropriate format at the bottom of the Properties page
+                    try{
+                        $oTwig = Combodo\iTop\Application\TwigBase\Twig\TwigHelper::GetTwigEnvironment(MODULESROOT . 'teemip-zone-mgmt/templates');
+                       $aParams = [
+                            'sDataString' => $this->GetDataString(),
+                        ];
+                        $sDataString = $oTwig->render('datastring.html.twig', $aParams);
+                    }
+                    catch(Exception $e){
+                        ExceptionLog::LogException($e, [
+                            'happened on' => 'RenderTemplate in TemplatingService.php',
+                            'error message' => $e->getMessage(),
+                        ]);
+                        return 'template error';
+                    }
+		            $oPage->add_ready_script(<<<JS
+    $('[data-attribute-code="zone_file_format"]').after(`$sDataString`);
+JS
+		            );
+	            }
+            }
+            ]]>
+          </code>
         </method>
       </methods>
       <presentation>
@@ -1885,6 +1946,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -2060,6 +2129,14 @@
                     </item>
                   </items>
                   <rank>20</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
                 </item>
               </items>
             </item>
@@ -2251,6 +2328,14 @@
                     </item>
                   </items>
                   <rank>20</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
                 </item>
               </items>
             </item>
@@ -2444,6 +2529,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -2632,6 +2725,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -2819,6 +2920,14 @@
                     </item>
                   </items>
                   <rank>20</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
                 </item>
               </items>
             </item>
@@ -3023,6 +3132,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -3216,6 +3333,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -3379,6 +3504,14 @@
                     </item>
                   </items>
                   <rank>20</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
                 </item>
               </items>
             </item>
@@ -3631,6 +3764,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -3841,6 +3982,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -4029,6 +4178,14 @@
                     </item>
                   </items>
                   <rank>20</rank>
+                </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
                 </item>
               </items>
             </item>
@@ -4224,6 +4381,14 @@
                   </items>
                   <rank>20</rank>
                 </item>
+                <item id="fieldset:ResourceRecord:RenderedInFile">
+                  <items>
+                    <item id="zone_file_format">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                  <rank>30</rank>
+                </item>
               </items>
             </item>
           </items>
@@ -4341,10 +4506,6 @@
           <target_class>TXTRecord</target_class>
           <on_target_delete>DEL_MANUAL</on_target_delete>
         </field>
-        <field id="previous_segment_name" xsi:type="AttributeExternalField">
-          <extkey_attcode>previous_segment_id</extkey_attcode>
-          <target_attcode>name</target_attcode>
-        </field>
         <field id="next_segment_id" xsi:type="AttributeExternalKey">
           <filter><![CDATA[SELECT TXTRecord AS r WHERE r.zone_id = :this->zone_id AND r.id != :this->id]]></filter>
           <dependencies>
@@ -4356,138 +4517,9 @@
           <target_class>TXTRecord</target_class>
           <on_target_delete>DEL_MANUAL</on_target_delete>
         </field>
-        <field id="next_segment_name" xsi:type="AttributeExternalField">
-          <extkey_attcode>next_segment_id</extkey_attcode>
-          <target_attcode>name</target_attcode>
-        </field>
       </fields>
-      <event_listeners>
-        <event_listener id="OnTXTRecordBeforeWriteRequestedByZoneMgmt">
-          <event>EVENT_DB_BEFORE_WRITE</event>
-          <callback>OnTXTRecordBeforeWriteRequestedByZoneMgmt</callback>
-          <rank>10</rank>
-        </event_listener>
-        <event_listener id="OnTXTRecordAfterWriteRequestedByZoneMgmt">
-          <event>EVENT_DB_AFTER_WRITE</event>
-          <callback>OnTXTRecordAfterWriteRequestedByZoneMgmt</callback>
-          <rank>10</rank>
-        </event_listener>
-        <event_listener id="OnTXTRecordAfterDeleteRequestedByZoneMgmt">
-          <event>EVENT_DB_AFTER_DELETE</event>
-          <callback>OnTXTRecordAfterDeleteRequestedByZoneMgmt</callback>
-          <rank>10</rank>
-        </event_listener>
-      </event_listeners>
+      <event_listeners/>
       <methods>
-        <method id="OnTXTRecordBeforeWriteRequestedByZoneMgmt">
-          <comment/>
-          <static>false</static>
-          <access>public</access>
-          <type>EventListener</type>
-          <code><![CDATA[    public function OnTXTRecordBeforeWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
-    {
-      // Add '"' at the front and the end of txt field if not already set
-      $sTxt = $this->Get('txt');
-      if (substr($sTxt, - 1) != '"')
-      {
-         $sTxt = $sTxt.'"';
-         if ($sTxt[0] != '"')
-         {
-            $sTxt = '"'.$sTxt;
-         }
-         $this->Set('txt', $sTxt);
-      }
-    }]]></code>
-        </method>
-        <method id="OnTXTRecordAfterWriteRequestedByZoneMgmt">
-          <comment/>
-          <static>false</static>
-          <access>public</access>
-          <type>EventListener</type>
-          <code><![CDATA[    public function OnTXTRecordAfterWriteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
-    {
-        $aEventData = $oEventData->GetEventData();
-        if ($aEventData['is_new']) {
-        	// We are in the AfterInsert situation
-        	// Set reflexive relation on previous and next records
-            if ($this->Get('previous_segment_id') > 0) {
-                $oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
-                if ($oPreviousTXTRecord) {
-                    $oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
-                    $oPreviousTXTRecord->DBUpdate();
-                }
-            }
-            if ($this->Get('next_segment_id') > 0) {
-                $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
-                if ($oNextTXTRecord) {
-                    $oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
-                    $oNextTXTRecord->DBUpdate();
-                }
-            }
-        } else {
-            $aChanges = $this->ListPreviousValuesForUpdatedAttributes();
-
-            // Update reflexive relation on previous and next records
-            if (array_key_exists('previous_segment_id', $aChanges)) {
-                if ($this->Get('previous_segment_id') > 0) {
-                    $oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
-                    if ($oPreviousTXTRecord) {
-                        $oPreviousTXTRecord->Set('next_segment_id', $this->GetKey());
-                        $oPreviousTXTRecord->DBUpdate();
-                    }
-                }
-                if ($aChanges['previous_segment_id'] > 0) {
-                    $oOldPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['previous_segment_id'], false);
-                    if ($oOldPreviousTXTRecord) {
-                        $oOldPreviousTXTRecord->Set('next_segment_id', 0);
-                        $oOldPreviousTXTRecord->DBUpdate();
-                    }
-                }
-            }
-
-            if (array_key_exists('next_segment_id', $aChanges)) {
-                if ($this->Get('next_segment_id') > 0) {
-                    $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
-                    if ($oNextTXTRecord) {
-                        $oNextTXTRecord->Set('previous_segment_id', $this->GetKey());
-                        $oNextTXTRecord->DBUpdate();
-                    }
-                }
-                if ($aChanges['next_segment_id'] > 0) {
-                    $oOldNextTXTRecord = MetaModel::GetObject('TXTRecord', $aChanges['next_segment_id'], false);
-                    if ($oOldNextTXTRecord) {
-                        $oOldNextTXTRecord->Set('previous_segment_id', 0);
-                        $oOldNextTXTRecord->DBUpdate();
-                    }
-                }
-            }
-        }
-    }]]></code>
-        </method>
-        <method id="OnTXTRecordAfterDeleteRequestedByZoneMgmt">
-          <comment/>
-          <static>false</static>
-          <access>public</access>
-          <type>EventListener</type>
-          <code><![CDATA[    public function OnTXTRecordAfterDeleteRequestedByZoneMgmt(Combodo\iTop\Service\Events\EventData $oEventData): void
-    {
-    	// Set reflexive relation on previous and next records
-    	if ($this->Get('previous_segment_id') > 0) {
-    		$oPreviousTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('previous_segment_id'), false);
-    		if ($oPreviousTXTRecord) {
-				$oPreviousTXTRecord->Set('next_segment_id', 0);
-				$oPreviousTXTRecord->DBUpdate();
-			}
-		}
-		if ($this->Get('next_segment_id') > 0) {
-    		$oNextTXTRecord = MetaModel::GetObject('TXTRecord', $this->Get('next_segment_id'), false);
-    		if ($oNextTXTRecord) {
-				$oNextTXTRecord->Set('previous_segment_id', 0);
-				$oNextTXTRecord->DBUpdate();
-			}
-		}
-    }]]></code>
-        </method>
         <method id="GetDataString">
           <comment/>
           <static>false</static>
@@ -4495,57 +4527,33 @@
           <type>Custom</type>
           <code><![CDATA[    public function GetDataString()
     {
-   		// Records that are internal segments of long (> 255 bytes) strings are not processed through the first segment
-    	if ($this->Get('previous_segment_id') != 0)  return '';
-
-	    // Handle records that host short (<= 255 bytes) strings or records that are a start for long strings
-	    $iNextSegment = $this->Get('next_segment_id');
-    	if ($iNextSegment == 0) {
-    		$stext = $this->Get('txt');
-    	} else {
-    		$stext = '('.$this->Get('txt');
-    	}
 		$sDataName = $this->GetDataNameForDataString();
 		if ($this->Get('overwrite_zone_ttl') == 'yes') {
-			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TXT        ".$stext;
+			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_TTL)." ".str_pad($this->Get('ttl'), SPACE_TTL_TO_CLASS)." IN TXT        ";
 		} else {
-			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TXT        ".$stext;
+			$sHtml = str_pad($sDataName, SPACE_OWNER_TO_CLASS)." IN TXT        ";
 		}
+
+        // Split txt attribute in 255 bytes segments
+        $aText = str_split($this->Get('txt'), TXT_RECORD_MAX_SIZE);
+        $iSizeText = sizeof($aText);
+        if ($iSizeText == 1) {
+            $sHtml .= '"'.$aText[0].'"';
+        } else {
+            $sHtml .= '("'.$aText[0].'"';
+    		for ($i = 1; $i < $iSizeText; $i++) {
+                $sHtml .= "\n".str_repeat(' ', SPACE_TO_TEXT).'"'.$aText[$i].'"';
+		    }
+		    $sHtml .= ")";
+		}
+
 		$sComment = $this->Get('comment');
 		if ($sComment == '') {
 			$sHtml .= "\n";
 		} else {
 			$sHtml = str_pad($sHtml, SPACE_TO_COMMENT)." ; ".$this->Get('comment')."\n";
 		}
-
-		if ($iNextSegment > 0) {
-			$sHtml .= $this->GetEndOfDataSegment($iNextSegment);
-		}
-
      	return $sHtml;
-    }]]></code>
-        </method>
-        <method id="GetEndOfDataSegment">
-          <comment/>
-          <static>false</static>
-          <access>private</access>
-          <type>Custom</type>
-          <code><![CDATA[    private function GetEndOfDataSegment($iNextSegment)
-    {
-        if ($iNextSegment == 0) return '';
-
-        $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $iNextSegment, false);
-        if (is_null($oNextTXTRecord)) return '';
-
-        $sHtml = str_repeat(' ', SPACE_TO_TEXT).$oNextTXTRecord->Get('txt');
-	    $iNextSegment = $oNextTXTRecord->Get('next_segment_id');
-	    if ($iNextSegment > 0) {
-	        $sHtml .= "\n".$oNextTXTRecord->GetEndOfDataSegment($iNextSegment);
-	    } else {
-	        $sHtml .= ")\n";
-	    }
-
-        return $sHtml;
     }]]></code>
         </method>
       </methods>
@@ -4585,13 +4593,10 @@
                   </items>
                   <rank>20</rank>
                 </item>
-                <item id="fieldset:TXTRecord:Chaining">
+                <item id="fieldset:ResourceRecord:RenderedInFile">
                   <items>
-                    <item id="previous_segment_id">
+                    <item id="zone_file_format">
                       <rank>10</rank>
-                    </item>
-                    <item id="next_segment_id">
-                      <rank>20</rank>
                     </item>
                   </items>
                   <rank>30</rank>
@@ -5133,6 +5138,7 @@
     <constant id="SPACE_RRTYPE_TO_PAYLOAD" xsi:type="integer" _delta="define">11</constant>
     <constant id="SPACE_TO_TEXT" xsi:type="integer" _delta="define">64</constant>
     <constant id="SPACE_TO_COMMENT" xsi:type="integer" _delta="define">120</constant>
+    <constant id="TXT_RECORD_MAX_SIZE" xsi:type="integer" _delta="define">255</constant>
   </constants>
   <snippets>
     <snippet id="TeemIpZoneMgmt" _delta="define">
