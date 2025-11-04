@@ -4654,20 +4654,14 @@ JS
             <item id="txt">
               <rank>30</rank>
             </item>
-            <item id="previous_segment_id">
+            <item id="zone_id">
               <rank>40</rank>
             </item>
-            <item id="next_segment_id">
+            <item id="comment">
               <rank>50</rank>
             </item>
-            <item id="zone_id">
-              <rank>60</rank>
-            </item>
-            <item id="comment">
-              <rank>70</rank>
-            </item>
             <item id="org_id">
-              <rank>80</rank>
+              <rank>60</rank>
             </item>
           </items>
         </list>
