@@ -132,6 +132,46 @@ if (!class_exists('ZoneManagementInstaller')) {
 				SetupLog::Info("Module teemip-zone-mgmt: migration done");
 			}
 
+            // Set TXT records to new format where txt attribute is contained in a AttributeText
+            if (version_compare($sCurrentVersion, '3.3.0-dev', '>=') && version_compare($sPreviousVersion, '3.3.0', '<')) {
+                SetupLog::Info("Module teemip-zone-mgmt: align TXT records to new handling method");
+
+                // Remove surrounding " chars
+                $aTXTRecordsSet = new CMDBObjectSet(DBObjectSearch::FromOQL("SELECT TXTRecord"));
+                while ($oTXTRecord = $aTXTRecordsSet->Fetch()) {
+                    $sTxt = $oTXTRecord->Get('txt');
+                    if ((substr($sTxt, 0, 1) == '"') && (substr($sTxt, -1) == '"')) {
+                        $sTxt = substr($sTxt, 0, -1);
+                        $sTxt = substr($sTxt, 1);
+                        $oTXTRecord->Set('txt', $sTxt);
+                        $oTXTRecord->DBUpdate();
+                    }
+                }
+
+                // Remove chains
+                $sOQL = "SELECT TXTRecord AS tr WHERE tr.previous_segment_id = 0 AND tr.next_segment_id > 0";
+                $aTXTRecordsSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL));
+                while ($oTXTRecord = $aTXTRecordsSet->Fetch()) {
+                    $sTxt = $oTXTRecord->Get('txt');
+                    $iNextTXTRecord = $oTXTRecord->Get('next_segment_id');
+                    while ($iNextTXTRecord > 0) {
+                        $oNextTXTRecord = MetaModel::GetObject('TXTRecord', $iNextTXTRecord);
+                        if ($oNextTXTRecord) {
+                            $sTxt .= $oNextTXTRecord->Get('txt');
+                            $iNextTXTRecord = $oNextTXTRecord->Get('next_segment_id');
+                            $oNextTXTRecord->DBDelete();
+                        } else {
+                            $iNextTXTRecord = 0;
+                        }
+                    }
+                    $oTXTRecord->Set('txt', $sTxt);
+                    $oTXTRecord->Set('next_segment_id', 0);
+                    $oTXTRecord->DBUpdate();
+                }
+
+                SetupLog::Info("Module teemip-zone-mgmt: migration done");
+            }
+
 			// Load audit category and rules related to the module
 			if (version_compare($sPreviousVersion, $sCurrentVersion, '!=')) {
 				$oDataLoader = new XMLDataLoader();
