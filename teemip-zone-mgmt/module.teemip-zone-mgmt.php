@@ -137,7 +137,8 @@ if (!class_exists('ZoneManagementInstaller')) {
                 SetupLog::Info("Module teemip-zone-mgmt: align TXT records to new handling method");
 
                 // Remove surrounding " chars
-                $aTXTRecordsSet = new CMDBObjectSet(DBObjectSearch::FromOQL("SELECT TXTRecord"));
+                $sOQL = "SELECT TXTRecord AS tr1 WHERE tr1.id NOT IN (SELECT TXTRecord AS tr2 JOIN SynchroReplica AS sr ON sr.dest_id=tr2.id)";
+                $aTXTRecordsSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL));
                 while ($oTXTRecord = $aTXTRecordsSet->Fetch()) {
                     $sTxt = $oTXTRecord->Get('txt');
                     if ((substr($sTxt, 0, 1) == '"') && (substr($sTxt, -1) == '"')) {
@@ -149,7 +150,7 @@ if (!class_exists('ZoneManagementInstaller')) {
                 }
 
                 // Remove chains
-                $sOQL = "SELECT TXTRecord AS tr WHERE tr.previous_segment_id = 0 AND tr.next_segment_id > 0";
+                $sOQL = "SELECT TXTRecord AS tr1 WHERE (tr1.previous_segment_id = 0) AND (tr1.next_segment_id > 0) AND (tr1.id NOT IN (SELECT TXTRecord AS tr2 JOIN SynchroReplica AS sr ON sr.dest_id=tr2.id))";
                 $aTXTRecordsSet = new CMDBObjectSet(DBObjectSearch::FromOQL($sOQL));
                 while ($oTXTRecord = $aTXTRecordsSet->Fetch()) {
                     $sTxt = $oTXTRecord->Get('txt');
