@@ -7,7 +7,7 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'teemip-zone-mgmt/3.3.0-dev',
+	'teemip-zone-mgmt/3.3.0',
 	array(
 		// Identification
 		//
@@ -133,7 +133,7 @@ if (!class_exists('ZoneManagementInstaller')) {
 			}
 
             // Set TXT records to new format where txt attribute is contained in a AttributeText
-            if (version_compare($sCurrentVersion, '3.3.0-dev', '>=') && version_compare($sPreviousVersion, '3.3.0', '<')) {
+            if (version_compare($sCurrentVersion, '3.3.0', '>=') && version_compare($sPreviousVersion, '3.3.0', '<')) {
                 SetupLog::Info("Module teemip-zone-mgmt: align TXT records to new handling method");
 
                 // Remove surrounding " chars
